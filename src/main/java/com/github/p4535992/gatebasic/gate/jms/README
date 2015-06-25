@@ -1,0 +1,77 @@
+I based it on the sample at
+https://github.com/spring-projects/spring-boot/tree/master/spring-boot-samples/spring-boot-sample-activemq,
+adding a couple of dependencies (gate-core and commons-pool).  I used
+GATE's Spring support to load the GATE application, essentially:
+
+src/main/resources/gate-beans.xml
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:gate="http://gate.ac.uk/ns/spring"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://gate.ac.uk/ns/spring
+         http://gate.ac.uk/ns/spring.xsd">
+
+  <gate:init gate-home.home="${gate.home.home}"/>
+
+  <gate:duplicate id="gateApplication" return-template="true">
+    <gate:saved-application location="${gate.application}" />
+  </gate:duplicate>
+
+  <bean id="documentProcessor"
+      class="gate.util.LanguageAnalyserDocumentProcessor">
+    <property name="analyser" ref="gateApplication" />
+    <gate:pooled-proxy max-size="${gate.numThreads}"
+initial-size="${gate.numThreads}" />
+  </bean>
+</beans>
+
+src/main/java/com/example/GateApp.java
+
+@SpringBootApplication
+@EnableJms
+@ImportResource("/gate-beans.xml")
+public class GateApp {
+
+  public static void main(String... args) {
+    SpringApplication.run(GateApp.class, args);
+  }
+}
+
+src/main/java/com/example/GateProcessor.java
+
+@Component
+public class GateProcessor {
+
+  @Autowired
+  private DocumentProcessor documentProcessor;
+
+  @JmsListener(destination = "${gate.queueName}", concurrency =
+"${gate.numThreads}")
+  public void receive(String message) {
+    try {
+      Document doc = Factory.newDocument(message);
+      try {
+        documentProcessor.processDocument(doc);
+        // do whatever you need to do with the results
+      } finally {
+        Factory.deleteResource(doc);
+      }
+    } catch(Exception e) {
+      // handle the exception somehow
+    }
+  }
+}
+
+
+
+You can put settings in application.properties to configure the message
+broker
+(http://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-messaging.html#boot-features-activemq),
+and then run the finished app with
+
+java -Xmx6G -jar appname-0.1-SNAPSHOT.jar --gate.home.home=file:/path/to/gate
+--gate.queueName=nameOfQueue
+--gate.application=file:/path/to/saved/file.xgapp --gate.numThreads=4
