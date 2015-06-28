@@ -94,7 +94,8 @@ public class Gate8Handler implements HttpRequestHandler {
 
   /**
    * good manners to clean it up ourselves though this isn’t
-   * necessary when using <gate:duplicate>
+   * necessary when using gate:duplicate
+   * @throws java.lang.Exception error.
    */
   public void destroy() throws Exception {
        cleanup();
@@ -162,6 +163,9 @@ public class Gate8Handler implements HttpRequestHandler {
 
   /**
    * Render the document's features in an HTML table.
+   * @param doc gate document.
+   * @param response response htttp message.
+   * @throws IOException error.
    */
   private void successMessage(Document doc, HttpServletResponse response)throws IOException {
     response.setContentType("text/html");
@@ -184,8 +188,12 @@ public class Gate8Handler implements HttpRequestHandler {
   }
 
   /**
-   * Simple org.p4535992.mvc.error handler - you would obviously use something more
+   * Simple errorhandler - you would obviously use something more
    * sophisticated in a real application.
+   * @param message string message.
+   * @param e exception .
+   * @param response response htttp.
+   * @throws IOException error.
    */
   private void failureMessage(String message, Exception e,
           HttpServletResponse response) throws IOException {

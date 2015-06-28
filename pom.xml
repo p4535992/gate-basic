@@ -77,9 +77,10 @@
         <!-- SPRING FRAMEWORK -->
         <io.spring.platform-version>1.1.2.RELEASE</io.spring.platform-version>
         <org.springframework.version>4.1.6.RELEASE</org.springframework.version>
-        <!-- Apache -->
-        <org.apache.httpcomponents.version>4.4.1</org.apache.httpcomponents.version>
-        <org.apache.commons.version>2.0</org.apache.commons.version>
+        <!-- DATABASE DRIVER -->
+        <mysql-connector-java.version>5.1.35</mysql-connector-java.version>
+        <!-- UTILITY -->
+        <com.github.p4535992.utility>1.2</com.github.p4535992.utility>
     </properties>
 
     <dependencyManagement>
@@ -110,7 +111,7 @@
         <dependency>
             <groupId>com.github.p4535992</groupId>
             <artifactId>utility</artifactId>
-            <version>1.1</version>
+            <version>${com.github.p4535992.utility}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -132,32 +133,15 @@
         <dependency>
             <groupId>uk.ac.gate</groupId>
             <artifactId>gate-core</artifactId>
-            <version>${gate.version}</version>
         </dependency>
 
-       <!-- <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                &lt;!&ndash;<exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                </exclusion>&ndash;&gt;
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql-connector-java.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
-      <!--  <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-log4j</artifactId>
-        </dependency>-->
 
         <!-- Spring JMS and Support -->
         <dependency>
@@ -166,19 +150,14 @@
             <version>${org.springframework.version}</version>
         </dependency>
 
-        <!--<dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jms_1.1_spec</artifactId>
-            <version>1.1.1</version>
-        </dependency>-->
 
-       <!-- <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-all</artifactId>
-            <version>5.11.1</version>
-        </dependency>-->
-
-        <!-- LOGBACK -->
+        <!-- LOGGING -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>${commons-logging.version}</version>
+            <scope>provided</scope>
+        </dependency>
        <!-- <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
@@ -213,11 +192,7 @@
             <artifactId>spring-web</artifactId>
             <version>${org.springframework.version}</version>
         </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>${commons-logging.version}</version>
-        </dependency>
+
     </dependencies>
 
 

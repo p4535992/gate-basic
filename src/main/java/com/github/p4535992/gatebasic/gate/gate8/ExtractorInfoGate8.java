@@ -51,6 +51,10 @@ public class ExtractorInfoGate8 {
      */
     public void setCorpus(Corpus corpus, CorpusController controller) {controller.setCorpus(corpus);} // setCorpus
 
+    public Corpus getCorpus() {
+        return corpus;
+    }
+
     /**
      * Run GATE.
      * @param controller corpus controller gate to set.
@@ -87,7 +91,7 @@ public class ExtractorInfoGate8 {
      * @param nameCorpus (optional) name of the corpus gate.
      * @param nameAnnotations (optional) list of annotation you want to get from the document.
      * @param nameAnnotationsSet (optional) list of annotationSet you want to get from the document
-     *                           if {@param firstAndExit} is true the list priority is given from the
+     *                           if param firstAndExit is true the list priority is given from the
      *                           index so the first element has more priority of the others element.
      * @param firstAndExit if true stop searching on other AnnotationSet hte same AnnotationType.
      * @return a map with all the string value you intend to extract from the document.
@@ -130,7 +134,7 @@ public class ExtractorInfoGate8 {
      * @param nameCorpus (optional) name of the corpus gate.
      * @param nameAnnotations (optional) list of annotation you want to get from the document.
      * @param nameAnnotationsSet (optional) list of annotationSet you want to get from the document
-     *                           if {@param firstAndExit} is true the list priority is given from the
+     *                           if param firstAndExit is true the list priority is given from the
      *                           index so the first element has more priority of the others element.
      * @param firstAndExit if true stop searching on other AnnotationSet hte same AnnotationType.
      * @return a map with all the string value you intend to extract from the document.
@@ -174,7 +178,7 @@ public class ExtractorInfoGate8 {
      * @param nameCorpus (optional) name of the corpus gate.
      * @param nameAnnotations (optional) list of annotation you want to get from the document.
      * @param nameAnnotationsSet (optional) list of annotationSet you want to get from the document
-     *                           if {@param firstAndExit} is true the list priority is given from the
+     *                           if param firstAndExit is true the list priority is given from the
      *                           index so the first element has more priority of the others element.
      * @param firstAndExit if true stop searching on other AnnotationSet hte same AnnotationType.
      * @return a map with all the string value you intend to extract from the documents.
@@ -184,20 +188,15 @@ public class ExtractorInfoGate8 {
             List<String> nameAnnotationsSet,boolean firstAndExit) {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         try{
-            for(URL url : listUrl) {
-                if (url != null) {
-                    SystemLog.message("Execute of GATE in process for the url " + url + "...");
-                    if (StringKit.isNullOrEmpty(nameCorpus)) {
-                        corpus = gc8.createCorpusByUrl(url, "GeoDocuments Corpus");
-                    } else {
-                        corpus = gc8.createCorpusByUrl(url, nameCorpus);
-                    }
-                }//if url!=null
+            SystemLog.message("Execute of GATE in process for a list of  " + listUrl.size() + " urls...");
+            if (StringKit.isNullOrEmpty(nameCorpus)) {
+                corpus = gc8.createCorpusByUrl(listUrl, "GeoDocuments Corpus");
+            } else {
+                corpus = gc8.createCorpusByUrl(listUrl, nameCorpus);
             }
             if(corpus == null){return null;}
             else{
                 setCorpus(corpus, controller);
-
                 execute(controller);
                 SystemLog.message("...GATE is been processed");
                 SystemLog.message("Work with the annotations...");
@@ -220,7 +219,7 @@ public class ExtractorInfoGate8 {
      * @param nameCorpus (optional) name of the corpus gate.
      * @param nameAnnotations (optional) list of annotation you want to get from the document.
      * @param nameAnnotationsSet (optional) list of annotationSet you want to get from the document
-     *                           if {@param firstAndExit} is true the list priority is given from the
+     *                           if param firstAndExit is true the list priority is given from the
      *                           index so the first element has more priority of the others element.
      * @param firstAndExit if true stop searching on other AnnotationSet hte same AnnotationType.
      * @return a map with all the string value you intend to extract from the documents.
@@ -231,7 +230,6 @@ public class ExtractorInfoGate8 {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         Document doc = new DocumentImpl();
         try{
-
             if (StringKit.isNullOrEmpty(nameCorpus)) {
                 corpus = Factory.newCorpus("GeoDocuments Corpus");
             } else {
@@ -290,7 +288,7 @@ public class ExtractorInfoGate8 {
      * @param nameCorpus (optional) name of the corpus gate.
      * @param nameAnnotations (optional) list of annotation you want to get from the document.
      * @param nameAnnotationsSet (optional) list of annotationSet you want to get from the document
-     *                           if {@param firstAndExit} is true the list priority is given from the
+     *                           if param firstAndExit is true the list priority is given from the
      *                           index so the first element has more priority of the others element.
      * @param firstAndExit if true stop searching on other AnnotationSet hte same AnnotationType.
      * @return a map with all the string value you intend to extract from the document.
@@ -298,7 +296,6 @@ public class ExtractorInfoGate8 {
     public Map<String,Map<String,Map<String,String>>> extractorGATE(
             File fileOrDirectory, CorpusController controller,String nameCorpus,List<String> nameAnnotations,
             List<String> nameAnnotationsSet,boolean firstAndExit) {
-
         if(FileUtil.isDirectory(fileOrDirectory)){
             List<File> listFiles = FileUtil.readDirectory(fileOrDirectory);
             List<URL> listUrl = new ArrayList<>();
@@ -330,7 +327,7 @@ public class ExtractorInfoGate8 {
      * @param nameCorpus (optional) name of the corpus gate.
      * @param nameAnnotations (optional) list of annotation you want to get from the document.
      * @param nameAnnotationsSet (optional) list of annotationSet you want to get from the document
-     *                           if {@param firstAndExit} is true the list priority is given from the
+     *                           if param firstAndExit is true the list priority is given from the
      *                           index so the first element has more priority of the others element.
      * @param firstAndExit if true stop searching on other AnnotationSet hte same AnnotationType.
      * @return a map with all the string value you intend to extract from the document.
@@ -348,6 +345,7 @@ public class ExtractorInfoGate8 {
                 } catch (MalformedURLException e) {
                     SystemLog.warning(e.getMessage());
                 }
+
             }
             return extractorGATE(listUrl, docProcessor,nameCorpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
         }else{
@@ -372,67 +370,4 @@ public class ExtractorInfoGate8 {
         }
     }
 
-    /*
-     * Method for convert a extrator gate information to a GeoDocument.
-     * @param mapExtractor map of informations estract from gate.
-     * @param url url of the web page.
-     * @return a geodocument fulled with information.
-     */
-    /*public GeoDocument convertMapExtractorToGeoDocument(Map<String,Map<String,String>> mapExtractor,String url){
-        GeoDocument geoDoc = new GeoDocument();
-        try {
-            geoDoc.setUrl(new URL(url));
-            for(Map.Entry<String,Map<String,String>> entryAnnSet: mapExtractor.entrySet()){
-                Map<String,String> entryAnn = entryAnnSet.getValue();
-                for(Map.Entry<String,String> entry: entryAnn.entrySet()){
-                    switch (entry.getKey()){
-                        case "MyRegione":{
-                            if(!StringKit.isNullOrEmpty(entry.getValue()) &&
-                               StringKit.isNullOrEmpty(geoDoc.getRegione())) {
-                                geoDoc.setRegione(entry.getValue());
-                            }
-                        }
-                        case "MyPhone":
-                            if(!StringKit.isNullOrEmpty(entry.getValue()) &&
-                                    StringKit.isNullOrEmpty(geoDoc.getTelefono())) {
-                                geoDoc.setTelefono(entry.getValue());
-                            }
-                        case "MyFax":
-                            if(!StringKit.isNullOrEmpty(entry.getValue()) &&
-                                    StringKit.isNullOrEmpty(geoDoc.getFax())) {
-                                geoDoc.setFax(entry.getValue());
-                            }
-                        case "MyEmail":
-                            if(!StringKit.isNullOrEmpty(entry.getValue()) &&
-                                    StringKit.isNullOrEmpty(geoDoc.getEmail())) {
-                                geoDoc.setEmail(entry.getValue());
-                            }
-                        case "MyPartitaIVA":
-                            if(!StringKit.isNullOrEmpty(entry.getValue()) &&
-                                    StringKit.isNullOrEmpty(geoDoc.getIva())) {
-                                geoDoc.setIva(entry.getValue());
-                            }
-                        case "MyLocalita":
-                            if(!StringKit.isNullOrEmpty(entry.getValue()) &&
-                                    StringKit.isNullOrEmpty(geoDoc.getCity())) {
-                                geoDoc.setCity(entry.getValue());
-                            }
-                        case "MyIndirizzo":
-                            if(!StringKit.isNullOrEmpty(entry.getValue()) &&
-                                    StringKit.isNullOrEmpty(geoDoc.getIndirizzo())) {
-                                geoDoc.setIndirizzo(entry.getValue());
-                            }
-                        case "MyEdificio":
-                            if(!StringKit.isNullOrEmpty(entry.getValue()) &&
-                                    StringKit.isNullOrEmpty(geoDoc.getEdificio())) {
-                                geoDoc.setEdificio(entry.getValue());
-                            }
-                    }//switch
-                }
-            }
-        } catch (MalformedURLException e) {
-            SystemLog.exception(e);
-        }
-        return geoDoc;
-    }*/
 }

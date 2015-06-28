@@ -24,7 +24,7 @@ import java.util.*;
 @SuppressWarnings("unused")
 public class Gate8Kit {
 
-    private static org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(Gate8Kit.class);
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(Gate8Kit.class);
 
     /** The Corpus Pipeline application to contain ANNE,Lingpipe,Tools,ecc. */
     private boolean showGate;
@@ -101,6 +101,8 @@ public class Gate8Kit {
      * @param configFileUser path to the file configuration of user gate eg user.xml.
      * @param configFileSession path to the file configuration of where write and save the session of GATE eg gate.session
      *                          if null is stoed on the user folder on the system.
+     * @param gappFile sting absolute path to the file gapp.
+     * @return the gate controller full setted.
      */
     public Controller setUpGateEmbedded(String directoryFolderHome,String directoryFolderPlugin,
                             String configFileGate,String configFileUser,String configFileSession,String gappFile){
@@ -230,13 +232,16 @@ public class Gate8Kit {
             procDoc = BeansKit.getBeanFromContext("documentProcessor",DocumentProcessor.class,ctx);
             procDoc = BeansKit.getBeanFromContext(idBeanDocumentProcessor,DocumentProcessor.class,ctx);
         } catch (IOException e) {
-            e.printStackTrace();
+            SystemLog.exception(e);
         }
         return procDoc;
     }
 
-
-    public class SortedAnnotationList extends Vector {
+    /**
+     * Class for sort the annotation in a list.
+     */
+    public class SortedAnnotationList extends Vector<Annotation> {
+        private static final long serialVersionUID = 15L;
         public SortedAnnotationList() {
             super();
         } // SortedAnnotationList
@@ -259,7 +264,7 @@ public class Gate8Kit {
             long currStart;
             // insert
             for (int i=0; i < size(); ++i) {
-                currAnot = (Annotation) get(i);
+                currAnot = get(i);
                 currStart = currAnot.getStartNode().getOffset();
                 if(annotStart < currStart) {
                     super.insertElementAt(annot, i);
@@ -287,14 +292,14 @@ public class Gate8Kit {
     public void createXMLFileForEachDoc(Corpus corpus,List<String> addAnnotTypesRequired,File directory) throws IOException{
         // for each document, get an XML document with the person,location,MyGeo names added
         String pathDir = FileUtil.path(directory);
-        Iterator iter = corpus.iterator();
+        Iterator<Document> iter = corpus.iterator();
         int count = 0;
         String startTagPart_1 = "<span GateID=\"";
         String startTagPart_2 = "\" title=\"";
         String startTagPart_3 = "\" style=\"background:Red;\">";
         String endTag = "</span>";
         while(iter.hasNext()) {
-            Document doc = (Document) iter.next();
+            Document doc = iter.next();
             AnnotationSet defaultAnnotSet = doc.getAnnotations();
             Set<String> annotTypesRequired = new HashSet<>();
             for (String s : addAnnotTypesRequired) {
@@ -331,7 +336,7 @@ public class Gate8Kit {
                 System.out.println("Sorted annotations count: "+sortedAnnotations.size());
                 if(newSetAnnotation.size()>0 && sortedAnnotations.size()>0){
                     for(int i=sortedAnnotations.size()-1; i>=0; --i) {
-                        currAnnot = (Annotation) sortedAnnotations.get(i);
+                        currAnnot = sortedAnnotations.get(i);
                         insertPositionStart =
                                 currAnnot.getStartNode().getOffset();
                         insertPositionStart = info.getOriginalPos(insertPositionStart);
@@ -349,9 +354,9 @@ public class Gate8Kit {
                         } // if
                     } // for
                 }// if size
-                FileWriter writer = new FileWriter(directory);
-                writer.write(editableContent.toString());
-                writer.close();
+                try (FileWriter writer = new FileWriter(directory)) {
+                    writer.write(editableContent.toString());
+                }
             } // if - should generate
             else if (originalContent != null) {
                 System.out.println("OrigContent existing. Generate file...");
@@ -373,7 +378,7 @@ public class Gate8Kit {
                 SystemLog.message("Sorted annotations count: " + sortedAnnotations.size());
                 if(newSetAnnotation.size()>0 && sortedAnnotations.size()>0){
                     for(int i=sortedAnnotations.size()-1; i>=0; --i) {
-                        currAnnot = (Annotation) sortedAnnotations.get(i);
+                        currAnnot = sortedAnnotations.get(i);
                         insertPositionStart = currAnnot.getStartNode().getOffset();
                         insertPositionEnd = currAnnot.getEndNode().getOffset();
                         if(insertPositionEnd != -1 && insertPositionStart != -1) {
@@ -388,9 +393,9 @@ public class Gate8Kit {
                         } // if
                     } // for
                 }//if size
-                FileWriter writer = new FileWriter(directory);
-                writer.write(editableContent.toString());
-                writer.close();
+                try (FileWriter writer = new FileWriter(directory)) {
+                    writer.write(editableContent.toString());
+                }
             }
             else {
                 SystemLog.message("Content : " + doc.getContent().toString());
@@ -401,9 +406,9 @@ public class Gate8Kit {
             String fileName = "("+count+")"+doc.getName()+".xml";
             //File dir2 = new File ("gate_files");
             File actualFile = new File (fileName);
-            FileWriter writer2 = new FileWriter(actualFile);
-            writer2.write(xmlDocument);
-            writer2.close();
+            try (FileWriter writer2 = new FileWriter(actualFile)) {
+                writer2.write(xmlDocument);
+            }
         }
     }
 

@@ -16,7 +16,7 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 public class GateCorpus8Kit {
-    private static org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger( GateCorpus8Kit.class);
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger( GateCorpus8Kit.class);
     private Document doc;
     public Corpus getCorpus() {
         return corpus;
@@ -65,7 +65,7 @@ public class GateCorpus8Kit {
     * @throws  IOException error.
     * @throws  ResourceInstantiationException error.
     */  
-    public Corpus createCorpusByListOfUrls(List<URL> listUrl,String nomeCorpus) throws IOException, ResourceInstantiationException{
+    public Corpus createCorpusByUrl(List<URL> listUrl,String nomeCorpus) throws IOException, ResourceInstantiationException{
         corpus = Factory.newCorpus(nomeCorpus);
         Integer indice = 0;
         for (URL url : listUrl) {
@@ -149,8 +149,8 @@ public class GateCorpus8Kit {
     public Corpus createCorpusByDocument(List<Document> listDoc,String nomeCorpus)
             throws ResourceInstantiationException{
         corpus = Factory.newCorpus(nomeCorpus);
-        for(Document doc: listDoc) {
-            corpus.add(doc);//add a document to the corpus
+        for(Document document: listDoc) {
+            corpus.add(document);//add a document to the corpus
         }
         SystemLog.message("Loaded a corpus of: "+corpus.size()+" files");
         return corpus;
@@ -176,6 +176,8 @@ public class GateCorpus8Kit {
      * Method for load a Corpus Gate on a Gate DataStore.
      * @param corpus corpus gate to save.
      * @param datastore datastore gate where save the corpus.
+     * @throws gate.persist.PersistenceException throw if any error is occurred.
+     * @throws gate.creole.ResourceInstantiationException throw if any error is occurred.
      */
     public void loadCorpusOnADataStore(Corpus corpus,GateDataStore8Kit datastore)
             throws PersistenceException, ResourceInstantiationException {
@@ -251,7 +253,7 @@ public class GateCorpus8Kit {
         try {
             doc = Factory.newDocument(message);
         } catch (ResourceInstantiationException e) {
-            e.printStackTrace();
+            SystemLog.exception(e);
         }
         return doc;
     }
@@ -266,7 +268,7 @@ public class GateCorpus8Kit {
         try {
             doc = Factory.newDocument(url);
         } catch (ResourceInstantiationException e) {
-            e.printStackTrace();
+            SystemLog.exception(e);
         }
         return doc;
     }
@@ -282,7 +284,7 @@ public class GateCorpus8Kit {
         try {
             doc = Factory.newDocument(url,encoding);
         } catch (ResourceInstantiationException e) {
-            e.printStackTrace();
+           SystemLog.exception(e);
         }
         return doc;
     }

@@ -3,21 +3,21 @@ package com.github.p4535992.gatebasic.gate.gate8;
 import com.github.p4535992.util.log.SystemLog;
 import com.github.p4535992.util.string.StringKit;
 import gate.*;
-import gate.annotation.AnnotationImpl;
+
 
 import java.util.*;
 
 /**
  * Estrai il contenuto dell annotazioni
  * semantiche da ogni documento del Corpus Struttura il contenuto in un oggetto
- * Java Keyword Per ogni documento da cui è estratta una Keyword inseriamo la
+ * Java Keyword Per ogni documento da cui Ã¨ estratta una Keyword inseriamo la
  * Keyword in una lista da utilizzare successivamente per lt'inserimento nel
  * database.
  */
 @SuppressWarnings("unused")
 public class GateAnnotation8Kit {
 
-    private static org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GateAnnotation8Kit.class);
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GateAnnotation8Kit.class);
 
     private static GateAnnotation8Kit instance = null;
     protected GateAnnotation8Kit(){}
@@ -38,12 +38,12 @@ public class GateAnnotation8Kit {
      * @return map of all the contnet of all annotation of all annotationSet on the document.
      */
      public Map<String,Map<String,Map<String,String>>> getAllAnnotationInfo(Corpus corpus, List<String> listNameAnnotation,List<String> listNameAnnotationSet,boolean firstAndExit) {
-         Iterator iter = corpus.iterator();
+         Iterator<Document> iter = corpus.iterator();
          Map<String,Map<String,Map<String,String>>> mapDocs = new HashMap<>();
          Map<String,Map<String,String>> mapAnnSet = new HashMap<>(); //AnnotationSet -> Annotation,Content
          Map<String,String> mapAnn = new HashMap<>();
          while (iter.hasNext()) {
-            Document document = (Document) iter.next();
+            Document document = iter.next();
             //URL url = document.getSourceUrl();
             //String lang = doc.getFeatures().get("LanguageType").toString();
             int size = mapAnnSet.size();
@@ -54,7 +54,7 @@ public class GateAnnotation8Kit {
              }
              Map<String,AnnotationSet> mapAnnotationSet = document.getNamedAnnotationSets();
              for(String nameAnnotationSet : listNameAnnotationSet){
-                 if(StringKit.isMapEntryNullOrInexistent(mapAnnotationSet,nameAnnotationSet)){
+                 if(isMapValueNullOrInexistent(mapAnnotationSet,nameAnnotationSet)){
                      continue;
                  }
                  AnnotationSet annSet =  mapAnnotationSet.get(nameAnnotationSet);
@@ -66,7 +66,7 @@ public class GateAnnotation8Kit {
                      //set a empty string for avoid the NullPointerException...
                      mapAnn.put(nameAnnotation,"");
                  }
-                 List<Annotation> listAnnotation = annSet.inDocumentOrder();
+                 //List<Annotation> listAnnotation = annSet.inDocumentOrder();
                  mapAnnSet.put(nameAnnotationSet,mapAnn);
              }
 
@@ -109,8 +109,8 @@ public class GateAnnotation8Kit {
         try {
             AnnotationSet annSet = getAnnotationSetFromDoc(nameAnnotationSet, document);
             //SystemLog.message("Get content of the Annotation " + nameAnnotation + " on the AnnotationSet " + annSet.getName() + "...");
-            //content = getContentLongestFromAnnnotationsOnAnnotationSet(document, nameAnnotation, annSet);
-            Annotation newAnn = null;
+            //content = getContentLongestFromAnnnotationsOnAnnotationSet(document, nameAnnotation, annSet);         
+            Annotation newAnn;
             for(Annotation ann: annSet){
                 if(ann.getType().equals(nameAnnotation)){
                     newAnn = ann;
@@ -122,15 +122,10 @@ public class GateAnnotation8Kit {
                 content ="";
             }else{
                 content = StringKit.cleanStringHTML(content);
-            }
-            //SystemLog.message("... has content:" + content);
-
-            //SystemLog.message("2)Get content of the Annotation " + nameAnnotation + " on the AnnotationSet " + annSet.getName() + "...");
+            }          
             //content =  getContentLastSingleAnnotationOnAnnotationSet(document, nameAnnotation, annSet);
-            //SystemLog.message("... Content:" + content);
-
         }catch(NullPointerException ne){
-            //SystemLog.warning("The AnnotationSet "+nameAnnotationSet+" not have a single annotation for this document to the url: "+ document.getSourceUrl());
+            SystemLog.warning("The AnnotationSet "+nameAnnotationSet+" not have a single annotation for this document to the url: "+ document.getSourceUrl());
         }
         return content;
     }
@@ -139,7 +134,7 @@ public class GateAnnotation8Kit {
         List<Object> list = new ArrayList<>();
         // obtain the Original markups annotation set
         AnnotationSet origMarkupsSet = doc.getAnnotations("Original markups");
-        // obtain annotations of type ’a’
+        // obtain annotations of type â€™aâ€™
         AnnotationSet anchorSet = origMarkupsSet.get("a");
         // iterate over each annotation
         // obtain its features and print the value of href feature
@@ -149,7 +144,7 @@ public class GateAnnotation8Kit {
             String valueAnn = (String) anchor.getFeatures().get(annotatioName);
             if(valueAnn != null) {
                 //URL uHref=new URL(doc.getSourceUrl(), href);
-                // resolving href value against the document’s url
+                // resolving href value against the documentâ€™s url
                 if(!(list.contains(valueAnn)))list.add(valueAnn);
             }//if
         }//for anchor
@@ -337,6 +332,22 @@ public class GateAnnotation8Kit {
         }//for setName
         return annotTypes;
     }*/
+    
+    public static <K,V> boolean isMapValueNullOrInexistent(Map<K,V> map,K key){
+        V value = map.get(key);
+        if (value != null) {
+            return false;
+        } else {
+            // Key might be present...
+            if (map.containsKey(key)) {
+                // Okay, there's a key but the value is null
+                return true;
+            } 
+            // Definitely no such key 
+            return true;
+            
+        }
+    }
 
 }//ManageAnnotationAndContent.java
 
