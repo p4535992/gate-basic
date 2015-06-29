@@ -65,14 +65,14 @@ You can the dependency to this github repository With jitpack (https://jitpack.i
 <!-- Put the Maven coordinates in your HTML: -->
  <pre class="prettyprint">&lt;dependency&gt;
   &lt;groupId&gt;com.github.p4535992&lt;/groupId&gt;
-  &lt;artifactId&gt;gateBasic&lt;/artifactId&gt;
+  &lt;artifactId&gt;gate-basic&lt;/artifactId&gt;
   &lt;version&gt;<span id="latest_release">1.3</span>&lt;/version&gt;
 &lt;/dependency&gt;  </pre>
 
 <!-- Add this script to update "latest_release" span to latest version -->
 <script>
       var user = 'p4535992'; // Replace with your user/repo
-      var repo = 'gateBasic'
+      var repo = 'gate-basic'
 
       var xmlhttp = new XMLHttpRequest();
       xmlhttp.onreadystatechange = function() {
