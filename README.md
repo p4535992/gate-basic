@@ -8,6 +8,7 @@ NOTE: I'm not a expert programmer so any suggestion or advise is welcome.
 
 Example code 1, extract information with gate:
 ```java
+
     //Init Gate Embedded
     Gate8Kit gate8 = Gate8Kit.getInstance();
     controller = gate8.setUpGateEmbedded("gate_files", "plugins", "gate.xml", "user-gate.xml", "gate.session",
@@ -31,6 +32,7 @@ Example code 1, extract information with gate:
     String content1 = support.getContent(0,"MyAnnSet", "MyIndirizzo");
     String content2 = support.getContent(0,0,"MyIndirizzo");
     String content3 = support.getContent(0,0,0); 
+    
 ```
 Example code 2, set up Gate embedded to the project with API GATE.
 Note: By default the base directory is given from "System.getProperty("user.dir")" the root folder of the project, if
@@ -44,6 +46,7 @@ you want change ou must invoke setBaseDirectory(String pathToTheDirectory) befor
                     "application_test1.xgapp");
     ExtractorInfoGate8 eig8 = ExtractorInfoGate8.getInstance();
     eig8 =...
+    
 ```
 Example code 3, set up Gate embedded to the project with Spring Framework (the parameter class just help us to find the
 resources file).
@@ -63,7 +66,7 @@ You can the dependency to this github repository With jitpack (https://jitpack.i
  <pre class="prettyprint">&lt;dependency&gt;
   &lt;groupId&gt;com.github.p4535992&lt;/groupId&gt;
   &lt;artifactId&gt;gateBasic&lt;/artifactId&gt;
-  &lt;version&gt;<span id="latest_release">1.1</span>&lt;/version&gt;
+  &lt;version&gt;<span id="latest_release">1.3</span>&lt;/version&gt;
 &lt;/dependency&gt;  </pre>
 
 <!-- Add this script to update "latest_release" span to latest version -->

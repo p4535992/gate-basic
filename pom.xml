@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.p4535992</groupId>
     <artifactId>gate-basic</artifactId>
-    <version>1.1</version>
+    <version>1.3</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -80,7 +80,10 @@
         <!-- DATABASE DRIVER -->
         <mysql-connector-java.version>5.1.35</mysql-connector-java.version>
         <!-- UTILITY -->
-        <com.github.p4535992.utility>1.2</com.github.p4535992.utility>
+        <com.github.p4535992.utility>1.3</com.github.p4535992.utility>
+
+        <!-- Support -->
+        <javax.servlet.servlet-api.version>2.5</javax.servlet.servlet-api.version>
     </properties>
 
     <dependencyManagement>
@@ -88,7 +91,7 @@
             <dependency>
                 <groupId>uk.ac.gate</groupId>
                 <artifactId>gate-core</artifactId>
-                <version>8.1</version>
+                <version>${gate.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.springframework</groupId>
@@ -127,7 +130,7 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
+            <version>${javax.servlet.servlet-api.version}</version>
         </dependency>
 
         <dependency>
