@@ -19,7 +19,7 @@ import java.util.*;
 /**
  * Created by 4535992 on 17/04/2015.
  * @author 4535992
- * @version 2015-06-25
+ * @version 2015-07-02
  */
 @SuppressWarnings("unused")
 public class Gate8Kit {
@@ -177,24 +177,11 @@ public class Gate8Kit {
      * @return corpus controller of the gapp file.
      */
     public CorpusController loadGapp(String base,String fileGapp){
-        SystemLog.message("Loading file .gapp/.xgapp...");
-        try {
-            if(!base.startsWith(File.separator)) base = File.separator + base;
-            if(!base.endsWith(File.separator)) base = base + File.separator;
-            if(fileGapp.startsWith(File.separator)) fileGapp = fileGapp.substring(1,fileGapp.length());
-            if(fileGapp.endsWith(File.separator)) fileGapp = fileGapp.substring(0,fileGapp.length()-1);
-            //File gapp = new File(home.home, "custom/gapp/geoLocationPipelineFast.xgapp");
-            if (new File(Gate.getGateHome() +  base +  fileGapp).exists()) {
-                controller = (CorpusController) PersistenceManager.loadObjectFromFile(
-                        new File(Gate.getGateHome()  + base + fileGapp));
-            } else {
-                throw new IOException("The gapp file not exists");
-            }
-            //CorpusController  con = (CorpusController) PersistenceManager.loadObjectFromFile(gapp);
-            SystemLog.message("... file .gapp/.xgapp loaded!");
-        }catch(GateException|IOException e){
-            SystemLog.exception(e);
-        }
+        if(!base.startsWith(File.separator)) base = File.separator + base;
+        if(!base.endsWith(File.separator)) base = base + File.separator;
+        if(fileGapp.startsWith(File.separator)) fileGapp = fileGapp.substring(1,fileGapp.length());
+        if(fileGapp.endsWith(File.separator)) fileGapp = fileGapp.substring(0,fileGapp.length()-1);
+        loadGapp(base + fileGapp);
         return (CorpusController)controller;
     } // initAnnie()
 
@@ -223,13 +210,21 @@ public class Gate8Kit {
         return (CorpusController) controller;
     } // initAnnie()
 
+    /**
+     * Method for setup the GATE API in EMbedded mode with spring configuration.
+     * @param referencePathResourceFile string reference path to the resource file spring for gate context
+     *                                  eg:"gate/gate_context.xml".
+     * @param thisClass the reference to the invoke class.
+     * @param idBeanDocumentProcessor string name/id of the bean refrence to DocumentProcessor on the gate context.
+     * @return the DocumentProcessor Controller.
+     */
     public DocumentProcessor setUpGateEmbeddedWithSpring(
             String referencePathResourceFile,Class<?> thisClass,String idBeanDocumentProcessor){
         ApplicationContext ctx;
         try {
             ctx = BeansKit.tryGetContextSpring(referencePathResourceFile, thisClass);
             //GATE provides a DocumentProcessor interface suitable for use with Spring pooling
-            procDoc = BeansKit.getBeanFromContext("documentProcessor",DocumentProcessor.class,ctx);
+            //procDoc = BeansKit.getBeanFromContext("documentProcessor",DocumentProcessor.class,ctx);
             procDoc = BeansKit.getBeanFromContext(idBeanDocumentProcessor,DocumentProcessor.class,ctx);
         } catch (IOException e) {
             SystemLog.exception(e);
