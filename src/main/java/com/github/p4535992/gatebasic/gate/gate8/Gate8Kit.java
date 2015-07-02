@@ -109,46 +109,58 @@ public class Gate8Kit {
         //SET GATE EMBEDDED
         try {
             SystemLog.message("Initializing GATE...");
-            if(!directoryFolderHome.startsWith(File.separator)) directoryFolderHome = File.separator + directoryFolderHome;
-            if(directoryFolderHome.endsWith(File.separator)) directoryFolderHome = directoryFolderHome.substring(0,directoryFolderHome.length()-1);
+            if (!directoryFolderHome.startsWith(File.separator))
+                directoryFolderHome = File.separator + directoryFolderHome;
+            if (directoryFolderHome.endsWith(File.separator))
+                directoryFolderHome = directoryFolderHome.substring(0, directoryFolderHome.length() - 1);
 
             directoryFolderHome = baseDirectory + directoryFolderHome;
             if (!new File(directoryFolderHome).exists())
-                throw new IOException("The folder directoryFolderHome "+directoryFolderHome+" of GATE not exists!");
+                throw new IOException("The folder directoryFolderHome " + directoryFolderHome + " of GATE not exists!");
             Gate.setGateHome(new File(directoryFolderHome));
 
-            if(!directoryFolderPlugin.startsWith(File.separator)) directoryFolderPlugin = File.separator + directoryFolderPlugin;
-            if(directoryFolderPlugin.endsWith(File.separator)) directoryFolderPlugin = directoryFolderPlugin.substring(0,directoryFolderPlugin.length()-1);
+            if (!directoryFolderPlugin.startsWith(File.separator))
+                directoryFolderPlugin = File.separator + directoryFolderPlugin;
+            if (directoryFolderPlugin.endsWith(File.separator))
+                directoryFolderPlugin = directoryFolderPlugin.substring(0, directoryFolderPlugin.length() - 1);
 
             directoryFolderPlugin = directoryFolderHome + directoryFolderPlugin;
             if (!new File(directoryFolderPlugin).exists())
-                throw new IOException("The folder directoryFolderPlugin "+directoryFolderPlugin+"of GATE not exists!");
+                throw new IOException("The folder directoryFolderPlugin " + directoryFolderPlugin + "of GATE not exists!");
             Gate.setPluginsHome(new File(directoryFolderPlugin));
 
-            if(!configFileGate.startsWith(File.separator)) configFileGate = File.separator + configFileGate;
-            if(configFileGate.endsWith(File.separator)) configFileGate = configFileGate.substring(0,configFileGate.length()-1);
+            if (!configFileGate.startsWith(File.separator)) configFileGate = File.separator + configFileGate;
+            if (configFileGate.endsWith(File.separator))
+                configFileGate = configFileGate.substring(0, configFileGate.length() - 1);
 
             configFileGate = directoryFolderHome + configFileGate;
-            if (!new File(configFileGate).exists()) throw new IOException("The configFileGate "+configFileGate+"of GATE not exists!");
+            if (!new File(configFileGate).exists())
+                throw new IOException("The configFileGate " + configFileGate + "of GATE not exists!");
             Gate.setSiteConfigFile(new File(configFileGate));
 
-            if(!configFileUser.startsWith(File.separator)) configFileUser = File.separator + configFileUser;
-            if(configFileUser.endsWith(File.separator)) configFileUser = configFileUser.substring(0,configFileUser.length()-1);
+            if (!configFileUser.startsWith(File.separator)) configFileUser = File.separator + configFileUser;
+            if (configFileUser.endsWith(File.separator))
+                configFileUser = configFileUser.substring(0, configFileUser.length() - 1);
 
             configFileUser = directoryFolderHome + configFileUser;
-            if (!new File(configFileUser).exists()) throw new IOException("The configFileUser "+configFileUser+" of GATE not exists!");
+            if (!new File(configFileUser).exists())
+                throw new IOException("The configFileUser " + configFileUser + " of GATE not exists!");
             Gate.setUserConfigFile(new File(configFileUser));
 
-            if(!configFileSession.startsWith(File.separator)) configFileSession = File.separator + configFileSession;
-            if(configFileSession.endsWith(File.separator)) configFileSession = configFileSession.substring(0,configFileSession.length()-1);
+            if (!configFileSession.startsWith(File.separator)) configFileSession = File.separator + configFileSession;
+            if (configFileSession.endsWith(File.separator))
+                configFileSession = configFileSession.substring(0, configFileSession.length() - 1);
 
             configFileSession = directoryFolderHome + configFileSession;
             if (!new File(configFileSession).exists())
-                throw new IOException("The configFileSession "+configFileSession+" of GATE not exists!");
+                throw new IOException("The configFileSession " + configFileSession + " of GATE not exists!");
             Gate.setUserSessionFile(new File(configFileSession));
-        }catch(IOException e) {
-            SystemLog.error(e.getMessage());
-            SystemLog.abort(0,"Failed the initialization of GATE");
+        } catch(IllegalStateException e){
+            SystemLog.warning("Some configuration file of GATE is has already been set");
+            SystemLog.warning(e.getMessage());
+        }catch(IOException e1) {
+            SystemLog.error(e1.getMessage());
+            SystemLog.abort(0, "Failed the initialization of GATE");
         }
         //...TRY A SECOND TIME TO INITIALIZE GATE
         try {
