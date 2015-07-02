@@ -54,6 +54,8 @@ public class GateSupport {
 
     private static GateSupport instance = null;
 
+    protected GateSupport(){}
+
     protected GateSupport(Map<String,Map<String,Map<String,String>>> mapDocs) {
         this.mapAnnotation = new HashMap<>();
         this.mapAnnotationSet = new HashMap<>();
@@ -64,6 +66,13 @@ public class GateSupport {
     public static GateSupport getInstance(Map<String,Map<String,Map<String,String>>> mapDocs){
         if(instance == null) {
             instance = new GateSupport(mapDocs);
+        }
+        return instance;
+    }
+
+    public static GateSupport getInstance(){
+        if(instance == null) {
+            instance = new GateSupport();
         }
         return instance;
     }
