@@ -275,6 +275,7 @@ public class ExtractorInfoGate8 {
             Corpus corpus,List<String> nameAnnotations,List<String> nameAnnotationsSet,boolean firstAndExit){
         //nameAnnotations.add("MyIndirizzo");
         //nameAnnotationsSet.add("MyAnnSet");
+        mapContentDocs.clear();
         GateAnnotation8Kit ga8 = GateAnnotation8Kit.getInstance();
         //Set the global variable here...
         mapContentDocs = ga8.getAllAnnotationInfo(corpus,nameAnnotations,nameAnnotationsSet,firstAndExit);

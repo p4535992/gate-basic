@@ -13,6 +13,8 @@ import java.util.*;
  * Java Keyword Per ogni documento da cui Ã¨ estratta una Keyword inseriamo la
  * Keyword in una lista da utilizzare successivamente per lt'inserimento nel
  * database.
+ * @author 4535992.
+ * @version 2015-07-07.
  */
 @SuppressWarnings("unused")
 public class GateAnnotation8Kit {
@@ -73,7 +75,8 @@ public class GateAnnotation8Kit {
              //get content from all the annotation in alll the annotaiotn set sorted....
             for (String nameAnnotation : listNameAnnotation) { //for each annotation...
                 for(String nameAnnotationSet: listNameAnnotationSet) {//for each annotation set...
-                    String content = getSingleAnnotationInfo(document, nameAnnotation, nameAnnotationSet);
+                    String content ="";
+                    content = getSingleAnnotationInfo(document, nameAnnotation, nameAnnotationSet);
                     //get the annotation on the first annotation set is have it without check the other annnotation set...
                     if (!StringKit.isNullOrEmpty(content)) {
                         if(firstAndExit) {
@@ -89,8 +92,7 @@ public class GateAnnotation8Kit {
                         }
                     }
                 }//for each annotationset
-                //mapAnn.clear();
-            }
+            }//for each annotation...
              String name = document.getName();
              mapDocs.put(name,mapAnnSet);
         }//while
@@ -125,7 +127,7 @@ public class GateAnnotation8Kit {
             }          
             //content =  getContentLastSingleAnnotationOnAnnotationSet(document, nameAnnotation, annSet);
         }catch(NullPointerException ne){
-            SystemLog.warning("The AnnotationSet "+nameAnnotationSet+" not have a single annotation for this document to the url: "+ document.getSourceUrl());
+            //SystemLog.warning("The AnnotationSet "+nameAnnotationSet+" not have a single annotation for this document to the url: "+ document.getSourceUrl());
         }
         return content;
     }

@@ -70,6 +70,11 @@ public class GateSupport {
         return instance;
     }
 
+    public static GateSupport getInstance(Map<String,Map<String,Map<String,String>>> mapDocs,boolean isNull){
+        if(isNull) instance = null;
+        return  getInstance(mapDocs);
+    }
+
     public static GateSupport getInstance(){
         if(instance == null) {
             instance = new GateSupport();
@@ -77,6 +82,14 @@ public class GateSupport {
         return instance;
     }
 
+    public static GateSupport getInstance(boolean isNull){
+        if(isNull) instance = null;
+        return getInstance();
+    }
+
+    public static void setInstance(GateSupport instance) {
+        GateSupport.instance = instance;
+    }
 
     public Map<String,Map<String,String>> getDocument(Integer index,Map<String,Map<String,Map<String,String>>> mapDocs){
         this.mapDocs = mapDocs;
