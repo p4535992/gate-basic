@@ -1,13 +1,4 @@
-/**
- * DatastoreApplication.java 
- * @author 4535992
- * @description
- * Class prevede il salvataggio del Corpus di GATE
- * in un Serial Lucene Datastore e tutti i metodi necessari per svolgere le
- * operazioni di CRUD sia per il corpus che per i singoli documenti direttamente 
- * dal DataStore.
- * NON E STATA INTEGRATA IN QUESTO PROGETTO MA PER INVOCARLA CI VUOLE POCO
- */
+
 package com.github.p4535992.gatebasic.gate.gate8;
 
 import com.github.p4535992.util.log.SystemLog;
@@ -24,8 +15,15 @@ import java.util.List;
 
 /**
  * Class utility for work with datastore gate.
+ /**
+ * DatastoreApplication.java
  * @author 4535992
- * @version 2015-06-25
+ * @version 2015-06-25.
+ * Class prevede il salvataggio del Corpus di GATE
+ * in un Serial Lucene Datastore e tutti i metodi necessari per svolgere le
+ * operazioni di CRUD sia per il corpus che per i singoli documenti direttamente
+ * dal DataStore.
+ * NON E STATA INTEGRATA IN QUESTO PROGETTO MA PER INVOCARLA CI VUOLE POCO
  */
 @SuppressWarnings("unused")
 public class GateDataStore8Kit {
