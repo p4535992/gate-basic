@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * Created by 4535992 on 24/06/2015.
  * @author 4535992
- * @version 2015-06-25
+ * @version 2015-09-15
  */
 @SuppressWarnings("unused")
 public class ExtractorInfoGate8 {
@@ -359,6 +359,39 @@ public class ExtractorInfoGate8 {
             }
             return extractorGATE(url, docProcessor,nameCorpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
         }
+    }
+
+    /**
+     * Method to Convert the Object Gate Support to a GeoDocument object.
+     * @param support the Gate Support Object.
+     * @param nameAnnotation the string name of the annotation we want to extract.
+     * @param index we use the index of the Document Gate on the corpus because we can't know the exact name of
+     *              the document given from the user.
+     * @return a GeoDocument Object.
+     */
+    public String extractContentAnnotationFromGateSupport(GateSupport support,String nameAnnotation,Integer index){
+        String content = "";
+        try {
+            //for(String nameAnnotation: anntotations ){
+                //get list of all annotation set...
+                List<Map<String,Map<String,String>>> list = new ArrayList<>(support.getMapDocs().values());
+                if(!list.isEmpty() && list.get(index).size()>0) {
+                    try {
+                        for (int j = 0; j < list.get(index).size(); j++) {
+                            content = support.getContent(index, j, nameAnnotation);
+                            if (!StringKit.isNullOrEmpty(content)) {
+                                return content;
+                            }
+                        }
+                    } catch (java.lang.IndexOutOfBoundsException e) {
+                        SystemLog.exception(e);
+                    }
+                }//if !isEmpty
+            //}//for each annotation
+        } catch (Exception e) {
+            SystemLog.exception(e);
+        }
+        return content;
     }
 
 
