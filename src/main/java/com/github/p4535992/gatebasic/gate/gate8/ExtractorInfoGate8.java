@@ -23,8 +23,8 @@ import java.util.Map;
 
 /**
  * Created by 4535992 on 24/06/2015.
- * @author 4535992
- * @version 2015-09-15
+ * @author 4535992.
+ * @version 2015-09-22.
  */
 @SuppressWarnings("unused")
 public class ExtractorInfoGate8 {
@@ -123,6 +123,7 @@ public class ExtractorInfoGate8 {
         }
         finally{
             cleanup();
+            corpus.clear();
         }
         return null;
     }//extractorGATE
@@ -360,6 +361,94 @@ public class ExtractorInfoGate8 {
             return extractorGATE(url, docProcessor,nameCorpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
         }
     }
+
+    /**
+     * Method to read all the processed result of GATE on the document referenced from the url.
+     * @param contentDocument the url address to the document you want to analize.
+     * @param controller a corpus controller with loaded a gapp file.
+     * @param nameCorpus (optional) name of the corpus gate.
+     * @param nameAnnotations (optional) list of annotation you want to get from the document.
+     * @param nameAnnotationsSet (optional) list of annotationSet you want to get from the document
+     *                           if param firstAndExit is true the list priority is given from the
+     *                           index so the first element has more priority of the others element.
+     * @param firstAndExit if true stop searching on other AnnotationSet hte same AnnotationType.
+     * @return a map with all the string value you intend to extract from the document.
+     */
+    public Map<String,Map<String,Map<String,String>>> extractorGATE(
+            String contentDocument, CorpusController controller,String nameCorpus,List<String> nameAnnotations,
+            List<String> nameAnnotationsSet,boolean firstAndExit) {
+        GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
+        try{
+            if(contentDocument!=null){
+                if(StringKit.isNullOrEmpty(nameCorpus)) {
+                    corpus = gc8.createCorpusByString(contentDocument, "GeoDocuments Corpus");
+                }else{
+                    corpus = gc8.createCorpusByString(contentDocument, nameCorpus);
+                }
+            }//if url!=null
+            if(corpus == null){return null;}
+            else{
+                setCorpus(corpus, controller);
+                SystemLog.message("Execute of GATE in process for a string content ...");
+                execute(controller);
+                SystemLog.message("...GATE is been processed");
+                SystemLog.message("Work with the annotations...");
+                return extractorGATE(corpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
+            }//else
+        }//try
+        catch(GateException|RuntimeException|IOException ex){
+            SystemLog.exception(ex);
+        }
+        finally{
+            cleanup();
+            corpus.clear();
+        }
+        return null;
+    }//extractorGATE
+
+    /**
+     * Method to read all the processed result of GATE on the document referenced from the url.
+     * @param contentDocument the string content of the url address to the document you want to analize.
+     * @param docProcessor a document processor with loaded a gapp file using Spring framework.
+     * @param nameCorpus (optional) name of the corpus gate.
+     * @param nameAnnotations (optional) list of annotation you want to get from the document.
+     * @param nameAnnotationsSet (optional) list of annotationSet you want to get from the document
+     *                           if param firstAndExit is true the list priority is given from the
+     *                           index so the first element has more priority of the others element.
+     * @param firstAndExit if true stop searching on other AnnotationSet hte same AnnotationType.
+     * @return a map with all the string value you intend to extract from the document.
+     */
+    public Map<String,Map<String,Map<String,String>>> extractorGATE(
+            String contentDocument, DocumentProcessor docProcessor, String nameCorpus,List<String> nameAnnotations,
+            List<String> nameAnnotationsSet,boolean firstAndExit){
+        GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
+        Document doc = new DocumentImpl();
+        try{
+            if(contentDocument!=null){
+                doc = gc8.createDoc(contentDocument);
+            }//if url!=null
+            SystemLog.message("Execute of GATE in process for a string content ...");
+            docProcessor.processDocument(doc);
+            SystemLog.message("...GATE is been processed");
+            if(StringKit.isNullOrEmpty(nameCorpus)) {
+                corpus = gc8.createCorpusByDocument(doc, "GeoDocuments Corpus");
+            }else{
+                corpus = gc8.createCorpusByDocument(doc, nameCorpus);
+            }
+            if(corpus == null){return null;}
+            else{
+                SystemLog.message("Work with the annotations...");
+                return extractorGATE(corpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
+            }//else
+        }//try
+        catch(GateException|RuntimeException ex){
+            SystemLog.exception(ex);
+        }
+        finally{
+            cleanup();
+        }
+        return null;
+    }//extractorGATE
 
     /**
      * Method to Convert the Object Gate Support to a GeoDocument object.

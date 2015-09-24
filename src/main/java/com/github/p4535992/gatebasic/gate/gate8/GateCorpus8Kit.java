@@ -156,7 +156,26 @@ public class GateCorpus8Kit {
         return corpus;
     } // createCorpus
 
-  
+    /**
+     * Crea un Corpus di Documenti Gate.
+     * @param  content string of the web document.
+     * @param  nomeCorpus corpus gate to set.
+     * @return corpus gate fulled.
+     * @throws  IOException error.
+     * @throws  ResourceInstantiationException error.
+     */
+    public Corpus createCorpusByString(String content,String nomeCorpus) throws IOException, ResourceInstantiationException{
+        corpus = Factory.newCorpus(nomeCorpus);
+        doc = createDoc(content);
+        if(doc != null) {
+            corpus.add(doc);//add a document to the corpus
+        }
+        SystemLog.message("Loaded a corpus of: "+corpus.size()+" files");
+        return corpus;
+    } // createCorpus
+
+
+
     /**
      * Metodo che salva un Corpus nel datastore.
      * @param corpus corpus to save.
