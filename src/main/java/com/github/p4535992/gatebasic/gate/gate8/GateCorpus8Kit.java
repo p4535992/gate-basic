@@ -240,11 +240,14 @@ public class GateCorpus8Kit {
             //document features insert by me
             FeatureMap feats = Factory.newFeatureMap();
             feats.put("date", new Date());
-            doc = (Document) Factory.createResource("gate.corpora.DocumentImpl", params,feats,"doc_"+i+"_"+url);
-
+            try {
+                doc = (Document) Factory.createResource("gate.corpora.DocumentImpl", params, feats, "doc_" + i + "_" + url);
+            }catch(gate.creole.ResourceInstantiationException e){
+                doc = Factory.newDocument(url,"UTF-8");
+            }
             //doc = Factory.newDocument(url, "utf-8");          
         } catch (ArrayIndexOutOfBoundsException ax) {
-            SystemLog.warning("Documento " + url + " non più disponibile o raggiungibile.");
+            SystemLog.warning("Document " + url + " not exists anymore or is unreachable.");
         }
         catch (NullPointerException|ResourceInstantiationException ne){
             SystemLog.exception(ne);
