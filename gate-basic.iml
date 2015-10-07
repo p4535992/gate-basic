@@ -142,6 +142,9 @@
     <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.2.2" level="project" />
     <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.2" level="project" />
     <orderEntry type="library" name="Maven: org.openrdf.sesame:sesame-queryresultio-binary:2.7.10" level="project" />
+    <orderEntry type="library" name="Maven: org.semanticweb.yars:nxparser-api:2.2" level="project" />
+    <orderEntry type="library" name="Maven: org.semanticweb.yars:nxparser-model:2.2" level="project" />
+    <orderEntry type="library" name="Maven: org.semanticweb.yars:nxparser-commons:2.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-dbcp2:2.0" level="project" />

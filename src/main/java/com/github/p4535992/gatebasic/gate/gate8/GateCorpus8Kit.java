@@ -243,13 +243,17 @@ public class GateCorpus8Kit {
             try {
                 doc = (Document) Factory.createResource("gate.corpora.DocumentImpl", params, feats, "doc_" + i + "_" + url);
             }catch(gate.creole.ResourceInstantiationException e){
-                doc = Factory.newDocument(url,"UTF-8");
+                try {
+                    doc = Factory.newDocument(url, "UTF-8");
+                }catch(gate.creole.ResourceInstantiationException e1){
+                    throw new NullPointerException(e1.getMessage());
+                }
             }
             //doc = Factory.newDocument(url, "utf-8");          
         } catch (ArrayIndexOutOfBoundsException ax) {
             SystemLog.warning("Document " + url + " not exists anymore or is unreachable.");
         }
-        catch (NullPointerException|ResourceInstantiationException ne){
+        catch (NullPointerException ne){
             SystemLog.exception(ne);
             doc = null;
         }
