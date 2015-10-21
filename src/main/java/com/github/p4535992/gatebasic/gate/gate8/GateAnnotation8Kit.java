@@ -1,7 +1,8 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
 import com.github.p4535992.util.log.SystemLog;
-import com.github.p4535992.util.string.StringKit;
+import com.github.p4535992.util.string.impl.StringIs;
+import com.github.p4535992.util.string.impl.StringKit;
 import gate.*;
 
 
@@ -78,7 +79,7 @@ public class GateAnnotation8Kit {
                     String content ="";
                     content = getSingleAnnotationInfo(document, nameAnnotation, nameAnnotationSet);
                     //get the annotation on the first annotation set is have it without check the other annnotation set...
-                    if (!StringKit.isNullOrEmpty(content)) {
+                    if (!StringIs.isNullOrEmpty(content)) {
                         if(firstAndExit) {
                             //found it the annotation on this annotationSet...
                             mapAnn.put(nameAnnotation,content);
@@ -120,7 +121,7 @@ public class GateAnnotation8Kit {
                     break;
                 }
             }
-            if(StringKit.isNullOrEmpty(content)){
+            if(StringIs.isNullOrEmpty(content)){
                 content ="";
             }else{
                 content = StringKit.cleanStringHTML(content);
@@ -238,7 +239,7 @@ public class GateAnnotation8Kit {
             annotationSet = annotationSet.get(nameAnnotation);
             int i = 0;
             for(Annotation annotation: annotationSet){
-                if (annotation == null || StringKit.isNullOrEmpty(Utils.stringFor(doc, annotation))) continue;
+                if (annotation == null || StringIs.isNullOrEmpty(Utils.stringFor(doc, annotation))) continue;
                 if(annotation.getType().equals(nameAnnotation)) {
                     begOffset = annotation.getStartNode().getOffset().intValue();
                     endOffset = annotation.getEndNode().getOffset().intValue();
@@ -261,7 +262,7 @@ public class GateAnnotation8Kit {
                 }
                 i++;
             }
-            if(StringKit.isNullOrEmpty(content)){
+            if(StringIs.isNullOrEmpty(content)){
                 return null;
             }else{
                 return content;

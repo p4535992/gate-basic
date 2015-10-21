@@ -2,7 +2,7 @@ package com.github.p4535992.gatebasic.gate.gate8;
 
 import com.github.p4535992.util.file.FileUtil;
 import com.github.p4535992.util.log.SystemLog;
-import com.github.p4535992.util.string.StringKit;
+import com.github.p4535992.util.string.impl.StringIs;
 import gate.Corpus;
 import gate.CorpusController;
 import gate.Document;
@@ -102,7 +102,7 @@ public class ExtractorInfoGate8 {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         try{
             if(url!=null){
-                if(StringKit.isNullOrEmpty(nameCorpus)) {
+                if(StringIs.isNullOrEmpty(nameCorpus)) {
                     corpus = gc8.createCorpusByUrl(url, "GeoDocuments Corpus");
                 }else{
                     corpus = gc8.createCorpusByUrl(url, nameCorpus);
@@ -152,7 +152,7 @@ public class ExtractorInfoGate8 {
             SystemLog.message("Execute of GATE in process for the url " + url + "...");
             docProcessor.processDocument(doc);
             SystemLog.message("...GATE is been processed");
-            if(StringKit.isNullOrEmpty(nameCorpus)) {
+            if(StringIs.isNullOrEmpty(nameCorpus)) {
                 corpus = gc8.createCorpusByDocument(doc, "GeoDocuments Corpus");
             }else{
                 corpus = gc8.createCorpusByDocument(doc, nameCorpus);
@@ -190,7 +190,7 @@ public class ExtractorInfoGate8 {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         try{
             SystemLog.message("Execute of GATE in process for a list of  " + listUrl.size() + " urls...");
-            if (StringKit.isNullOrEmpty(nameCorpus)) {
+            if (StringIs.isNullOrEmpty(nameCorpus)) {
                 corpus = gc8.createCorpusByUrl(listUrl, "GeoDocuments Corpus");
             } else {
                 corpus = gc8.createCorpusByUrl(listUrl, nameCorpus);
@@ -231,7 +231,7 @@ public class ExtractorInfoGate8 {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         Document doc = new DocumentImpl();
         try{
-            if (StringKit.isNullOrEmpty(nameCorpus)) {
+            if (StringIs.isNullOrEmpty(nameCorpus)) {
                 corpus = Factory.newCorpus("GeoDocuments Corpus");
             } else {
                 corpus = Factory.newCorpus(nameCorpus);
@@ -380,7 +380,7 @@ public class ExtractorInfoGate8 {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         try{
             if(contentDocument!=null){
-                if(StringKit.isNullOrEmpty(nameCorpus)) {
+                if(StringIs.isNullOrEmpty(nameCorpus)) {
                     corpus = gc8.createCorpusByString(contentDocument, "GeoDocuments Corpus");
                 }else{
                     corpus = gc8.createCorpusByString(contentDocument, nameCorpus);
@@ -430,7 +430,7 @@ public class ExtractorInfoGate8 {
             SystemLog.message("Execute of GATE in process for a string content ...");
             docProcessor.processDocument(doc);
             SystemLog.message("...GATE is been processed");
-            if(StringKit.isNullOrEmpty(nameCorpus)) {
+            if(StringIs.isNullOrEmpty(nameCorpus)) {
                 corpus = gc8.createCorpusByDocument(doc, "GeoDocuments Corpus");
             }else{
                 corpus = gc8.createCorpusByDocument(doc, nameCorpus);
@@ -468,7 +468,7 @@ public class ExtractorInfoGate8 {
                     try {
                         for (int j = 0; j < list.get(index).size(); j++) {
                             content = support.getContent(index, j, nameAnnotation);
-                            if (!StringKit.isNullOrEmpty(content)) {
+                            if (!StringIs.isNullOrEmpty(content)) {
                                 return content;
                             }
                         }
