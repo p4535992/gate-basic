@@ -1,6 +1,6 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
-import com.github.p4535992.util.file.FileUtil;
+import com.github.p4535992.util.file.impl.FileUtil;
 import com.github.p4535992.util.log.SystemLog;
 import com.github.p4535992.util.string.impl.StringIs;
 import gate.Corpus;
