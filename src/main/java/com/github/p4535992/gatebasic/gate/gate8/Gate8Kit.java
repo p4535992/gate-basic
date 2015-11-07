@@ -1,7 +1,7 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
 import com.github.p4535992.util.bean.BeansKit;
-import com.github.p4535992.util.file.impl.FileUtil;
+import com.github.p4535992.util.file.impl.FileUtilities;
 import com.github.p4535992.util.log.SystemLog;
 import gate.*;
 import gate.corpora.RepositioningInfo;
@@ -168,7 +168,7 @@ public class Gate8Kit {
         }catch(GateException e){
             //..Usuallly you got here for bad reading of the session file
             try {
-                FileUtil.createFile(configFileSession);
+                FileUtilities.createFile(configFileSession);
                 Gate.init();
             }catch(GateException|IOException ex){
                 SystemLog.exception(e);
@@ -298,7 +298,7 @@ public class Gate8Kit {
      */
     public void createXMLFileForEachDoc(Corpus corpus,List<String> addAnnotTypesRequired,File directory) throws IOException{
         // for each document, get an XML document with the person,location,MyGeo names added
-        String pathDir = FileUtil.path(directory);
+        String pathDir = FileUtilities.getPath(directory);
         Iterator<Document> iter = corpus.iterator();
         int count = 0;
         String startTagPart_1 = "<span GateID=\"";
@@ -323,7 +323,7 @@ public class Gate8Kit {
             ///GENERAZIONE DEI DOCUMENTI
             String nameGateDocument0 = doc.getName();
             String fileName0 = "("+count+")"+nameGateDocument0+".html";
-            FileUtil.createFile(directory);//create file if not exists...
+            FileUtilities.createFile(directory);//create file if not exists...
             System.out.println("File write to the path : '"+ directory.getAbsolutePath()+"'");
             //after the controller is execute....
             if(originalContent != null && info != null) {
