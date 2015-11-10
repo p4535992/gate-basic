@@ -1,6 +1,6 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
-import com.github.p4535992.util.file.impl.FileUtilities;
+import com.github.p4535992.util.file.impl.FileUtil;
 import com.github.p4535992.util.log.SystemLog;
 import com.github.p4535992.util.string.impl.StringIs;
 import gate.Corpus;
@@ -298,12 +298,12 @@ public class ExtractorInfoGate8 {
     public Map<String,Map<String,Map<String,String>>> extractorGATE(
             File fileOrDirectory, CorpusController controller,String nameCorpus,List<String> nameAnnotations,
             List<String> nameAnnotationsSet,boolean firstAndExit) {
-        if(FileUtilities.isDirectory(fileOrDirectory)){
-            List<File> listFiles = FileUtilities.readDirectory(fileOrDirectory);
+        if(FileUtil.isDirectory(fileOrDirectory)){
+            List<File> listFiles = FileUtil.readDirectory(fileOrDirectory);
             List<URL> listUrl = new ArrayList<>();
             for(File file: listFiles) {
                 try {
-                    URL url = FileUtilities.convertFileToURL(file);
+                    URL url = FileUtil.convertFileToURL(file);
                     listUrl.add(url);
                 } catch (MalformedURLException e) {
                     SystemLog.warning(e.getMessage());
@@ -313,7 +313,7 @@ public class ExtractorInfoGate8 {
         }else{
             URL url;
             try {
-                url = FileUtilities.convertFileToURL(fileOrDirectory);
+                url = FileUtil.convertFileToURL(fileOrDirectory);
             } catch (MalformedURLException e) {
                 SystemLog.warning(e.getMessage());
                 return null;
@@ -337,12 +337,12 @@ public class ExtractorInfoGate8 {
     public Map<String,Map<String,Map<String,String>>> extractorGATE(
             File fileOrDirectory, DocumentProcessor docProcessor, String nameCorpus,List<String> nameAnnotations,
             List<String> nameAnnotationsSet,boolean firstAndExit){
-        if(FileUtilities.isDirectory(fileOrDirectory)){
-            List<File> listFiles = FileUtilities.readDirectory(fileOrDirectory);
+        if(FileUtil.isDirectory(fileOrDirectory)){
+            List<File> listFiles = FileUtil.readDirectory(fileOrDirectory);
             List<URL> listUrl = new ArrayList<>();
             for(File file: listFiles) {
                 try {
-                    URL url = FileUtilities.convertFileToURL(file);
+                    URL url = FileUtil.convertFileToURL(file);
                     listUrl.add(url);
                 } catch (MalformedURLException e) {
                     SystemLog.warning(e.getMessage());
@@ -353,7 +353,7 @@ public class ExtractorInfoGate8 {
         }else{
             URL url;
             try {
-                url = FileUtilities.convertFileToURL(fileOrDirectory);
+                url = FileUtil.convertFileToURL(fileOrDirectory);
             } catch (MalformedURLException e) {
                 SystemLog.warning(e.getMessage());
                 return null;
