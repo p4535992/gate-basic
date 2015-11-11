@@ -1,5 +1,5 @@
 package com.github.p4535992.gatebasic.gate.gate8;
-import com.github.p4535992.util.file.impl.FileUtil;
+import com.github.p4535992.util.file.FileUtilities;
 import com.github.p4535992.util.log.SystemLog;
 import gate.*;
 import gate.corpora.DocumentImpl;
@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Class utility for work with Document and Corpus of the GATE API.
  * @author 4535992 Elaborato Sistemi Distribuiti
- * @version 2015-06-25
+ * @version 2015-11-12
  */
 @SuppressWarnings("unused")
 public class GateCorpus8Kit {
@@ -89,12 +89,12 @@ public class GateCorpus8Kit {
      * @throws IOException throw if any error is occurred.
      */
     public Corpus createCorpusByFile(File fileOrDirectory,String nameCorpus) throws ResourceInstantiationException, IOException {
-        if(FileUtil.isDirectory(fileOrDirectory)){
-            List<File> listFiles = FileUtil.readDirectory(fileOrDirectory);
+        if(FileUtilities.isDirectory(fileOrDirectory)){
+            List<File> listFiles = FileUtilities.readDirectory(fileOrDirectory);
             return createCorpusByFile(listFiles,nameCorpus);
         }else {
             corpus = Factory.newCorpus(nameCorpus);
-            doc = createDocByUrl(FileUtil.convertFileToUri(fileOrDirectory.getAbsolutePath()).toURL());
+            doc = createDocByUrl(FileUtilities.toUri(fileOrDirectory.getAbsolutePath()).toURL());
             if (doc != null) {
                 corpus.add(doc);//add a document to the corpus
             }
@@ -114,7 +114,7 @@ public class GateCorpus8Kit {
         corpus = Factory.newCorpus(nameCorpus);
         Integer indice = 0;
         for(File file : listFiles) {
-            doc = createDocByUrl(FileUtil.convertFileToUri(file.getAbsolutePath()).toURL(),indice);
+            doc = createDocByUrl(FileUtilities.toUri(file.getAbsolutePath()).toURL(),indice);
             //Document doc = Factory.newDocument(docFile.toURL(), "utf-8");
             if (doc != null) {
                 corpus.add(doc);//add a document to the corpus

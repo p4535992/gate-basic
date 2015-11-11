@@ -1,21 +1,19 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
 import com.github.p4535992.util.log.SystemLog;
-import com.github.p4535992.util.string.impl.StringIs;
-import com.github.p4535992.util.string.impl.StringKit;
+import com.github.p4535992.util.string.StringUtilities;
 import gate.*;
 
 
 import java.util.*;
 
 /**
- * Estrai il contenuto dell annotazioni
- * semantiche da ogni documento del Corpus Struttura il contenuto in un oggetto
- * Java Keyword Per ogni documento da cui Ã¨ estratta una Keyword inseriamo la
- * Keyword in una lista da utilizzare successivamente per lt'inserimento nel
- * database.
+ * Extract the contents of records
+ * Semantics of each document of Corpus structure the content into an object
+ * Java Keyword For each document from which is extracted a Keyword insert the
+ * Keyword in a list to be used later for inclusion in Database.
  * @author 4535992.
- * @version 2015-07-07.
+ * @version 2015-11-12.
  */
 @SuppressWarnings("unused")
 public class GateAnnotation8Kit {
@@ -79,7 +77,7 @@ public class GateAnnotation8Kit {
                     String content ="";
                     content = getSingleAnnotationInfo(document, nameAnnotation, nameAnnotationSet);
                     //get the annotation on the first annotation set is have it without check the other annnotation set...
-                    if (!StringIs.isNullOrEmpty(content)) {
+                    if (!StringUtilities.isNullOrEmpty(content)) {
                         if(firstAndExit) {
                             //found it the annotation on this annotationSet...
                             mapAnn.put(nameAnnotation,content);
@@ -121,10 +119,10 @@ public class GateAnnotation8Kit {
                     break;
                 }
             }
-            if(StringIs.isNullOrEmpty(content)){
+            if(StringUtilities.isNullOrEmpty(content)){
                 content ="";
             }else{
-                content = StringKit.cleanStringHTML(content);
+                content = StringUtilities.cleanHTML(content);
             }          
             //content =  getContentLastSingleAnnotationOnAnnotationSet(document, nameAnnotation, annSet);
         }catch(NullPointerException ne){
@@ -239,7 +237,7 @@ public class GateAnnotation8Kit {
             annotationSet = annotationSet.get(nameAnnotation);
             int i = 0;
             for(Annotation annotation: annotationSet){
-                if (annotation == null || StringIs.isNullOrEmpty(Utils.stringFor(doc, annotation))) continue;
+                if (annotation == null || StringUtilities.isNullOrEmpty(Utils.stringFor(doc, annotation))) continue;
                 if(annotation.getType().equals(nameAnnotation)) {
                     begOffset = annotation.getStartNode().getOffset().intValue();
                     endOffset = annotation.getEndNode().getOffset().intValue();
@@ -262,7 +260,7 @@ public class GateAnnotation8Kit {
                 }
                 i++;
             }
-            if(StringIs.isNullOrEmpty(content)){
+            if(StringUtilities.isNullOrEmpty(content)){
                 return null;
             }else{
                 return content;

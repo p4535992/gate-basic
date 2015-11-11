@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Marco on 25/06/2015.
+ * Created by 4535992 on 25/06/2015.
  * @author 4535992
- * @version 2015-06-25
+ * @version 2015-11-12
  */
 @SuppressWarnings("unused")
 public class GateSupport {

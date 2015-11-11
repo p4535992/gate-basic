@@ -1,8 +1,8 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
-import com.github.p4535992.util.file.impl.FileUtil;
+import com.github.p4535992.util.file.FileUtilities;
 import com.github.p4535992.util.log.SystemLog;
-import com.github.p4535992.util.string.impl.StringIs;
+import com.github.p4535992.util.string.StringUtilities;
 import gate.Corpus;
 import gate.CorpusController;
 import gate.Document;
@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * Created by 4535992 on 24/06/2015.
  * @author 4535992.
- * @version 2015-09-22.
+ * @version 2015-11-12.
  */
 @SuppressWarnings("unused")
 public class ExtractorInfoGate8 {
@@ -102,7 +102,7 @@ public class ExtractorInfoGate8 {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         try{
             if(url!=null){
-                if(StringIs.isNullOrEmpty(nameCorpus)) {
+                if(StringUtilities.isNullOrEmpty(nameCorpus)) {
                     corpus = gc8.createCorpusByUrl(url, "GeoDocuments Corpus");
                 }else{
                     corpus = gc8.createCorpusByUrl(url, nameCorpus);
@@ -152,7 +152,7 @@ public class ExtractorInfoGate8 {
             SystemLog.message("Execute of GATE in process for the url " + url + "...");
             docProcessor.processDocument(doc);
             SystemLog.message("...GATE is been processed");
-            if(StringIs.isNullOrEmpty(nameCorpus)) {
+            if(StringUtilities.isNullOrEmpty(nameCorpus)) {
                 corpus = gc8.createCorpusByDocument(doc, "GeoDocuments Corpus");
             }else{
                 corpus = gc8.createCorpusByDocument(doc, nameCorpus);
@@ -190,7 +190,7 @@ public class ExtractorInfoGate8 {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         try{
             SystemLog.message("Execute of GATE in process for a list of  " + listUrl.size() + " urls...");
-            if (StringIs.isNullOrEmpty(nameCorpus)) {
+            if (StringUtilities.isNullOrEmpty(nameCorpus)) {
                 corpus = gc8.createCorpusByUrl(listUrl, "GeoDocuments Corpus");
             } else {
                 corpus = gc8.createCorpusByUrl(listUrl, nameCorpus);
@@ -231,7 +231,7 @@ public class ExtractorInfoGate8 {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         Document doc = new DocumentImpl();
         try{
-            if (StringIs.isNullOrEmpty(nameCorpus)) {
+            if (StringUtilities.isNullOrEmpty(nameCorpus)) {
                 corpus = Factory.newCorpus("GeoDocuments Corpus");
             } else {
                 corpus = Factory.newCorpus(nameCorpus);
@@ -298,12 +298,12 @@ public class ExtractorInfoGate8 {
     public Map<String,Map<String,Map<String,String>>> extractorGATE(
             File fileOrDirectory, CorpusController controller,String nameCorpus,List<String> nameAnnotations,
             List<String> nameAnnotationsSet,boolean firstAndExit) {
-        if(FileUtil.isDirectory(fileOrDirectory)){
-            List<File> listFiles = FileUtil.readDirectory(fileOrDirectory);
+        if(FileUtilities.isDirectory(fileOrDirectory)){
+            List<File> listFiles = FileUtilities.readDirectory(fileOrDirectory);
             List<URL> listUrl = new ArrayList<>();
             for(File file: listFiles) {
                 try {
-                    URL url = FileUtil.convertFileToURL(file);
+                    URL url = FileUtilities.toURL(file);
                     listUrl.add(url);
                 } catch (MalformedURLException e) {
                     SystemLog.warning(e.getMessage());
@@ -313,7 +313,7 @@ public class ExtractorInfoGate8 {
         }else{
             URL url;
             try {
-                url = FileUtil.convertFileToURL(fileOrDirectory);
+                url = FileUtilities.toURL(fileOrDirectory);
             } catch (MalformedURLException e) {
                 SystemLog.warning(e.getMessage());
                 return null;
@@ -337,12 +337,12 @@ public class ExtractorInfoGate8 {
     public Map<String,Map<String,Map<String,String>>> extractorGATE(
             File fileOrDirectory, DocumentProcessor docProcessor, String nameCorpus,List<String> nameAnnotations,
             List<String> nameAnnotationsSet,boolean firstAndExit){
-        if(FileUtil.isDirectory(fileOrDirectory)){
-            List<File> listFiles = FileUtil.readDirectory(fileOrDirectory);
+        if(FileUtilities.isDirectory(fileOrDirectory)){
+            List<File> listFiles = FileUtilities.readDirectory(fileOrDirectory);
             List<URL> listUrl = new ArrayList<>();
             for(File file: listFiles) {
                 try {
-                    URL url = FileUtil.convertFileToURL(file);
+                    URL url = FileUtilities.toURL(file);
                     listUrl.add(url);
                 } catch (MalformedURLException e) {
                     SystemLog.warning(e.getMessage());
@@ -353,7 +353,7 @@ public class ExtractorInfoGate8 {
         }else{
             URL url;
             try {
-                url = FileUtil.convertFileToURL(fileOrDirectory);
+                url = FileUtilities.toURL(fileOrDirectory);
             } catch (MalformedURLException e) {
                 SystemLog.warning(e.getMessage());
                 return null;
@@ -380,7 +380,7 @@ public class ExtractorInfoGate8 {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         try{
             if(contentDocument!=null){
-                if(StringIs.isNullOrEmpty(nameCorpus)) {
+                if(StringUtilities.isNullOrEmpty(nameCorpus)) {
                     corpus = gc8.createCorpusByString(contentDocument, "GeoDocuments Corpus");
                 }else{
                     corpus = gc8.createCorpusByString(contentDocument, nameCorpus);
@@ -430,7 +430,7 @@ public class ExtractorInfoGate8 {
             SystemLog.message("Execute of GATE in process for a string content ...");
             docProcessor.processDocument(doc);
             SystemLog.message("...GATE is been processed");
-            if(StringIs.isNullOrEmpty(nameCorpus)) {
+            if(StringUtilities.isNullOrEmpty(nameCorpus)) {
                 corpus = gc8.createCorpusByDocument(doc, "GeoDocuments Corpus");
             }else{
                 corpus = gc8.createCorpusByDocument(doc, nameCorpus);
@@ -468,7 +468,7 @@ public class ExtractorInfoGate8 {
                     try {
                         for (int j = 0; j < list.get(index).size(); j++) {
                             content = support.getContent(index, j, nameAnnotation);
-                            if (!StringIs.isNullOrEmpty(content)) {
+                            if (!StringUtilities.isNullOrEmpty(content)) {
                                 return content;
                             }
                         }
