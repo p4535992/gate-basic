@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.p4535992</groupId>
     <artifactId>gate-basic</artifactId>
-    <version>1.4.3</version>
+    <version>1.4.4</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -47,14 +47,6 @@
 
     <repositories>
         <repository>
-            <id>ExtractInfo4</id>
-            <url>https://github.com/p4535992/ExtractInfo</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
@@ -88,8 +80,7 @@
         <!-- DATABASE DRIVER -->
         <mysql-connector-java.version>5.1.35</mysql-connector-java.version>
         <!-- UTILITY -->
-        <com.github.p4535992.utility.version>1.4.3</com.github.p4535992.utility.version>
-        <!--<com.github.p4535992.ExtractInfo.version>1.3.1</com.github.p4535992.ExtractInfo.version>-->
+        <com.github.p4535992.utility.version>1.4.4</com.github.p4535992.utility.version>   
         <!-- Support -->
         <javax.servlet.servlet-api.version>2.5</javax.servlet.servlet-api.version>
     </properties>
@@ -160,25 +151,6 @@
             <version>${org.springframework.version}</version>
         </dependency>
 
-
-        <!-- LOGGING -->
-      <!--  <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>${commons-logging.version}</version>
-            <scope>provided</scope>
-        </dependency>-->
-       <!-- <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>${org.slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-        </dependency>-->
-
         <!-- Spring base -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -208,11 +180,6 @@
 
     <build>
         <plugins>
-           <!-- <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>-->
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
