@@ -1,6 +1,5 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
-import com.github.p4535992.util.log.SystemLog;
 import com.github.p4535992.util.string.StringUtilities;
 import gate.*;
 
@@ -18,7 +17,12 @@ import java.util.*;
 @SuppressWarnings("unused")
 public class GateAnnotation8Kit {
 
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GateAnnotation8Kit.class);
+    private static final org.slf4j.Logger logger =
+            org.slf4j.LoggerFactory.getLogger(GateAnnotation8Kit.class);
+
+    private static String gm() {
+        return Thread.currentThread().getStackTrace()[1].getMethodName()+":: ";
+    }
 
     private static GateAnnotation8Kit instance = null;
     protected GateAnnotation8Kit(){}
@@ -74,7 +78,7 @@ public class GateAnnotation8Kit {
              //get content from all the annotation in alll the annotaiotn set sorted....
             for (String nameAnnotation : listNameAnnotation) { //for each annotation...
                 for(String nameAnnotationSet: listNameAnnotationSet) {//for each annotation set...
-                    String content ="";
+                    String content; //empty string
                     content = getSingleAnnotationInfo(document, nameAnnotation, nameAnnotationSet);
                     //get the annotation on the first annotation set is have it without check the other annnotation set...
                     if (!StringUtilities.isNullOrEmpty(content)) {
@@ -179,7 +183,7 @@ public class GateAnnotation8Kit {
             return finalList;
 
         } catch (NullPointerException ep) {
-            SystemLog.exception(ep);
+            logger.info(gm() + ep.getMessage(), ep);
         }
         return finalList;
 
@@ -215,7 +219,7 @@ public class GateAnnotation8Kit {
             //for
             return content;
         } catch (NullPointerException ep) {
-            SystemLog.exception(ep);
+            logger.info(gm() + ep.getMessage(), ep);
         }
         return null;
     }
@@ -227,7 +231,7 @@ public class GateAnnotation8Kit {
      * @param annotationSet string name of the annotationset.
      * @return string most longest content from the same annotations.
      */
-    public String getContentLongestFromAnnnotationsOnAnnotationSet(Document doc,String nameAnnotation,AnnotationSet annotationSet){
+    public String getContentLongestFromAnnotationsOnAnnotationSet(Document doc,String nameAnnotation,AnnotationSet annotationSet){
         long begOffset,endOffset;
         long x = 0;
         long y = 0;
@@ -266,7 +270,7 @@ public class GateAnnotation8Kit {
                 return content;
             }
         } catch (NullPointerException ep) {
-            SystemLog.warning(ep.getMessage());
+            logger.info(gm() + ep.getMessage(),ep);
         }
         return null;
     }

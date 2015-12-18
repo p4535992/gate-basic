@@ -2,7 +2,6 @@ package com.github.p4535992.gatebasic.gate.gate8;
 
 import com.github.p4535992.util.bean.BeansKit;
 import com.github.p4535992.util.file.FileUtilities;
-import com.github.p4535992.util.log.SystemLog;
 import gate.*;
 import gate.corpora.RepositioningInfo;
 import gate.gui.MainFrame;
@@ -24,7 +23,12 @@ import java.util.*;
 @SuppressWarnings("unused")
 public class Gate8Kit {
 
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(Gate8Kit.class);
+    private static final org.slf4j.Logger logger =
+            org.slf4j.LoggerFactory.getLogger(Gate8Kit.class);
+
+    private static String gm() {
+        return Thread.currentThread().getStackTrace()[1].getMethodName()+":: ";
+    }
 
     /** The Corpus Pipeline application to contain ANNE,Lingpipe,Tools,ecc. */
     private boolean showGate;
@@ -108,7 +112,7 @@ public class Gate8Kit {
                             String configFileGate,String configFileUser,String configFileSession,String gappFile){
         //SET GATE EMBEDDED
         try {
-            SystemLog.message("Initializing GATE...");
+            logger.info(gm() + "Initializing GATE...");
             if (!directoryFolderHome.startsWith(File.separator))
                 directoryFolderHome = File.separator + directoryFolderHome;
             if (directoryFolderHome.endsWith(File.separator))
@@ -156,11 +160,10 @@ public class Gate8Kit {
                 throw new IOException("The configFileSession " + configFileSession + " of GATE not exists!");
             Gate.setUserSessionFile(new File(configFileSession));
         } catch(IllegalStateException e){
-            SystemLog.warning("Some configuration file of GATE is has already been set");
-            SystemLog.warning(e.getMessage());
-        }catch(IOException e1) {
-            SystemLog.error(e1.getMessage());
-            SystemLog.abort(0, "Failed the initialization of GATE");
+            logger.warn(gm() + "Some configuration file of GATE is has already been set");
+            logger.warn(gm() + e.getMessage(), e);
+        }catch(IOException e) {
+            logger.error(gm() + "Failed the initialization of GATE:" +e.getMessage(),e);
         }
         //...TRY A SECOND TIME TO INITIALIZE GATE
         try {
@@ -171,10 +174,10 @@ public class Gate8Kit {
                 FileUtilities.createFile(configFileSession);
                 Gate.init();
             }catch(GateException ex){
-                SystemLog.exception(e);
+                logger.error(gm() +e.getMessage(),e);
             }
         }
-        SystemLog.message("...GATE initialized");
+        logger.info(gm() + "...GATE initialized");
         if(showGate) {
             //Work with graphic GATE interface
             MainFrame.getInstance().setVisible(true);
@@ -203,7 +206,7 @@ public class Gate8Kit {
      * @return corpus controller of the gapp file.
      */
     public CorpusController loadGapp(String fileGapp){
-        SystemLog.message("Loading file .gapp/.xgapp...");
+        logger.info(gm() + "Loading file .gapp/.xgapp...");
         try {
             if(!fileGapp.startsWith(File.separator)) fileGapp = File.separator + fileGapp;
             if(fileGapp.endsWith(File.separator)) fileGapp = fileGapp.substring(0,fileGapp.length()-1);
@@ -215,9 +218,9 @@ public class Gate8Kit {
                 throw new IOException("The gapp file not exists");
             }
             //CorpusController  con = (CorpusController) PersistenceManager.loadObjectFromFile(gapp);
-            SystemLog.message("... file .gapp/.xgapp loaded!");
+            logger.info(gm() + "... file .gapp/.xgapp loaded!");
         }catch(GateException|IOException e){
-            SystemLog.exception(e);
+            logger.warn(gm() + e.getMessage(), e);
         }
         return (CorpusController) controller;
     } // initAnnie()
@@ -239,7 +242,7 @@ public class Gate8Kit {
             //procDoc = BeansKit.getBeanFromContext("documentProcessor",DocumentProcessor.class,ctx);
             procDoc = BeansKit.getBeanFromContext(idBeanDocumentProcessor,DocumentProcessor.class,ctx);
         } catch (IOException e) {
-            SystemLog.exception(e);
+            logger.warn(gm() + e.getMessage(), e);
         }
         return procDoc;
     }
@@ -275,15 +278,15 @@ public class Gate8Kit {
                 currStart = currAnot.getStartNode().getOffset();
                 if(annotStart < currStart) {
                     super.insertElementAt(annot, i);
-                    SystemLog.message("Insert start: " + annotStart + " at position: " + i + " size=" + size());
-                    SystemLog.message("Current start: " + currStart);
+                    logger.info(gm() + "Insert start: " + annotStart + " at position: " + i + " size=" + size());
+                    logger.info(gm() + "Current start: " + currStart);
                     return true;
                 } // if
             } // for
 
             int size = size();
             super.insertElementAt(annot, size);
-            SystemLog.message("Insert start: " + annotStart + " at size position: " + size);
+            logger.info(gm() + "Insert start: " + annotStart + " at size position: " + size);
             return true;
         } // addSorted
     } // SortedAnnotationList
@@ -324,10 +327,10 @@ public class Gate8Kit {
             String nameGateDocument0 = doc.getName();
             String fileName0 = "("+count+")"+nameGateDocument0+".html";
             FileUtilities.createFile(directory);//create file if not exists...
-            System.out.println("File write to the path : '"+ directory.getAbsolutePath()+"'");
+            logger.info(gm() + "File write to the path : '" + directory.getAbsolutePath() + "'");
             //after the controller is execute....
             if(originalContent != null && info != null) {
-                System.out.println("OrigContent and reposInfo existing. Generate file...");
+                logger.info(gm() + "OrigContent and reposInfo existing. Generate file...");
                 Iterator<Annotation> it = newSetAnnotation.iterator();
                 Annotation currAnnot;
                 SortedAnnotationList sortedAnnotations = new SortedAnnotationList();
@@ -339,8 +342,8 @@ public class Gate8Kit {
                 long insertPositionEnd;
                 long insertPositionStart;
                 // insert anotation tags backward
-                System.out.println("Unsorted annotations count: "+newSetAnnotation.size());
-                System.out.println("Sorted annotations count: "+sortedAnnotations.size());
+                logger.info(gm() + "Unsorted annotations count: " + newSetAnnotation.size());
+                logger.info(gm() + "Sorted annotations count: " + sortedAnnotations.size());
                 if(newSetAnnotation.size()>0 && sortedAnnotations.size()>0){
                     for(int i=sortedAnnotations.size()-1; i>=0; --i) {
                         currAnnot = sortedAnnotations.get(i);
@@ -366,7 +369,7 @@ public class Gate8Kit {
                 }
             } // if - should generate
             else if (originalContent != null) {
-                System.out.println("OrigContent existing. Generate file...");
+                logger.info(gm() + "OrigContent existing. Generate file...");
 
                 Iterator<Annotation> it = newSetAnnotation.iterator();
                 Annotation currAnnot;
@@ -381,8 +384,8 @@ public class Gate8Kit {
                 long insertPositionEnd;
                 long insertPositionStart;
                 // insert anotation tags backward
-                SystemLog.message("Unsorted annotations count: " + newSetAnnotation.size());
-                SystemLog.message("Sorted annotations count: " + sortedAnnotations.size());
+                logger.info(gm() + "Unsorted annotations count: " + newSetAnnotation.size());
+                logger.info(gm() + "Sorted annotations count: " + sortedAnnotations.size());
                 if(newSetAnnotation.size()>0 && sortedAnnotations.size()>0){
                     for(int i=sortedAnnotations.size()-1; i>=0; --i) {
                         currAnnot = sortedAnnotations.get(i);
@@ -405,8 +408,8 @@ public class Gate8Kit {
                 }
             }
             else {
-                SystemLog.message("Content : " + doc.getContent().toString());
-                SystemLog.message("Repositioning: " + info);
+                logger.info(gm() + "Content : " + doc.getContent().toString());
+                logger.info(gm() +"Repositioning: " + info);
             }
 
             String xmlDocument = doc.toXml(newSetAnnotation, false);

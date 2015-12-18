@@ -1,6 +1,6 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 import com.github.p4535992.util.file.FileUtilities;
-import com.github.p4535992.util.log.SystemLog;
+
 import gate.*;
 import gate.corpora.DocumentImpl;
 import gate.creole.ResourceInstantiationException;
@@ -16,7 +16,14 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 public class GateCorpus8Kit {
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger( GateCorpus8Kit.class);
+
+    private static final org.slf4j.Logger logger =
+            org.slf4j.LoggerFactory.getLogger(GateCorpus8Kit.class);
+
+    private static String gm() {
+        return Thread.currentThread().getStackTrace()[1].getMethodName()+":: ";
+    }
+
     private Document doc;
     public Corpus getCorpus() {
         return corpus;
@@ -53,7 +60,7 @@ public class GateCorpus8Kit {
         if(doc != null) {
             corpus.add(doc);//add a document to the corpus
         }
-        SystemLog.message("Loaded a corpus of: "+corpus.size()+" files");
+        logger.info(gm() + "Loaded a corpus of: " + corpus.size() + " files");
         return corpus;
     } // createCorpus
     
@@ -75,7 +82,7 @@ public class GateCorpus8Kit {
                 indice++;
             }
         } // for each corpus
-        SystemLog.message("Contenuto del Corpus costituito da:" + indice + " indirizzi url.");
+        logger.info(gm() + "The Corpus has:" + indice + " document create from urls address.");
         return corpus;
     } // createCorpus
 
@@ -135,7 +142,7 @@ public class GateCorpus8Kit {
             throws ResourceInstantiationException{
         corpus = Factory.newCorpus(nomeCorpus);
         corpus.add(doc);//add a document to the corpus
-        SystemLog.message("Loaded a corpus of: "+corpus.size()+" files");
+        logger.info(gm() + "Loaded a corpus of: " + corpus.size() + " files");
         return corpus;
     } // createCorpus
 
@@ -152,7 +159,7 @@ public class GateCorpus8Kit {
         for(Document document: listDoc) {
             corpus.add(document);//add a document to the corpus
         }
-        SystemLog.message("Loaded a corpus of: "+corpus.size()+" files");
+        logger.info(gm() + "Loaded a corpus of: " + corpus.size() + " files");
         return corpus;
     } // createCorpus
 
@@ -170,7 +177,7 @@ public class GateCorpus8Kit {
         if(doc != null) {
             corpus.add(doc);//add a document to the corpus
         }
-        SystemLog.message("Loaded a corpus of: "+corpus.size()+" files");
+        logger.info(gm() + "Loaded a corpus of: " + corpus.size() + " files");
         return corpus;
     } // createCorpus
 
@@ -250,11 +257,11 @@ public class GateCorpus8Kit {
                 }
             }
             //doc = Factory.newDocument(url, "utf-8");          
-        } catch (ArrayIndexOutOfBoundsException ax) {
-            SystemLog.warning("Document " + url + " not exists anymore or is unreachable.");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            logger.warn(gm() + "Document " + url + " not exists anymore or is unreachable:"+e.getMessage(),e);
         }
-        catch (NullPointerException ne){
-            SystemLog.exception(ne);
+        catch (NullPointerException e){
+            logger.error(gm() + e.getMessage(),e);
             doc = null;
         }
         return doc;
@@ -279,7 +286,7 @@ public class GateCorpus8Kit {
         try {
             doc = Factory.newDocument(message);
         } catch (ResourceInstantiationException e) {
-            SystemLog.exception(e);
+            logger.error(gm() + e.getMessage(), e);
         }
         return doc;
     }
@@ -294,7 +301,7 @@ public class GateCorpus8Kit {
         try {
             doc = Factory.newDocument(url);
         } catch (ResourceInstantiationException e) {
-            SystemLog.exception(e);
+            logger.error(gm() + e.getMessage(), e);
         }
         return doc;
     }
@@ -310,7 +317,7 @@ public class GateCorpus8Kit {
         try {
             doc = Factory.newDocument(url,encoding);
         } catch (ResourceInstantiationException e) {
-           SystemLog.exception(e);
+            logger.error(gm() + e.getMessage(),e);
         }
         return doc;
     }

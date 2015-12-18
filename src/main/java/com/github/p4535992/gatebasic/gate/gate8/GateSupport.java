@@ -1,7 +1,5 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
-import com.github.p4535992.util.log.SystemLog;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +12,13 @@ import java.util.Map;
  */
 @SuppressWarnings("unused")
 public class GateSupport {
+
+    private static final org.slf4j.Logger logger =
+            org.slf4j.LoggerFactory.getLogger(GateSupport.class);
+
+    private static String gm() {
+        return Thread.currentThread().getStackTrace()[1].getMethodName()+":: ";
+    }
 
     private Map<String,String> mapAnnotation;
     private Map<String,Map<String,String>> mapAnnotationSet;
@@ -98,7 +103,8 @@ public class GateSupport {
 
     public Map<String,Map<String,String>> getDocument(Integer index){
         if(index > mapDocs.size()){
-             SystemLog.warning("The index:"+index+" on the map of the documents you try to get not exists on this map of the result of GATE!!!");
+            logger.warn(gm() + "The index:" + index + " on the map of the documents you try to get not " +
+                    "exists on this map of the result of GATE, return NULL");
              return null;
         }
         List<Map<String,Map<String,String>>> list = new ArrayList<>(mapDocs.values());
@@ -130,7 +136,8 @@ public class GateSupport {
             }
 
         }
-        SystemLog.warning("The document with the name:"+nameDocument+" not exists on this map of the result of GATE!!!");
+        logger.warn(gm() + "The document with the name:" + nameDocument + " not exists on this map of " +
+                "the result of GATE, return NULL");
         return null;
     }
 
@@ -141,7 +148,8 @@ public class GateSupport {
 
     public Map<String,String> getAnnotationSet(Integer index){
         if(index > mapAnnotationSet.size()){
-            SystemLog.warning("The index on the map of the annotationSets you try to get not exists on this map of the result of GATE!!!");
+            logger.warn(gm() + "The index on the map of the annotationSets you try to get not " +
+                    "exists on this map of the result of GATE, return NULL");
             return null;
         }
         List<Map<String,String>> list = new ArrayList<>(mapAnnotationSet.values());
@@ -174,7 +182,8 @@ public class GateSupport {
             }
 
         }
-        SystemLog.warning("The annotationSet with the name:"+nameAnnotationSet+" not exists on this map of the result of GATE!!!");
+        logger.warn(gm() + "The annotationSet with the name:" + nameAnnotationSet + " not exists on this map of " +
+                "the result of GATE, return NULL");
         return null;
     }
 
@@ -185,7 +194,8 @@ public class GateSupport {
 
     public String getAnnotation(Integer index){
         if(index > mapAnnotation.size()){
-            SystemLog.warning("The index:"+index+" on the map of the annotations you try to get not exists on this map of the result of GATE!!!");
+            logger.warn(gm() + "The index:" + index + " on the map of the annotations you try to get not exists" +
+                    " on this map of the result of GATE, return NULL");
             return null;
         }
         List<String> list = new ArrayList<>(mapAnnotation.values());
@@ -215,7 +225,8 @@ public class GateSupport {
             }
 
         }
-        SystemLog.warning("The annotation with the name:"+nameAnnotation+" not exists on this map of the result of GATE!!!");
+        logger.error(gm() + "The annotation with the name:" + nameAnnotation + " not exists " +
+                "on this map of the result of GATE, return NULL");
         return null;
     }
 
@@ -223,8 +234,9 @@ public class GateSupport {
         try {
             return getAnnotation(nameAnnotation, getAnnotationSet(nameAnnotationSet, getDocument(nameDocument, mapDocs)));
         }catch(NullPointerException ne){
-            SystemLog.error("Some parameter of input is wrong or this combination document/annotationSet/annotation not exists!");
-            return null;
+            logger.error("Some parameter of input is wrong or this combination document/annotationSet/annotation not exists," +
+                    "return empty String");
+            return "";
         }
     }
 
@@ -232,8 +244,9 @@ public class GateSupport {
         try{
             return getAnnotation(nameAnnotation, getAnnotationSet(nameAnnotationSet, getDocument(indexDoc, mapDocs)));
         }catch(NullPointerException ne){
-            SystemLog.error("Some parameter of input is wrong or this combination document/annotationSet/annotation not exists!");
-            return null;
+            logger.error("Some parameter of input is wrong or this combination document/annotationSet/annotation not exists," +
+                    "return empty String");
+            return "";
         }
     }
 
@@ -241,8 +254,9 @@ public class GateSupport {
         try {
             return getAnnotation(nameAnnotation, getAnnotationSet(indexAnnSet, getDocument(indexDoc, mapDocs)));
         }catch(NullPointerException ne){
-            SystemLog.error("Some parameter of input is wrong or this combination document/annotationSet/annotation not exists!");
-            return null;
+            logger.error("Some parameter of input is wrong or this combination document/annotationSet/annotation not exists," +
+                    "return empty String");
+            return "";
         }
     }
 
@@ -250,8 +264,9 @@ public class GateSupport {
         try {
             return getAnnotation(indexAnn, getAnnotationSet(indexAnnSet, getDocument(indexDoc, mapDocs)));
         }catch(NullPointerException ne){
-            SystemLog.error("Some parameter of input is wrong or this combination document/annotationSet/annotation not exists!");
-            return null;
+            logger.error("Some parameter of input is wrong or this combination document/annotationSet/annotation not exists," +
+                    "return empty String");
+            return "";
         }
 
     }
