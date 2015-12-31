@@ -308,7 +308,7 @@ public class ExtractorInfoGate8 {
             File fileOrDirectory, CorpusController controller,String nameCorpus,List<String> nameAnnotations,
             List<String> nameAnnotationsSet,boolean firstAndExit) {
         if(FileUtilities.isDirectory(fileOrDirectory)){
-            List<File> listFiles = FileUtilities.readDirectory(fileOrDirectory);
+            List<File> listFiles = FileUtilities.getFilesFromDirectory(fileOrDirectory);
             List<URL> listUrl = new ArrayList<>();
             for(File file: listFiles) {
                 try {
@@ -347,7 +347,7 @@ public class ExtractorInfoGate8 {
             File fileOrDirectory, DocumentProcessor docProcessor, String nameCorpus,List<String> nameAnnotations,
             List<String> nameAnnotationsSet,boolean firstAndExit){
         if(FileUtilities.isDirectory(fileOrDirectory)){
-            List<File> listFiles = FileUtilities.readDirectory(fileOrDirectory);
+            List<File> listFiles = FileUtilities.getFilesFromDirectory(fileOrDirectory);
             List<URL> listUrl = new ArrayList<>();
             for(File file: listFiles) {
                 try {

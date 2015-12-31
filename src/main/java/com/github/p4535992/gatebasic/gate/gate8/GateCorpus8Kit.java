@@ -97,7 +97,7 @@ public class GateCorpus8Kit {
      */
     public Corpus createCorpusByFile(File fileOrDirectory,String nameCorpus) throws ResourceInstantiationException, IOException {
         if(FileUtilities.isDirectory(fileOrDirectory)){
-            List<File> listFiles = FileUtilities.readDirectory(fileOrDirectory);
+            List<File> listFiles = FileUtilities.getFilesFromDirectory(fileOrDirectory);
             return createCorpusByFile(listFiles,nameCorpus);
         }else {
             corpus = Factory.newCorpus(nameCorpus);

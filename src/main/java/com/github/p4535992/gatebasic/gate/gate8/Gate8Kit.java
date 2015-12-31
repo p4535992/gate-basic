@@ -26,10 +26,6 @@ public class Gate8Kit {
     private static final org.slf4j.Logger logger =
             org.slf4j.LoggerFactory.getLogger(Gate8Kit.class);
 
-    private static String gm() {
-        return Thread.currentThread().getStackTrace()[1].getMethodName()+":: ";
-    }
-
     /** The Corpus Pipeline application to contain ANNE,Lingpipe,Tools,ecc. */
     private boolean showGate;
     /** Gate Corpus Controller*/
@@ -42,6 +38,8 @@ public class Gate8Kit {
     private DocumentProcessor procDoc;
     /** Base Directory for Gate Files*/
     private String baseDirectory;
+    /** Check if the GATE API is already set for this Thread */
+    private boolean gateAlreadySetted = false;
 
     private static Gate8Kit instance = null;
     protected Gate8Kit(){
@@ -112,7 +110,7 @@ public class Gate8Kit {
                             String configFileGate,String configFileUser,String configFileSession,String gappFile){
         //SET GATE EMBEDDED
         try {
-            logger.info(gm() + "Initializing GATE...");
+            logger.info("Initializing GATE...");
             if (!directoryFolderHome.startsWith(File.separator))
                 directoryFolderHome = File.separator + directoryFolderHome;
             if (directoryFolderHome.endsWith(File.separator))
@@ -160,10 +158,9 @@ public class Gate8Kit {
                 throw new IOException("The configFileSession " + configFileSession + " of GATE not exists!");
             Gate.setUserSessionFile(new File(configFileSession));
         } catch(IllegalStateException e){
-            logger.warn(gm() + "Some configuration file of GATE is has already been set");
-            logger.warn(gm() + e.getMessage(), e);
+            logger.warn("Some configuration file of GATE is has already been set:"+e.getMessage(), e);
         }catch(IOException e) {
-            logger.error(gm() + "Failed the initialization of GATE:" +e.getMessage(),e);
+            logger.error("Failed the initialization of GATE:" +e.getMessage(),e);
         }
         //...TRY A SECOND TIME TO INITIALIZE GATE
         try {
@@ -174,10 +171,10 @@ public class Gate8Kit {
                 FileUtilities.createFile(configFileSession);
                 Gate.init();
             }catch(GateException ex){
-                logger.error(gm() +e.getMessage(),e);
+                logger.error(e.getMessage(),e);
             }
         }
-        logger.info(gm() + "...GATE initialized");
+        logger.info("...GATE initialized");
         if(showGate) {
             //Work with graphic GATE interface
             MainFrame.getInstance().setVisible(true);
@@ -206,7 +203,7 @@ public class Gate8Kit {
      * @return corpus controller of the gapp file.
      */
     public CorpusController loadGapp(String fileGapp){
-        logger.info(gm() + "Loading file .gapp/.xgapp...");
+        logger.info("Loading file .gapp/.xgapp...");
         try {
             if(!fileGapp.startsWith(File.separator)) fileGapp = File.separator + fileGapp;
             if(fileGapp.endsWith(File.separator)) fileGapp = fileGapp.substring(0,fileGapp.length()-1);
@@ -218,9 +215,9 @@ public class Gate8Kit {
                 throw new IOException("The gapp file not exists");
             }
             //CorpusController  con = (CorpusController) PersistenceManager.loadObjectFromFile(gapp);
-            logger.info(gm() + "... file .gapp/.xgapp loaded!");
+            logger.info("... file .gapp/.xgapp loaded!");
         }catch(GateException|IOException e){
-            logger.warn(gm() + e.getMessage(), e);
+            logger.warn(e.getMessage(), e);
         }
         return (CorpusController) controller;
     } // initAnnie()
@@ -242,185 +239,67 @@ public class Gate8Kit {
             //procDoc = BeansKit.getBeanFromContext("documentProcessor",DocumentProcessor.class,ctx);
             procDoc = BeansKit.getBeanFromContext(idBeanDocumentProcessor,DocumentProcessor.class,ctx);
         } catch (IOException e) {
-            logger.warn(gm() + e.getMessage(), e);
+            logger.warn(e.getMessage(), e);
         }
         return procDoc;
     }
 
     /**
-     * Class for sort the annotation in a list.
+     * Method to set the GATE Embedded API.
+     * @param directoryFolderHome the root directory where all files of gate are stored eg:"gate_files".
+     * @param directoryFolderPlugin  the root directory of all plugin of gate under the directoryFolderHome eg: "plugins".
+     * @param configFileGate the path to the config file of gate under the directoryFolderHome eg:"gate.xml".
+     * @param configFileUser the path to the config file user of gate under the directoryFolderHome eg:"user-gate.xml".
+     * @param configFileSession the path to the config file session of gate under the directoryFolderHome eg:"gate.session".
+     * @param gappFile the path to the gapp file user of gate under the directoryFolderHome eg:"custom/gapp/test.xgapp".
+     * @return the GATE Controller.
      */
-    public class SortedAnnotationList extends Vector<Annotation> {
-        private static final long serialVersionUID = 15L;
-        public SortedAnnotationList() {
-            super();
-        } // SortedAnnotationList
-
-        public boolean addSortedExclusive(Annotation annot) {
-            Annotation currAnot;
-            // overlapping check
-            /*for (int i=0; i<size(); ++i) {
-                currAnot = (Annotation) get(i);
-                if(annot.overlaps(currAnot)) {
-                    return false;
-                } // if
-            } // for*/
-            for (Object o : this) {
-                currAnot = (Annotation) o;
-                if (annot.overlaps(currAnot)) return false;
-                // if
-            } // for
-            long annotStart = annot.getStartNode().getOffset();
-            long currStart;
-            // insert
-            for (int i=0; i < size(); ++i) {
-                currAnot = get(i);
-                currStart = currAnot.getStartNode().getOffset();
-                if(annotStart < currStart) {
-                    super.insertElementAt(annot, i);
-                    logger.info(gm() + "Insert start: " + annotStart + " at position: " + i + " size=" + size());
-                    logger.info(gm() + "Current start: " + currStart);
-                    return true;
-                } // if
-            } // for
-
-            int size = size();
-            super.insertElementAt(annot, size);
-            logger.info(gm() + "Insert start: " + annotStart + " at size position: " + size);
-            return true;
-        } // addSorted
-    } // SortedAnnotationList
-
-
-    /**
-     * Method to convert every gate document in a coprus in xml files with all the annotations you gate in them
-     * @param corpus corpus  of gate.
-     * @param addAnnotTypesRequired list of annotation.
-     * @param directory file directory where store the html and xml file of the gate documents.
-     * @throws IOException error.
-     */
-    public void createXMLFileForEachDoc(Corpus corpus,List<String> addAnnotTypesRequired,File directory) throws IOException{
-        // for each document, get an XML document with the person,location,MyGeo names added
-        String pathDir = FileUtilities.getPath(directory);
-        Iterator<Document> iter = corpus.iterator();
-        int count = 0;
-        String startTagPart_1 = "<span GateID=\"";
-        String startTagPart_2 = "\" title=\"";
-        String startTagPart_3 = "\" style=\"background:Red;\">";
-        String endTag = "</span>";
-        while(iter.hasNext()) {
-            Document doc = iter.next();
-            AnnotationSet defaultAnnotSet = doc.getAnnotations();
-            Set<String> annotTypesRequired = new HashSet<>();
-            for (String s : addAnnotTypesRequired) {
-                annotTypesRequired.add(s);
-                System.out.println(s);
+    public Controller setGate(String directoryFolderHome,String directoryFolderPlugin,
+                              String configFileGate,String configFileUser,String configFileSession,String gappFile){
+        if(controller==null) {
+            if(gateAlreadySetted) {
+                this.controller = setUpGateEmbedded(directoryFolderHome, directoryFolderPlugin,
+                        configFileGate, configFileUser, configFileSession, gappFile);
+                gateAlreadySetted = false;
+                return controller;
+            }else{
+                logger.warn("The GATE embedded API is already set with Spring Framework and ProcessorDocument!!!");
+                return null;
             }
-            // annotTypesRequired.add("Person");
-            // annotTypesRequired.add("Location");
-            Set<Annotation> newSetAnnotation = new HashSet<>(defaultAnnotSet.get(annotTypesRequired));
-            FeatureMap features = doc.getFeatures();
-            String originalContent = (String)features.get(GateConstants.ORIGINAL_DOCUMENT_CONTENT_FEATURE_NAME);
-            RepositioningInfo info = (RepositioningInfo)features.get(GateConstants.DOCUMENT_REPOSITIONING_INFO_FEATURE_NAME);
-            ++count;
-            ///GENERAZIONE DEI DOCUMENTI
-            String nameGateDocument0 = doc.getName();
-            String fileName0 = "("+count+")"+nameGateDocument0+".html";
-            FileUtilities.createFile(directory);//create file if not exists...
-            logger.info(gm() + "File write to the path : '" + directory.getAbsolutePath() + "'");
-            //after the controller is execute....
-            if(originalContent != null && info != null) {
-                logger.info(gm() + "OrigContent and reposInfo existing. Generate file...");
-                Iterator<Annotation> it = newSetAnnotation.iterator();
-                Annotation currAnnot;
-                SortedAnnotationList sortedAnnotations = new SortedAnnotationList();
-                while(it.hasNext()) {
-                    currAnnot = it.next();
-                    sortedAnnotations.addSortedExclusive(currAnnot);
-                } // while
-                StringBuilder editableContent = new StringBuilder(originalContent);
-                long insertPositionEnd;
-                long insertPositionStart;
-                // insert anotation tags backward
-                logger.info(gm() + "Unsorted annotations count: " + newSetAnnotation.size());
-                logger.info(gm() + "Sorted annotations count: " + sortedAnnotations.size());
-                if(newSetAnnotation.size()>0 && sortedAnnotations.size()>0){
-                    for(int i=sortedAnnotations.size()-1; i>=0; --i) {
-                        currAnnot = sortedAnnotations.get(i);
-                        insertPositionStart =
-                                currAnnot.getStartNode().getOffset();
-                        insertPositionStart = info.getOriginalPos(insertPositionStart);
-                        insertPositionEnd = currAnnot.getEndNode().getOffset();
-                        insertPositionEnd = info.getOriginalPos(insertPositionEnd, true);
-                        if(insertPositionEnd != -1 && insertPositionStart != -1) {
-                            editableContent.insert((int)insertPositionEnd, endTag);
-                            editableContent.insert((int)insertPositionStart, startTagPart_3);
-                            editableContent.insert((int)insertPositionStart,
-                                    currAnnot.getType());
-                            editableContent.insert((int)insertPositionStart, startTagPart_2);
-                            editableContent.insert((int)insertPositionStart,
-                                    currAnnot.getId().toString());
-                            editableContent.insert((int)insertPositionStart, startTagPart_1);
-                        } // if
-                    } // for
-                }// if size
-                try (FileWriter writer = new FileWriter(directory)) {
-                    writer.write(editableContent.toString());
-                }
-            } // if - should generate
-            else if (originalContent != null) {
-                logger.info(gm() + "OrigContent existing. Generate file...");
-
-                Iterator<Annotation> it = newSetAnnotation.iterator();
-                Annotation currAnnot;
-                SortedAnnotationList sortedAnnotations = new SortedAnnotationList();
-
-                while(it.hasNext()) {
-                    currAnnot = it.next();
-                    sortedAnnotations.addSortedExclusive(currAnnot);
-                } // while
-
-                StringBuilder editableContent = new StringBuilder(originalContent);
-                long insertPositionEnd;
-                long insertPositionStart;
-                // insert anotation tags backward
-                logger.info(gm() + "Unsorted annotations count: " + newSetAnnotation.size());
-                logger.info(gm() + "Sorted annotations count: " + sortedAnnotations.size());
-                if(newSetAnnotation.size()>0 && sortedAnnotations.size()>0){
-                    for(int i=sortedAnnotations.size()-1; i>=0; --i) {
-                        currAnnot = sortedAnnotations.get(i);
-                        insertPositionStart = currAnnot.getStartNode().getOffset();
-                        insertPositionEnd = currAnnot.getEndNode().getOffset();
-                        if(insertPositionEnd != -1 && insertPositionStart != -1) {
-                            editableContent.insert((int)insertPositionEnd, endTag);
-                            editableContent.insert((int)insertPositionStart, startTagPart_3);
-                            editableContent.insert((int)insertPositionStart,
-                                    currAnnot.getType());
-                            editableContent.insert((int)insertPositionStart, startTagPart_2);
-                            editableContent.insert((int) insertPositionStart,
-                                    currAnnot.getId().toString());
-                            editableContent.insert((int)insertPositionStart, startTagPart_1);
-                        } // if
-                    } // for
-                }//if size
-                try (FileWriter writer = new FileWriter(directory)) {
-                    writer.write(editableContent.toString());
-                }
-            }
-            else {
-                logger.info(gm() + "Content : " + doc.getContent().toString());
-                logger.info(gm() +"Repositioning: " + info);
-            }
-
-            String xmlDocument = doc.toXml(newSetAnnotation, false);
-            String fileName = "("+count+")"+doc.getName()+".xml";
-            //File dir2 = new File ("gate_files");
-            File actualFile = new File (fileName);
-            try (FileWriter writer2 = new FileWriter(actualFile)) {
-                writer2.write(xmlDocument);
-            }
+        }else{
+            logger.warn("The GATE embedded API is already set with Corpus Controller!!!");
+            return controller;
         }
     }
+
+    /**
+     * Method to set the GATE Embedded API with Spring framework.
+     * @param pathToTheGateContextFile path to the GATE Context File eg: "gate/gate-beans.xml".
+     * @param beanNameOfTheProcessorDocument string name of the bean for the DocumentProcessor class on the
+     *                                       gate context file eg:"documentProcessor".
+     * @param thisClass class here you want invoke this method necessary for avoid exception with spring.
+     * @return the GATE DocumentProcessor.
+     */
+    public DocumentProcessor setGateWithSpring(
+            String pathToTheGateContextFile,String beanNameOfTheProcessorDocument,Class<?> thisClass){
+        if(procDoc ==null) {
+            if(gateAlreadySetted) {
+                this.procDoc = setUpGateEmbeddedWithSpring(pathToTheGateContextFile, thisClass, beanNameOfTheProcessorDocument);
+                gateAlreadySetted = false;
+                return procDoc;
+            }else{
+                logger.warn("The GATE embedded API is already set with Corpus Controller!!!");
+                return null;
+            }
+        }else {
+            logger.warn("The GATE embedded API is already set with Spring Framework and ProcessorDocument!!!");
+            return procDoc;
+        }
+    }
+
+    //--------------------------------------------------------------------------------------------
+
+
 
 
 }
