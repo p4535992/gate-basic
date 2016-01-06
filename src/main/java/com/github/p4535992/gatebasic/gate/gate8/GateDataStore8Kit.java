@@ -295,7 +295,7 @@ public class GateDataStore8Kit {
            logger.info(gm() + "(" + i + ")" + "ID NAME:" + c.getLRPersistenceId());
            listCorpus.add(c);
        }
-       //Corpus c = (Corpus)Factory.createResource("gate.corpora.SerialCorpusImpl", fm);
+       //Corpus c = (Corpus)Factory.toResource("gate.corpora.SerialCorpusImpl", fm);
        return listCorpus;
        // similarly for documents, just use gate.corpora.DocumentImpl as the class name
    }
