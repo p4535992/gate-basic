@@ -20,10 +20,6 @@ public class GateCorpus8Kit {
     private static final org.slf4j.Logger logger =
             org.slf4j.LoggerFactory.getLogger(GateCorpus8Kit.class);
 
-    private static String gm() {
-        return Thread.currentThread().getStackTrace()[1].getMethodName()+":: ";
-    }
-
     private Document doc;
     public Corpus getCorpus() {
         return corpus;
@@ -60,7 +56,7 @@ public class GateCorpus8Kit {
         if(doc != null) {
             corpus.add(doc);//add a document to the corpus
         }
-        logger.info(gm() + "Loaded a corpus of: " + corpus.size() + " files");
+        logger.info("Loaded a corpus of: " + corpus.size() + " files");
         return corpus;
     } // createCorpus
     
@@ -82,7 +78,7 @@ public class GateCorpus8Kit {
                 indice++;
             }
         } // for each corpus
-        logger.info(gm() + "The Corpus has:" + indice + " document create from urls address.");
+        logger.info("The Corpus has:" + indice + " document create from urls address.");
         return corpus;
     } // createCorpus
 
@@ -142,7 +138,7 @@ public class GateCorpus8Kit {
             throws ResourceInstantiationException{
         corpus = Factory.newCorpus(nomeCorpus);
         corpus.add(doc);//add a document to the corpus
-        logger.info(gm() + "Loaded a corpus of: " + corpus.size() + " files");
+        logger.info("Loaded a corpus of: " + corpus.size() + " files");
         return corpus;
     } // createCorpus
 
@@ -159,7 +155,7 @@ public class GateCorpus8Kit {
         for(Document document: listDoc) {
             corpus.add(document);//add a document to the corpus
         }
-        logger.info(gm() + "Loaded a corpus of: " + corpus.size() + " files");
+        logger.info("Loaded a corpus of: " + corpus.size() + " files");
         return corpus;
     } // createCorpus
 
@@ -177,7 +173,7 @@ public class GateCorpus8Kit {
         if(doc != null) {
             corpus.add(doc);//add a document to the corpus
         }
-        logger.info(gm() + "Loaded a corpus of: " + corpus.size() + " files");
+        logger.info("Loaded a corpus of: " + corpus.size() + " files");
         return corpus;
     } // createCorpus
 
@@ -258,10 +254,10 @@ public class GateCorpus8Kit {
             }
             //doc = Factory.newDocument(url, "utf-8");          
         } catch (ArrayIndexOutOfBoundsException e) {
-            logger.warn(gm() + "Document " + url + " not exists anymore or is unreachable:"+e.getMessage(),e);
+            logger.warn("Document " + url + " not exists anymore or is unreachable:"+e.getMessage(),e);
         }
         catch (NullPointerException e){
-            logger.error(gm() + e.getMessage(),e);
+            logger.error(e.getMessage(),e);
             doc = null;
         }
         return doc;
@@ -286,7 +282,7 @@ public class GateCorpus8Kit {
         try {
             doc = Factory.newDocument(message);
         } catch (ResourceInstantiationException e) {
-            logger.error(gm() + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         return doc;
     }
@@ -301,7 +297,7 @@ public class GateCorpus8Kit {
         try {
             doc = Factory.newDocument(url);
         } catch (ResourceInstantiationException e) {
-            logger.error(gm() + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         return doc;
     }
@@ -317,7 +313,7 @@ public class GateCorpus8Kit {
         try {
             doc = Factory.newDocument(url,encoding);
         } catch (ResourceInstantiationException e) {
-            logger.error(gm() + e.getMessage(),e);
+            logger.error(e.getMessage(),e);
         }
         return doc;
     }
@@ -329,7 +325,7 @@ public class GateCorpus8Kit {
      * @param doc gate document.
      * @throws IOException throws if any error is occurred.
      */
-    public void wrtieXMLFromDocuemnt(File fileXml,Document doc) throws IOException {
+    public void writeXMLFromDocument(File fileXml,Document doc) throws IOException {
         String docXMLString;
         docXMLString = doc.toXml();
         String outputFileName = doc.getName() + ".out.xml";

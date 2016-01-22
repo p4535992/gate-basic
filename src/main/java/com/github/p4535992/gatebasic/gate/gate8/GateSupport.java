@@ -16,10 +16,6 @@ public class GateSupport {
     private static final org.slf4j.Logger logger =
             org.slf4j.LoggerFactory.getLogger(GateSupport.class);
 
-    private static String gm() {
-        return Thread.currentThread().getStackTrace()[1].getMethodName()+":: ";
-    }
-
     private Map<String,String> mapAnnotation;
     private Map<String,Map<String,String>> mapAnnotationSet;
     private Map<String,Map<String,Map<String,String>>> mapDocs;
@@ -103,7 +99,7 @@ public class GateSupport {
 
     public Map<String,Map<String,String>> getDocument(Integer index){
         if(index > mapDocs.size()){
-            logger.warn(gm() + "The index:" + index + " on the map of the documents you try to get not " +
+            logger.warn("The index:" + index + " on the map of the documents you try to get not " +
                     "exists on this map of the result of GATE, return NULL");
              return null;
         }
@@ -136,7 +132,7 @@ public class GateSupport {
             }
 
         }
-        logger.warn(gm() + "The document with the name:" + nameDocument + " not exists on this map of " +
+        logger.warn("The document with the name:" + nameDocument + " not exists on this map of " +
                 "the result of GATE, return NULL");
         return null;
     }
@@ -148,7 +144,7 @@ public class GateSupport {
 
     public Map<String,String> getAnnotationSet(Integer index){
         if(index > mapAnnotationSet.size()){
-            logger.warn(gm() + "The index on the map of the annotationSets you try to get not " +
+            logger.warn("The index on the map of the annotationSets you try to get not " +
                     "exists on this map of the result of GATE, return NULL");
             return null;
         }
@@ -182,7 +178,7 @@ public class GateSupport {
             }
 
         }
-        logger.warn(gm() + "The annotationSet with the name:" + nameAnnotationSet + " not exists on this map of " +
+        logger.warn("The annotationSet with the name:" + nameAnnotationSet + " not exists on this map of " +
                 "the result of GATE, return NULL");
         return null;
     }
@@ -194,7 +190,7 @@ public class GateSupport {
 
     public String getAnnotation(Integer index){
         if(index > mapAnnotation.size()){
-            logger.warn(gm() + "The index:" + index + " on the map of the annotations you try to get not exists" +
+            logger.warn("The index:" + index + " on the map of the annotations you try to get not exists" +
                     " on this map of the result of GATE, return NULL");
             return null;
         }
@@ -225,7 +221,7 @@ public class GateSupport {
             }
 
         }
-        logger.error(gm() + "The annotation with the name:" + nameAnnotation + " not exists " +
+        logger.error("The annotation with the name:" + nameAnnotation + " not exists " +
                 "on this map of the result of GATE, return NULL");
         return null;
     }

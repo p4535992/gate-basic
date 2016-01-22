@@ -27,15 +27,11 @@ public class GateDataStore8Kit {
     private static final org.slf4j.Logger logger =
             org.slf4j.LoggerFactory.getLogger(GateDataStore8Kit.class);
 
-    private static String gm() {
-        return Thread.currentThread().getStackTrace()[1].getMethodName()+":: ";
-    }
-
     //the directory must EXIST and be EMPTY
     private String DS_DIR = null;//"/var/tmp/gate001"
     private String NAME_DATASTORE = null;
     private SerialDataStore sds = null;
-    private DataStore ds = null;
+    //private DataStore ds = null;
 
      private static GateDataStore8Kit instance = null;
   
@@ -60,7 +56,7 @@ public class GateDataStore8Kit {
           Path rep = Paths.get(DS_DIR + NAME_DATASTORE).toAbsolutePath();
           DS_DIR = rep.toString();
           //DS_DIR = "file:///"+rep.toString();
-          logger.info(gm() +"Datastore directory is located on :" + DS_DIR);
+          logger.info("Datastore directory is located on :" + DS_DIR);
           this.DS_DIR = DS_DIR;
           this.NAME_DATASTORE = NAME_DATASTORE;
       }
@@ -74,24 +70,24 @@ public class GateDataStore8Kit {
           //gate.init() --- Gate.init()
           //Creazione e settaggio del Corpus avvenuta
           //gate.setCorpus(corpus)
-          logger.info(gm() + "Datastore directory:" + DS_DIR + "\nNome DataStore:" + NAME_DATASTORE);
+          logger.info( "Datastore directory:" + DS_DIR + "\nNome DataStore:" + NAME_DATASTORE);
           try {
                 //insert&open a new Serial Data Store
                 //pass the datastore class and path as parameteres
                 sds  = (SerialDataStore)Factory.createDataStore("gate.persist.SerialDataStore",DS_DIR);
                 sds.setName(NAME_DATASTORE);
-                logger.info(gm() + "Serial datastore created...");
+                logger.info( "Serial datastore created...");
                 //insert test corpus
                 // SecurityInfo is ingored for SerialDataStore - just pass null
                 // a new persisent corpus is returned
                 Corpus  persistCorp = (Corpus)sds.adopt(corp);
                 sds.sync(persistCorp);
-                logger.info(gm() +"Corpus saved in datastore...");
+                logger.info("Corpus saved in datastore...");
                 Object corpusID  = persistCorp.getLRPersistenceId();
-                logger.info(gm() + corpusID.toString());
+                logger.info( corpusID.toString());
           }
           catch(PersistenceException e) {
-                logger.error(gm() + "The datastore already exists:", e.getMessage(),e);
+                logger.error( "The datastore already exists:", e.getMessage(),e);
           }
       }
 
@@ -105,7 +101,7 @@ public class GateDataStore8Kit {
        public void changeNameCorpus(Corpus persistCorp,String nameCorpus) throws PersistenceException{
            persistCorp.setName(nameCorpus);
            persistCorp.sync();
-           logger.info(gm() + "Change name of the Corpus:" + persistCorp.getName() + " on the datastoe with name " + nameCorpus);
+           logger.info( "Change name of the Corpus:" + persistCorp.getName() + " on the datastoe with name " + nameCorpus);
        }
        /**
         * Method to Load corpus from datastore using its persistent ID.
@@ -121,7 +117,7 @@ public class GateDataStore8Kit {
            corpFeatures.put(DataStore.DATASTORE_FEATURE_NAME, sds);
            //tell the context to load the Serial Corpus with the specified ID from the specified  datastore
            Corpus persistCorp = (Corpus)Factory.createResource("gate.corpora.SerialCorpusImpl", corpFeatures);
-           logger.info(gm() + "Corpus " + persistCorp.getName() + " loaded on the datastore...");
+           logger.info( "Corpus " + persistCorp.getName() + " loaded on the datastore...");
            return persistCorp;
 
        }
@@ -133,7 +129,7 @@ public class GateDataStore8Kit {
         */
        public void deleteCorpusFromDataStoreById(Corpus persistCorp,Object corpusID) throws PersistenceException {
            sds.delete("gate.corpora.SerialCorpusImpl", corpusID);
-           logger.info(gm() + "Corpus " + persistCorp.getName() + " deleted from the datastore " + sds.getName() + "!!!");
+           logger.info( "Corpus " + persistCorp.getName() + " deleted from the datastore " + sds.getName() + "!!!");
        }
 
        /**Close the DataStore.
@@ -142,7 +138,7 @@ public class GateDataStore8Kit {
        public void closeDataStore() throws PersistenceException{
            sds.close();
            //sds = null;
-           logger.info(gm() + "Datastore " + sds.getName() + " closed!!!");
+           logger.info( "Datastore " + sds.getName() + " closed!!!");
        }
 
        /**
@@ -151,7 +147,7 @@ public class GateDataStore8Kit {
         */
        public void deleteDataStore() throws PersistenceException{
            sds.delete();
-           logger.info(gm() + "Datastore " + sds.getName() + " deleted!!!");
+           logger.info( "Datastore " + sds.getName() + " deleted!!!");
        }
 
        /** open-reopen DataStore.
@@ -164,21 +160,21 @@ public class GateDataStore8Kit {
                       sds = new SerialDataStore(absolutePathDirectory);
                       sds.setName(NAME_DATASTORE);
                   }catch(Exception e) {
-                      //oppure
-                      ds = Factory.openDataStore("gate.persist.SerialDataStore", "file://" + absolutePathDirectory);
+                      //or
+                      DataStore ds = Factory.openDataStore("gate.persist.SerialDataStore", "file://" + absolutePathDirectory);
                       sds = (SerialDataStore) ds;
                   }
               }
               sds.open();
-              logger.info(gm() +"Datastore " + sds.getName() + " opened");
+              logger.info("Datastore " + sds.getName() + " opened");
            }catch(PersistenceException e){
               try {
                   sds  = (SerialDataStore)Factory.createDataStore("gate.persist.SerialDataStore",DS_DIR);
                   sds.setName(NAME_DATASTORE);
                   sds.open();
-                  logger.info(gm() + "Datastore " + sds.getName() + " opened");
+                  logger.info( "Datastore " + sds.getName() + " opened");
               } catch (PersistenceException ex) {
-                  logger.error(gm() + e.getMessage(),e);
+                  logger.error( e.getMessage(),e);
               }
           }
        }
@@ -192,18 +188,18 @@ public class GateDataStore8Kit {
                 sds = new SerialDataStore(DS_DIR);
                 sds.setName(NAME_DATASTORE);
              }
-             logger.info(gm() + "Try to open the Datastore on directory:" + DS_DIR + "...");
+             logger.info( "Try to open the Datastore on directory:" + DS_DIR + "...");
              //sds =(SerialDataStore) Factory.openDataStore("gate.persist.SerialDataStore","file://"+DS_DIR);
              sds.open();
-             logger.info(gm() + "...opened Datastore " + sds.getName() + "!!!");
+             logger.info( "...opened Datastore " + sds.getName() + "!!!");
         } catch(PersistenceException e){
               try {
                   sds  = (SerialDataStore)Factory.createDataStore("gate.persist.SerialDataStore",DS_DIR);
                   sds.setName(NAME_DATASTORE);
                   sds.open();
-                  logger.info(gm() + "Try to opne the Datastore directory:" + DS_DIR + "...");
+                  logger.info( "Try to opne the Datastore directory:" + DS_DIR + "...");
               } catch (PersistenceException ex) {
-                  logger.info(gm() + ex.getMessage(), ex);
+                  logger.info( ex.getMessage(), ex);
               }
 
         }
@@ -220,7 +216,7 @@ public class GateDataStore8Kit {
        //SecurityInfo is ingored for SerialDataStore - just pass null
        Document persistDoc = (Document)sds.adopt(doc);
        sds.sync(persistDoc);
-       logger.info(gm() + "Document " + doc.getName() + " save to Datastore with the name " + persistDoc.getName());
+       logger.info( "Document " + doc.getName() + " save to Datastore with the name " + persistDoc.getName());
        return persistDoc;
    }
 
@@ -235,7 +231,7 @@ public class GateDataStore8Kit {
        String oldName = persistDoc.getName();
        persistDoc.setName(newName);
        persistDoc.sync();
-       logger.info(gm() +"Document: " + oldName + " on the Datastore has a new name: " + persistDoc.getName());
+       logger.info("Document: " + oldName + " on the Datastore has a new name: " + persistDoc.getName());
    }
 
    /**
@@ -251,7 +247,7 @@ public class GateDataStore8Kit {
        docFeatures.put(DataStore.LR_ID_FEATURE_NAME, docID);
        docFeatures.put(DataStore.DATASTORE_FEATURE_NAME, sds);
        Document persistDoc = (Document)Factory.createResource("gate.corpora.DocumentImpl", docFeatures);
-       logger.info(gm() + "Document" + persistDoc.getName() + " is loaded from the DataStore!!!");
+       logger.info( "Document" + persistDoc.getName() + " is loaded from the DataStore!!!");
        return persistDoc;
    }
 
@@ -263,7 +259,7 @@ public class GateDataStore8Kit {
    public void deleteDocumentFromDataStore(Document persistDoc) throws PersistenceException{
        Object docID  = persistDoc.getLRPersistenceId();
        sds.delete("gate.corpora.DocumentImpl", docID);
-       logger.info(gm() +"The document " + persistDoc.getName() + " is deleted from the DataStore!!!");
+       logger.info("The document " + persistDoc.getName() + " is deleted from the DataStore!!!");
    }
 
    /**
@@ -291,8 +287,8 @@ public class GateDataStore8Kit {
            fm.put(DataStore.DATASTORE_FEATURE_NAME, sds);
            fm.put(DataStore.LR_ID_FEATURE_NAME, corpusIds.get(i));
            Corpus c = (Corpus)Factory.createResource("gate.corpora.SerialCorpusImpl", fm);
-           logger.info(gm() + "(" + i + ")" + "CORPUS NAME:" + c.getName());
-           logger.info(gm() + "(" + i + ")" + "ID NAME:" + c.getLRPersistenceId());
+           logger.info( "(" + i + ")" + "CORPUS NAME:" + c.getName());
+           logger.info( "(" + i + ")" + "ID NAME:" + c.getLRPersistenceId());
            listCorpus.add(c);
        }
        //Corpus c = (Corpus)Factory.toResource("gate.corpora.SerialCorpusImpl", fm);
@@ -314,11 +310,11 @@ public class GateDataStore8Kit {
        //listCorpus = loadAllCorpusOnTheDataStore();
        for(Corpus corpus: listCorpus){
            String name_corpus = corpus.getName();
-           logger.info(gm() + name_corpus.toUpperCase());
+           logger.info( name_corpus.toUpperCase());
            for(Document doc: corpus){
                String old_name_doc = doc.getName();
                String new_name_doc =name_corpus+"_"+old_name_doc;
-               logger.info(gm() + "Document of Corpus:" + new_name_doc);
+               logger.info( "Document of Corpus:" + new_name_doc);
                doc.setName(new_name_doc);
                finalCorpus.add(doc);
            }
@@ -339,11 +335,11 @@ public class GateDataStore8Kit {
        List<Corpus> listCorpus = loadAllCorpusOnTheDataStore();
        for(Corpus corpus: listCorpus){
            String name_corpus = corpus.getName();
-           logger.info(gm() + name_corpus.toUpperCase());
+           logger.info( name_corpus.toUpperCase());
            for(Document doc: corpus){
                String old_name_doc = doc.getName();
                String new_name_doc =name_corpus+"_"+old_name_doc;
-               logger.info(gm() + "Document of the Corpus:" + new_name_doc);
+               logger.info( "Document of the Corpus:" + new_name_doc);
                doc.setName(new_name_doc);
                finalCorpus.add(doc);
            }
@@ -355,9 +351,9 @@ public class GateDataStore8Kit {
        //insert test corpus
        Corpus persistCorp = (Corpus)sds.adopt(corp);
        sds.sync(persistCorp);
-       logger.info(gm() + "corpus saved in datastore...");
+       logger.info( "corpus saved in datastore...");
        Object corpusID  = persistCorp.getLRPersistenceId();
-       logger.info(gm() +"ID del Corpus salvato nel datastore:" + corpusID.toString());
+       logger.info("ID del Corpus salvato nel datastore:" + corpusID.toString());
    }
 
     //SETTER AND GETTER

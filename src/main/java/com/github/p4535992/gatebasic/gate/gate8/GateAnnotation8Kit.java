@@ -20,10 +20,6 @@ public class GateAnnotation8Kit {
     private static final org.slf4j.Logger logger =
             org.slf4j.LoggerFactory.getLogger(GateAnnotation8Kit.class);
 
-    private static String gm() {
-        return Thread.currentThread().getStackTrace()[1].getMethodName()+":: ";
-    }
-
     private static GateAnnotation8Kit instance = null;
     protected GateAnnotation8Kit(){}
 
@@ -183,7 +179,7 @@ public class GateAnnotation8Kit {
             return finalList;
 
         } catch (NullPointerException ep) {
-            logger.info(gm() + ep.getMessage(), ep);
+            logger.info(ep.getMessage(), ep);
         }
         return finalList;
 
@@ -219,7 +215,7 @@ public class GateAnnotation8Kit {
             //for
             return content;
         } catch (NullPointerException ep) {
-            logger.info(gm() + ep.getMessage(), ep);
+            logger.info(ep.getMessage(), ep);
         }
         return null;
     }
@@ -270,7 +266,7 @@ public class GateAnnotation8Kit {
                 return content;
             }
         } catch (NullPointerException ep) {
-            logger.info(gm() + ep.getMessage(),ep);
+            logger.info(ep.getMessage(),ep);
         }
         return null;
     }

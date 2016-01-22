@@ -31,10 +31,6 @@ public class ExtractorInfoGate8 {
     private static final org.slf4j.Logger logger =
             org.slf4j.LoggerFactory.getLogger(ExtractorInfoGate8.class);
 
-    private static String gm() {
-        return Thread.currentThread().getStackTrace()[1].getMethodName()+":: ";
-    }
-
     private Corpus corpus;
     private Map<String,Map<String,Map<String,String>>> mapContentDocs;
 
@@ -78,14 +74,14 @@ public class ExtractorInfoGate8 {
                 exeTentative ++;
                 execute(controller);
             }else{
-                logger.warn(gm() + "No sentences or tokens to process in some gate documents");
+                logger.warn("No sentences or tokens to process in some gate documents");
             }
         }catch(OutOfMemoryError e){
             if(exeTentative < 3){
                 exeTentative ++;
                 execute(controller);
             }else{
-                logger.warn(gm() + "Exception in thread \"AWT-EventQueue-0\" ava.lang.OutOfMemoryError: Java heap space");
+                logger.warn("Exception in thread \"AWT-EventQueue-0\" ava.lang.OutOfMemoryError: Java heap space");
             }
         }
     }
@@ -117,15 +113,15 @@ public class ExtractorInfoGate8 {
             if(corpus == null){return null;}
             else{
                 setCorpus(corpus, controller);
-                logger.info(gm() + "Execute of GATE in process for the url " + url + "...");
+                logger.info("Execute of GATE in process for the url " + url + "...");
                 execute(controller);
-                logger.info(gm() + "...GATE is been processed");
-                logger.info(gm() + "Work with the annotations...");
+                logger.info("...GATE is been processed");
+                logger.info("Work with the annotations...");
                 return extractorGATE(corpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
             }//else
         }//try
         catch(GateException|RuntimeException|IOException e){
-            logger.error(gm() + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         finally{
             cleanup();
@@ -155,9 +151,9 @@ public class ExtractorInfoGate8 {
             if(url!=null){
                 doc = gc8.createDoc(url);
             }//if url!=null
-            logger.info(gm() + "Execute of GATE in process for the url " + url + "...");
+            logger.info("Execute of GATE in process for the url " + url + "...");
             docProcessor.processDocument(doc);
-            logger.info(gm() + "...GATE is been processed");
+            logger.info("...GATE is been processed");
             if(StringUtilities.isNullOrEmpty(nameCorpus)) {
                 corpus = gc8.createCorpusByDocument(doc, "GeoDocuments Corpus");
             }else{
@@ -168,12 +164,12 @@ public class ExtractorInfoGate8 {
                 return null;
             }
             else{
-                logger.info(gm() + "Work with the annotations...");
+                logger.info("Work with the annotations...");
                 return extractorGATE(corpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
             }//else
         }//try
         catch(GateException|RuntimeException e){
-            logger.error(gm() + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         finally{
             cleanup();
@@ -198,7 +194,7 @@ public class ExtractorInfoGate8 {
             List<String> nameAnnotationsSet,boolean firstAndExit) {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         try{
-            logger.info(gm() + "Execute of GATE in process for a list of  " + listUrl.size() + " urls...");
+            logger.info("Execute of GATE in process for a list of  " + listUrl.size() + " urls...");
             if (StringUtilities.isNullOrEmpty(nameCorpus)) {
                 corpus = gc8.createCorpusByUrl(listUrl, "GeoDocuments Corpus");
             } else {
@@ -208,13 +204,13 @@ public class ExtractorInfoGate8 {
             else{
                 setCorpus(corpus, controller);
                 execute(controller);
-                logger.info(gm() + "...GATE is been processed");
-                logger.info(gm() + "Work with the annotations...");
+                logger.info("...GATE is been processed");
+                logger.info("Work with the annotations...");
                 return extractorGATE(corpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
             }//else
         }//try
         catch(GateException|RuntimeException|IOException e){
-            logger.error(gm() + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         finally{
             cleanup();
@@ -250,22 +246,22 @@ public class ExtractorInfoGate8 {
                     if (url != null) {
                         doc = gc8.createDoc(url);
                     }//if url!=null
-                    logger.info(gm() + "Execute of GATE in process for the url " + url + "...");
+                    logger.info("Execute of GATE in process for the url " + url + "...");
                     docProcessor.processDocument(doc);
-                    logger.info(gm() + "...GATE is been processed");
+                    logger.info("...GATE is been processed");
                     corpus.add(doc);
                 } catch(GateException e){
-                    logger.warn(gm() + e.getMessage(),e);
+                    logger.warn(e.getMessage(),e);
                 }
             }
             if(corpus == null){return null;}
             else{
-                logger.info(gm() + "Work with the annotations...");
+                logger.info("Work with the annotations...");
                 return extractorGATE(corpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
             }//else
         }//try
         catch(GateException|RuntimeException e){
-            logger.error(gm() + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         finally{
             cleanup();
@@ -307,27 +303,12 @@ public class ExtractorInfoGate8 {
     public Map<String,Map<String,Map<String,String>>> extractorGATE(
             File fileOrDirectory, CorpusController controller,String nameCorpus,List<String> nameAnnotations,
             List<String> nameAnnotationsSet,boolean firstAndExit) {
-        if(FileUtilities.isDirectory(fileOrDirectory)){
-            List<File> listFiles = FileUtilities.getFilesFromDirectory(fileOrDirectory);
-            List<URL> listUrl = new ArrayList<>();
-            for(File file: listFiles) {
-                try {
-                    URL url = FileUtilities.toURL(file);
-                    listUrl.add(url);
-                } catch (MalformedURLException e) {
-                    logger.warn(gm() + e.getMessage(), e);
-                }
-            }
-            return extractorGATE(listUrl, controller,nameCorpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
+        List<URL> listUrl = prepareListURL(fileOrDirectory);
+
+        if(listUrl.size() > 1) {
+            return extractorGATE(listUrl, controller, nameCorpus, nameAnnotations, nameAnnotationsSet, firstAndExit);
         }else{
-            URL url;
-            try {
-                url = FileUtilities.toURL(fileOrDirectory);
-            } catch (MalformedURLException e) {
-                logger.error(gm() + e.getMessage(), e);
-                return null;
-            }
-            return extractorGATE(url, controller,nameCorpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
+            return extractorGATE(listUrl.get(0), controller, nameCorpus, nameAnnotations, nameAnnotationsSet, firstAndExit);
         }
     }
 
@@ -346,28 +327,12 @@ public class ExtractorInfoGate8 {
     public Map<String,Map<String,Map<String,String>>> extractorGATE(
             File fileOrDirectory, DocumentProcessor docProcessor, String nameCorpus,List<String> nameAnnotations,
             List<String> nameAnnotationsSet,boolean firstAndExit){
-        if(FileUtilities.isDirectory(fileOrDirectory)){
-            List<File> listFiles = FileUtilities.getFilesFromDirectory(fileOrDirectory);
-            List<URL> listUrl = new ArrayList<>();
-            for(File file: listFiles) {
-                try {
-                    URL url = FileUtilities.toURL(file);
-                    listUrl.add(url);
-                } catch (MalformedURLException e) {
-                    logger.warn(gm() + e.getMessage(), e);
-                }
+        List<URL> listUrl = prepareListURL(fileOrDirectory);
 
-            }
+        if(listUrl.size() > 1) {
             return extractorGATE(listUrl, docProcessor,nameCorpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
         }else{
-            URL url;
-            try {
-                url = FileUtilities.toURL(fileOrDirectory);
-            } catch (MalformedURLException e) {
-                logger.error(gm() + e.getMessage(), e);
-                return null;
-            }
-            return extractorGATE(url, docProcessor,nameCorpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
+            return extractorGATE(listUrl.get(0), docProcessor,nameCorpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
         }
     }
 
@@ -398,15 +363,15 @@ public class ExtractorInfoGate8 {
             if(corpus == null){return null;}
             else{
                 setCorpus(corpus, controller);
-                logger.info(gm() + "Execute of GATE in process for a string content ...");
+                logger.info("Execute of GATE in process for a string content ...");
                 execute(controller);
-                logger.info(gm() + "...GATE is been processed");
-                logger.info(gm() + "Work with the annotations...");
+                logger.info("...GATE is been processed");
+                logger.info("Work with the annotations...");
                 return extractorGATE(corpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
             }//else
         }//try
         catch(GateException|RuntimeException|IOException e){
-            logger.error(gm() + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         finally{
             cleanup();
@@ -436,9 +401,9 @@ public class ExtractorInfoGate8 {
             if(contentDocument!=null){
                 doc = gc8.createDoc(contentDocument);
             }//if url!=null
-            logger.info(gm() + "Execute of GATE in process for a string content ...");
+            logger.info("Execute of GATE in process for a string content ...");
             docProcessor.processDocument(doc);
-            logger.info(gm() + "...GATE is been processed");
+            logger.info("...GATE is been processed");
             if(StringUtilities.isNullOrEmpty(nameCorpus)) {
                 corpus = gc8.createCorpusByDocument(doc, "GeoDocuments Corpus");
             }else{
@@ -446,12 +411,12 @@ public class ExtractorInfoGate8 {
             }
             if(corpus == null){return null;}
             else{
-                logger.info(gm() +"Work with the annotations...");
+                logger.info("Work with the annotations...");
                 return extractorGATE(corpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
             }//else
         }//try
         catch(GateException|RuntimeException e){
-            logger.error(gm() + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         finally{
             cleanup();
@@ -482,20 +447,20 @@ public class ExtractorInfoGate8 {
                             }
                         }
                     } catch (java.lang.IndexOutOfBoundsException e) {
-                        logger.error(gm() + e.getMessage(), e);
+                        logger.error(e.getMessage(), e);
                         return null;
                     }
-                    logger.warn(gm() + "We not find any content for the Annotation we inspect, " +
+                    logger.warn("We not find any content for the Annotation we inspect, " +
                             "usually this can't be happened, return a empty string");
                     return "";
                 }//if !isEmpty
                 else{
-                    logger.warn(gm() + "We try to extract content of annotation from a empty list of annotation return empty string");
+                    logger.warn("We try to extract content of annotation from a empty list of annotation return empty string");
                     return "";
                 }
             //}//for each annotation
         } catch (Exception e) {
-            logger.error(gm() + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -508,6 +473,30 @@ public class ExtractorInfoGate8 {
         if(corpus!=null) {
             Factory.deleteResource(corpus);
         }
+    }
+
+    /**
+     * Method to preapre a List of URL froma File or Directoryl
+     * @param fileOrDirectory the {@link File} to inspect.
+     * @return the list of {@link URL}.
+     */
+    private List<URL> prepareListURL(File fileOrDirectory){
+        List<File> listFiles = new ArrayList<>();
+        if(FileUtilities.isDirectory(fileOrDirectory)) {
+            listFiles = FileUtilities.getFilesFromDirectory(fileOrDirectory);
+        }else{
+            listFiles.add(fileOrDirectory);
+        }
+        List<URL> listUrl = new ArrayList<>();
+        for(File file: listFiles) {
+            try {
+                URL url = FileUtilities.toURL(file);
+                listUrl.add(url);
+            } catch (MalformedURLException e) {
+                logger.warn(e.getMessage(), e);
+            }
+        }
+        return listUrl;
     }
 
 }
