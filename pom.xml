@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.p4535992</groupId>
     <artifactId>gate-basic</artifactId>
-    <version>1.6.5</version>
+    <version>1.6.7</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -58,9 +58,8 @@
         <downloadJavadocs>true</downloadJavadocs>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
-        <java-version>1.7</java-version>
+        <java.language.level.version>1.7</java.language.level.version>
         <encoding>UTF-8</encoding>
-        <language-level>1.7</language-level>
         <!-- Version of the Maven properties -->
         <maven-eclipse-plugin.version>2.9</maven-eclipse-plugin.version>
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
@@ -80,7 +79,7 @@
         <!-- DATABASE DRIVER -->
         <mysql-connector-java.version>5.1.35</mysql-connector-java.version>
         <!-- UTILITY -->
-        <com.github.p4535992.utility.version>1.6.5</com.github.p4535992.utility.version>   
+        <com.github.p4535992.utility.version>1.6.7</com.github.p4535992.utility.version>
         <!-- Support -->
         <javax.servlet.servlet-api.version>2.5</javax.servlet.servlet-api.version>
     </properties>
@@ -219,8 +218,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>${language-level}</source>
-                    <target>${language-level}</target>
+                    <source>${java.language.level.version}</source>
+                    <target>${java.language.level.version}</target>
                     <compilerArgument>-Xlint:all</compilerArgument>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>

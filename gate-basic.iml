@@ -9,7 +9,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-    <orderEntry type="jdk" jdkName="1.7" jdkType="JavaSDK" />
+    <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="utility" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate-core:4.3.10.Final" level="project" />
@@ -147,7 +147,6 @@
     <orderEntry type="library" name="Maven: org.fusesource.jansi:jansi:1.11" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.12" level="project" />
     <orderEntry type="library" name="Maven: uk.org.lidalia:sysout-over-slf4j:1.0.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-slf4j-impl:2.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-core:2.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-api:2.5" level="project" />
     <orderEntry type="library" name="Maven: com.univocity:univocity-parsers:2.0.0-SNAPSHOT" level="project" />

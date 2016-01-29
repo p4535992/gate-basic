@@ -92,7 +92,7 @@ public class GateCorpus8Kit {
      * @throws IOException throw if any error is occurred.
      */
     public Corpus createCorpusByFile(File fileOrDirectory,String nameCorpus) throws ResourceInstantiationException, IOException {
-        if(FileUtilities.isDirectory(fileOrDirectory)){
+        if(FileUtilities.isDirectoryExists(fileOrDirectory.getAbsolutePath())){
             List<File> listFiles = FileUtilities.getFilesFromDirectory(fileOrDirectory);
             return createCorpusByFile(listFiles,nameCorpus);
         }else {

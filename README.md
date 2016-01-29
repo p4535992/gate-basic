@@ -2,7 +2,7 @@
 ### A MODULE MAVEN WITH MANY UTILITY CLASS FOR THE API GATE VERSION 8###
 ##############################################################
 #########################
-###Last Update: 2015-11-12
+###Last Update: 2016-01-28
 #########################
 NOTE: I'm not a expert programmer so any suggestion or advise is welcome.
 
@@ -68,7 +68,7 @@ You can the dependency to this github repository With jitpack (https://jitpack.i
  <pre class="prettyprint">&lt;dependency&gt;
   &lt;groupId&gt;com.github.p4535992&lt;/groupId&gt;
   &lt;artifactId&gt;gate-basic&lt;/artifactId&gt;
-  &lt;version&gt;<span id="latest_release">1.4.4</span>&lt;/version&gt;
+  &lt;version&gt;<span id="latest_release">1.6.7</span>&lt;/version&gt;
 &lt;/dependency&gt;  </pre>
 
 <!-- Add this script to update "latest_release" span to latest version -->

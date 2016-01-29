@@ -482,7 +482,7 @@ public class ExtractorInfoGate8 {
      */
     private List<URL> prepareListURL(File fileOrDirectory){
         List<File> listFiles = new ArrayList<>();
-        if(FileUtilities.isDirectory(fileOrDirectory)) {
+        if(FileUtilities.isDirectoryExists(fileOrDirectory.getAbsolutePath())) {
             listFiles = FileUtilities.getFilesFromDirectory(fileOrDirectory);
         }else{
             listFiles.add(fileOrDirectory);
