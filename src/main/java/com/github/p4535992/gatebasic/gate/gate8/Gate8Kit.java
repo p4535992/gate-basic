@@ -168,7 +168,7 @@ public class Gate8Kit {
         }catch(GateException e){
             //..Usuallly you got here for bad reading of the session file
             try {
-                FileUtilities.createFile(configFileSession);
+                FileUtilities.toFile(configFileSession);
                 Gate.init();
             }catch(GateException ex){
                 logger.error(e.getMessage(),e);
