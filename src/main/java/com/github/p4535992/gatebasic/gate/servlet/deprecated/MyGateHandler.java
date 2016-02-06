@@ -30,7 +30,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MyGateHandler implements HttpRequestHandler {
   
   private static List<URL> listaUrl= new ArrayList<>();
-  private static final Logger log = Logger.getLogger(MyGateHandler.class);
+  private static final org.slf4j.Logger log =
+          org.slf4j.LoggerFactory.getLogger(MyGateHandler.class);
   private static GateCorpus8Kit create = GateCorpus8Kit.getInstance();
 
   /**Atomic counter that we use to obtain a unique ID for each handler instance.*/
