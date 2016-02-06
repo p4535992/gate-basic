@@ -11,7 +11,6 @@ package com.github.p4535992.gatebasic.gate.servlet.deprecated;
 import gate.*;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
-import org.apache.log4j.Logger;
 import org.springframework.web.HttpRequestHandler;
 
 import javax.annotation.PostConstruct;
@@ -31,8 +30,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @SuppressWarnings("unused")
 public class GateHandler implements HttpRequestHandler {
-  
-  private static final Logger log = Logger.getLogger(GateHandler.class);
+
+  private static final org.slf4j.Logger logger =
+          org.slf4j.LoggerFactory.getLogger(GateHandler.class);
 
   /**
    * Atomic counter that we use to obtain a unique ID for each handler
@@ -73,7 +73,7 @@ public class GateHandler implements HttpRequestHandler {
   @PostConstruct
   public void init() throws Exception {
     handlerId = nextId.getAndIncrement();
-    log.info("init() for GateHandler " + handlerId);
+    logger.info("init() for GateHandler " + handlerId);
     // insert a corpus and give it to the spring.mvc.home.home.initializer.org.p4535992.mvc.webapp.controller
     corpus = Factory.newCorpus("org.p4535992.mvc.webapp corpus");
     application.setCorpus(corpus);
@@ -86,7 +86,7 @@ public class GateHandler implements HttpRequestHandler {
    */
   @PreDestroy
   public void cleanup() throws Exception {
-    log.info("cleanup() for GateHandler " + handlerId);
+    logger.info("cleanup() for GateHandler " + handlerId);
     Factory.deleteResource(corpus);
     Factory.deleteResource(application);
   }
@@ -96,7 +96,7 @@ public class GateHandler implements HttpRequestHandler {
    */
   public void handleRequest(HttpServletRequest request,
           HttpServletResponse response) throws ServletException, IOException {
-    log.info("Handler " + handlerId + " handling request");
+    logger.info("Handler " + handlerId + " handling request");
     // we take the text to annotate from a form field
     String text = request.getParameter("text");
     // the form also allows you to provide a mime type
@@ -110,13 +110,13 @@ public class GateHandler implements HttpRequestHandler {
         delay = Integer.parseInt(delayParam);
       }
       catch(NumberFormatException e) {
-        log.warn("Failed to parse delay value " + delayParam + ", ignored", e);
+        logger.warn("Failed to parse delay value " + delayParam + ", ignored", e);
       }
     }
 
     Document doc;
     try {
-      log.debug("Creating document");
+      logger.debug("Creating document");
       doc = (Document)Factory.createResource("gate.corpora.DocumentImpl",
                   Utils.featureMap("stringContent", text, "mimeType", mime));
     }
@@ -127,7 +127,7 @@ public class GateHandler implements HttpRequestHandler {
     }
     try {
       corpus.add(doc);
-      log.info("Executing application");
+      logger.info("Executing application");
       application.execute();
       // fake a long-running application by sleeping for delay seconds
       try {
@@ -137,7 +137,7 @@ public class GateHandler implements HttpRequestHandler {
         // re-interrupt self
         Thread.currentThread().interrupt();
       }
-      log.info("Application completed");
+      logger.info("Application completed");
       successMessage(doc, response);
     }
     catch(ExecutionException e) {
@@ -146,7 +146,7 @@ public class GateHandler implements HttpRequestHandler {
     finally {
       // remember to do the clean-up tasks in a finally
       corpus.clear();
-      log.info("Deleting document");
+      logger.info("Deleting document");
       Factory.deleteResource(doc);
     }
   }

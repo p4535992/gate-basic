@@ -1,11 +1,3 @@
-/*
- * This file is part of a hands-on exercise for the third GATE training course,
- * Montreal, August/September 2010.  It is released under the GNU Lesser
- * General Public Licence version 3.0, a copy of which is available at
- * http://gate.ac.uk/gate/licence.html
- *
- * Original code (c) 2010 The University of Sheffield.
- */
 package com.github.p4535992.gatebasic.gate.servlet;
 
 import gate.*;
