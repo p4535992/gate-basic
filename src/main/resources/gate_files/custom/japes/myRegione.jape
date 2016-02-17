@@ -1,0 +1,11 @@
+Phase:	myRegione
+Input:Lookup SpaceToken Sentence Split Location Token regioni
+Options: control = appelt
+
+Rule: RuleMyRegione
+Priority: 50
+(	
+  ({Lookup.majorType==regioni})
+):myRegione
+-->
+:myRegione.MyRegione = {kind = "myRegione", rule = "RuleMyRegione"}

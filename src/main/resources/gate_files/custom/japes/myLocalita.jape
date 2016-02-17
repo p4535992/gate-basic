@@ -1,0 +1,42 @@
+﻿Phase:myLocalita
+Input:Lookup SpaceToken Sentence Split Location Token provincie localita
+Options: control = appelt
+/*localita:Città Arezzo*/
+/*
+Rule: RuleMyLocalita
+Priority: 100
+(
+   ({Lookup.majorType==provincie})
+):myLocalita
+  -->
+:myLocalita.MyLocalita = {kind = "myLocalita", rule = "RuleMyLocalita"}
+*/
+/*
+Rule: RuleMyLocalita2
+Priority: 50
+(
+   ({Lookup.majorType == localita})
+):myLocalita2
+  -->
+:myLocalita2.MyLocalita = {kind = "myLocalita2", rule = "RuleMyLocalita2"}
+*/
+Rule: RuleMyLocalita10
+Priority: 150
+(
+   ({Lookup.majorType == myIndirizzo})[1,1]
+   (CONJ_UNIVERSAL_ITA)[0,3]
+   ({Lookup.majorType == localita}|{Lookup.majorType==provincie}):myLocalita10_1
+):myLocalita10
+  -->
+:myLocalita10_1.MyLocalita = {kind = "myLocalita10_1", rule = "RuleMyLocalita10"}
+
+Rule: RuleMyLocalita11
+Priority: 125
+(
+   ({Token.kind == number,Token.length == 5}|{Token.kind == number,Token.length == 6}
+   |{Token.kind == number,Token.length == 2}|{Token.kind == number,Token.length == 3})[1,1]
+   (CONJ_UNIVERSAL_ITA)[0,4]
+   ({Lookup.majorType == localita}|{Lookup.majorType==provincie}):myLocalita11_1
+):myLocalita11
+  -->
+:myLocalita11_1.MyLocalita = {kind = "myLocalita11_1", rule = "RuleMyLocalita11"}

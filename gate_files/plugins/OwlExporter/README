@@ -1,0 +1,50 @@
+The OwlExporter -- An ontology population component for GATE
+
+To download the latest version of the OwlExporter, please visit 
+http://www.semanticsoftware.info/owlexporter.
+
+The distribution contains the following files:
+
+owlexporter-x/
+  +--doc/
+  |   -- The documentation for the OwlExporter
+  |   -- Our OwlExporter LREC 2010 publication
+  |
+  +--gate/
+       The GATE example pipeline
+       |
+       +--plugins/
+       |   Included Components
+       |	|
+       |        +--OwlExporter/
+       |	|    The source code for the OwlExporter plugin
+       |	+--ANNIE/
+       |             ANNIE Resources
+       |
+       +--application-resources/
+            Resource for the pipeline
+                |
+                +--ontologies/
+                |    Domain and NLP ontologies
+		+--MuNPEx
+		|    Multi-Lingual Noun Phrases Extractor	
+                +--grammars/
+		|    Grammar for demo pipeline
+		+--corpora/
+		     Corpora for demo pipeline
+						
+
+Quickstart: 
+
+To run the pipeline, simply:
+1. add this directory in the CREOLE Plugin Manager
+2. enable the new owlexporter plugin
+3. Load one of the example pipelines through the
+   "Ready-made Applications" menu
+
+For details, please refer to the included documentation.
+
+Note:
+The GNU Affero General Public License v3 (AGPL3) (http://www.gnu.org/licenses/agpl-3.0.html)
+applies to all OwlExporter resources, except for resources where different licenses have been
+included.

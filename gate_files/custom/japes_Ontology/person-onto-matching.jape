@@ -1,0 +1,11 @@
+Phase: OntoMatching
+Input: Lookup
+Options: control = appelt
+
+Rule: PersonLookup
+(
+  ({Lookup.class == Person})
+):person
+-->
+:person.Mention = {class = :person.Lookup.class, inst = :person.Lookup.inst}
+

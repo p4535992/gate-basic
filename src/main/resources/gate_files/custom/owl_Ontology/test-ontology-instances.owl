@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns="http://gate.ac.uk/example#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:protons="http://proton.semanticweb.org/2005/04/protons#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:protont="http://proton.semanticweb.org/2005/04/protont#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#">
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#Organization">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#Location">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#Person">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#Entity">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#John_Smith">
+	<rdf:type rdf:resource="http://gate.ac.uk/example#Person"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#person_has_age">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#A_Company">
+	<rdf:type rdf:resource="http://gate.ac.uk/example#Organization"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#person_works_for">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#Leader">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#Gordon_Brown">
+	<rdf:type rdf:resource="http://gate.ac.uk/example#Leader"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#David_Cameron">
+	<rdf:type rdf:resource="http://gate.ac.uk/example#Leader"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#person_has_age">
+	<rdfs:domain rdf:resource="http://gate.ac.uk/example#Person"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#person_works_for">
+	<rdfs:domain rdf:resource="http://gate.ac.uk/example#Person"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#person_has_age">
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#person_works_for">
+	<rdfs:range rdf:resource="http://gate.ac.uk/example#Organization"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#Organization">
+	<rdfs:subClassOf rdf:resource="http://gate.ac.uk/example#Entity"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#Location">
+	<rdfs:subClassOf rdf:resource="http://gate.ac.uk/example#Entity"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#Person">
+	<rdfs:subClassOf rdf:resource="http://gate.ac.uk/example#Entity"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#Leader">
+	<rdfs:subClassOf rdf:resource="http://gate.ac.uk/example#Person"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#">
+	<rdfs:comment>Our demo ontology</rdfs:comment>
+	<owl:versionInfo>"0.1"</owl:versionInfo>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#Person">
+	<rdfs:label xml:lang="en">My Person class</rdfs:label>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#John_Smith">
+	<rdfs:label xml:lang="en">John Smith</rdfs:label>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#A_Company">
+	<rdfs:label xml:lang="en">My first company</rdfs:label>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#Person">
+	<rdfs:label xml:lang="en">person</rdfs:label>
+	<rdfs:label xml:lang="en">people</rdfs:label>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://gate.ac.uk/example#John_Smith">
+	<person_has_age rdf:datatype="http://www.w3.org/2001/XMLSchema#int">29</person_has_age>
+</rdf:Description>
+
+</rdf:RDF>

@@ -1,0 +1,182 @@
+Phase:	myEmailPhase
+Input:  Token Lookup SpaceToken Split email
+Options: control = appelt
+
+/////////////////////////////////////////////////////////
+MACRO: EMAIL(
+
+/**
+ (
+  ({Token.String=="email"})
+  ({Split}|{SpaceToken}|{Token.String==":"})?
+  ({Split}|{SpaceToken})?
+ )?
+ */
+ (
+  {Token.kind == word}|
+  {Token.kind == number}
+ )+
+ (
+  {Token.string == "_"}
+ )?
+ ({Token.string == "."})?
+  ({Token.kind == word}|
+   {Token.kind == number}|
+   {Token.string == "_"}
+  )*
+ 
+ ({Token.string == "@"}|
+   (
+   ({SpaceToken})?({Token.string == "AT"}|{Token.string == "at"})({SpaceToken})?
+   )
+ )		
+ (
+  {Token.kind == word}|
+  {Token.kind == symbol}|
+  {Token.kind == punctuation}|
+  {Token.kind == number}
+ )
+ ({Token.string == "."})?
+ (
+  {Token.kind == word}|
+  {Token.kind == symbol}|
+  {Token.kind == punctuation}|
+  {Token.kind == number}
+ )*
+ ({Token.string == "."})?
+(
+  {Token.kind == word}|
+  {Token.kind == symbol}|
+  {Token.kind == punctuation}|
+  {Token.kind == number}
+ )?
+({Token.string == "."})?
+ (
+  {Token.string == "."}		
+  (
+   {Token.kind == word}|
+   {Token.kind == number}	
+  )
+  ({Token.string == "."})?
+  (
+   {Token.kind == word}|
+   {Token.kind == number}	
+  )?
+  ({Token.string == "."})?
+  (
+   {Token.kind == word}|
+   {Token.kind == number}	
+  )?
+ )
+ ({Split}|{SpaceToken})?
+)
+/**
+MACRO:EMAIL2(
+
+  (
+  ({Lookup.majorType==email})
+  ({Split}|{SpaceToken}|{Token.String==":"})?
+  ({Split}|{SpaceToken})?
+ )?
+ 
+ (
+  {Token.kind == word}|
+  {Token.kind == number}
+ )+
+ (
+  {Token.string == "_"}
+ )?
+ ({Token.string == "."})?
+  ({Token.kind == word}|
+   {Token.kind == number}|
+   {Token.string == "_"}
+  )*
+ 
+ ({Token.string == "@"}|
+   (
+   ({SpaceToken})?({Token.string == "AT"}|{Token.string == "at"})({SpaceToken})?
+   )
+ )		
+ (
+  {Token.kind == word}|
+  {Token.kind == symbol}|
+  {Token.kind == punctuation}|
+  {Token.kind == number}
+ )
+ ({Token.string == "."})?
+ (
+  {Token.kind == word}|
+  {Token.kind == symbol}|
+  {Token.kind == punctuation}|
+  {Token.kind == number}
+ )*
+ ({Token.string == "."})?
+(
+  {Token.kind == word}|
+  {Token.kind == symbol}|
+  {Token.kind == punctuation}|
+  {Token.kind == number}
+ )?
+({Token.string == "."})?
+ (
+  {Token.string == "."}		
+  (
+   {Token.kind == word}|
+   {Token.kind == number}	
+  )
+  ({Token.string == "."})?
+  (
+   {Token.kind == word}|
+   {Token.kind == number}	
+  )?
+  ({Token.string == "."})?
+  (
+   {Token.kind == word}|
+   {Token.kind == number}	
+  )?
+ )
+ ({Split}|{SpaceToken})?
+  
+  
+) 
+*/
+/**
+MACRO: EMAIL3(
+	({Lookup.majorType==email})
+	({Split}|{SpaceToken}|{Token.string==":"})[0,1]
+)
+* */
+/*
+Rule: myEMAIL_ADDRESS
+Priority: 30
+(
+  (EMAIL)
+):myEmail -->
+:myEmail.MyEmail = {kind = "myEmail", rule = myEMAIL_ADDRESS}
+*/
+Rule: myEMAIL_ADDRESS2
+Priority: 20
+(
+  (
+    ({Token.String=="email"}|{Lookup.majorType==email})
+    ({Split}|{SpaceToken}|{Token.String==":"})[0,3]
+  )[0,1]
+  (EMAIL):myEmaily
+):myEmail2 -->
+:myEmaily.MyEmail = {kind = "myEmaily", rule = myEMAIL_ADDRESS2}
+/**
+Rule: myEMAIL_ADDRESS3
+Priority: 10
+(
+  ({Lookup.majorType==email})
+  ({Split}|{SpaceToken}|{Token.string==":"})[0,1]
+  (
+    (
+            ({Token})
+            ({Split}|{SpaceToken})[0,3]
+    )[0,15]
+   ):myEmailx
+):myEmail3 -->
+:myEmailx.MyEmail = {kind = "myEmailx", rule = myEMAIL_ADDRESS3}
+*/
+

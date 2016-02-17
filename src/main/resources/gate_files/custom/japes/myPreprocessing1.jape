@@ -1,0 +1,118 @@
+/*
+*  myPreprocessing1.jape
+*
+* ConjunctionIdentifier ITA
+* The Phase seperates Annotations of CC and commas from Token Annotations 
+* articoloIndeterminativo.lst:articoloIndeterminativo::it:Lookup
+* articoloDeterminativo.lst:articoloDeterminativo::it:Lookup
+* preposizioni.lst:preposizioni::it:Lookup
+* avverbiDiLuogo.lst:avverbiDiLuogo::it:Lookup
+* locuzioni.lst:locuzioni::it:Lookup
+* congiunzione.lst:congiunzione::it:Lookup
+*/
+Phase: myPreprocessing1 
+Input: Token Split Lookup articoloIndeterminativo articoloDeterminativo preposizioni avverbiDiLuogo locuzioni congiunzione trash conjunction
+Options: control = appelt
+
+//MACRO:CONJ_ITA(
+	//{Lookup.majorType==articoloIndeterminativo}/*(1)un una uno un'*/
+	//|{Lookup.majorType==articoloDeterminativo}/*(2)il lo l' la i gli le*/
+	//|{Lookup.majorType==preposizioni}/*(3)a agli ai al all' alla alle allo assieme attraverso avanti circa con contro da dagli dai dal dall' dalla dalle dallo*/
+	//|{Lookup.majorType==avverbiDiLuogo}/*(4)altrove ci codesto costà costì dappertutto davanti dentro*/
+	//|{Lookup.majorType==locuzioni}/*(5)accanto a vicino a davanti a innanzi a lontano da invece di insieme con*/
+	//|{Lookup.majorType==congiunzione}/*(6)altresì ancora anzi ciò nonostante*/
+	//|{Lookup.majorType==conjunction}	
+//)
+
+/*(1)un una uno un'*/
+Rule: RuleArticoloIndeterminativo
+(
+   ({Lookup.majorType==articoloIndeterminativo})
+):articoloIndeterminativo
+-->
+:articoloIndeterminativo.Temp = {kind = "articoloIndeterminativo", rule = "RuleArticoloIndeterminativo"}
+/*(2)il lo l' la i gli le*/
+Rule: RuleArticoloDeterminativo
+(
+   ({Lookup.majorType==articoloDeterminativo})
+):articoloDeterminativo
+-->
+:articoloDeterminativo.Temp = {kind = "articoloDeterminativo", rule = "RuleArticoloDeterminativo"}
+
+/*(3)a agli ai al all' alla alle allo assieme attraverso avanti circa con contro da dagli dai dal dall' dalla dalle dallo*/
+Rule: RulePreposizioni
+(
+   ({Lookup.majorType==preposizioni})
+):preposizioni
+-->
+:preposizioni.Temp = {kind = "preposizioni", rule = "RulePreposizioni"}
+
+/*(4)altrove ci codesto costà costì dappertutto davanti dentro*/
+Rule: RuleAvverbiDiLuogo
+(
+   ({Lookup.majorType==avverbiDiLuogo})
+):avverbiDiLuogo
+-->
+:avverbiDiLuogo.Temp = {kind = "avverbiDiLuogo", rule = "RuleAvverbiDiLuogo"}
+
+/*(5)accanto a vicino a davanti a innanzi a lontano da invece di insieme con*/
+Rule: RuleLocuzioni
+(
+   ({Lookup.majorType==locuzioni})
+):locuzioni
+-->
+:locuzioni.Temp = {kind = "locuzioni", rule = "RuleLocuzioni"}
+
+/*(6)altresì ancora anzi ciò nonostante*/
+Rule: RuleCongiunzione
+(
+   ({Lookup.majorType==congiunzione})
+):congiunzione
+-->
+:congiunzione.Temp = {kind = "congiunzione", rule = "RuleCongiunzione"}
+
+/*(6), ; : . _ - ( ) [ ] { }*/
+Rule: RuleTrash
+(
+   ({Lookup.majorType==trash})
+):trash
+-->
+:trash.Temp = {kind = "trash", rule = "RuleTrash"}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////77
+
+Rule: ZZZ2
+(
+ {Lookup.majorType == indirizzo}
+):zzz2
+-->
+:zzz2.IndirizzoSupport2 ={kind="zzz2", rule = ZZZ2}
+
+Rule: YYY
+(
+ ({Token.kind == word, Token.orth == allCaps})
+):yyy
+-->
+:yyy.Upper ={kind="yyy", rule = YYY}
+
+Rule: FFF
+(
+ ({Token.kind == word})
+):fff
+-->
+:fff.WordSupport ={kind="fff", rule = FFF}
+
+Rule: UUU
+(
+ {Lookup.majorType == Url}
+):uuu
+-->
+:uuu.UrlSupport ={kind="uuu", rule = UUU}
+
+Rule: NNN
+(
+ {Token.kind == number}
+):nnn
+-->
+:nnn.NumberSupport ={kind="nnn", rule = NNN}

@@ -24,17 +24,85 @@
     <util:properties id="nodeProperty"  location="classpath:gate/gate.properties" />
     <context:property-placeholder properties-ref="nodeProperty" />
     <context:component-scan base-package="com.github.p4535992.gatebasic.gate" />
-    <!--<beans:property name="userDir" value="#{ systemProperties['user.dir'] }"/>&ndash;&gt;-->
+
+    <!--<beans:bean>
+            <beans:property name="userDir" value="#{ systemProperties['user.dir'] }">
+            </beans:property>
+    </beans:bean>-->
+
+    <!-- ========================================================== -->
+    <!-- GATE INTEGRATION WITH SPRING FRAMEWORK (NO BOOT)           -->
+    <!-- ========================================================== -->
+    <!-- Test: C:/Users/Marco/Documents/GitHub/EAT/gate_files-->
+    <!--<gate:init gate-home="file:../gate_files" plugins-home="file:../gate_files/plugins"
+               site-config-file="file:../gate_files/gate.xml" user-config-file="file:../gate_files/gate.xml"/>-->
+    <gate:init gate-home="classpath:gate_files" plugins-home="classpath:gate_files/plugins"
+               site-config-file="classpath:gate_files/gate.xml" user-config-file="classpath:gate_files/user-gate.xml"/>
+
+    <!-- Load a file gapp on spring -->
+
+    <gate:duplicate id="gateApplication" return-template="true">
+        <gate:saved-application location="classpath:gate_files/custom/gapp/geoLocationPipeline06102014v7_fastMode.xgapp" />
+    </gate:duplicate>
+
+    <!-- Define Handler ben,Injection of the controller -->
+    <!--  <beans:bean id="mainHandler"  class="com.github.p4535992.gatebasic.gate.servlet.Gate8Handler" destroy-method="destroy">
+         <beans:property name="application" ref="gateApplication" />
+         <gate:pooled-proxy max-size="3" initial-size="3" />
+     </beans:bean>-->
+
+    <!-- Define the processor bean to be pooled -->
+    <beans:bean id="documentProcessor" class="gate.util.LanguageAnalyserDocumentProcessor" destroy-method="cleanup">
+        <beans:property name="analyser" ref="gateApplication" />
+        <gate:pooled-proxy max-size="3" />
+    </beans:bean>
+
+    <!--<beans:bean id="documentProcessor" class="gate.util.LanguageAnalyserDocumentProcessor">
+        <beans:property name="analyser" ref="gateApplication" />
+        <gate:pooled-proxy max-size="${gate.numThreads}" initial-size="${gate.numThreads}" />
+    </beans:bean>
+-->
+    <!-- Put the following code  to the web.xml file if is a webapp application-->
+    <!--
+    <listener>
+         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    -->
+    <!--
+    <servlet>
+        <servlet-name>mainHandler</servlet-name>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+    </servlet>
+    -->
+
     <!--<property name="fileSep" value="#{ systemProperties['file.separator'] }"/>&ndash;&gt;-->
 
-   <!-- <gate:init gate-home="path/to/GATE"
-               site-config-file="site/gate.xml"
-               user-config-file="user/gate.xml">
-        <gate:preload-plugins>
-            <value>plugins/ANNIE</value>
-            <value>http://plugins.org/another/plugin</value>
-        </gate:preload-plugins>
-    </gate:init>-->
+    <!-- SET UP ENVIROIMENT VARIABLES FOR SPRING -->
+    <!--<beans:bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <beans:property name="locations">
+            <beans:list>
+                <beans:value>
+                    classpath:main-config.properties
+                </beans:value>
+                <beans:value>
+                    file:///${user.home}/spring-test.properties
+                </beans:value>
+            </beans:list>
+        </beans:property>
+        <beans:property name="ignoreResourceNotFound" value="true"/>
+        <beans:property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+    </beans:bean>-->
+    <!-- OR-->
+    <!--<context:property-placeholder location="file:///C:/Applications/external/external.properties"/>-->
+
+    <!-- <gate:init gate-home="path/to/GATE"
+                site-config-file="site/gate.xml"
+                user-config-file="user/gate.xml">
+         <gate:preload-plugins>
+             <value>plugins/ANNIE</value>
+             <value>http://plugins.org/another/plugin</value>
+         </gate:preload-plugins>
+     </gate:init>-->
 
    <!-- <beans:bean class="gate.util.spring.Init" init-method="init">
         <beans:property name="gateHome" value="classpath:gate_files" />
@@ -86,54 +154,6 @@
         </gate:customisers>
     </gate:saved-application>-->
 
-    <!-- ========================================================== -->
-    <!-- GATE INTEGRATION WITH SPRING FRAMEWORK (NO BOOT)           -->
-    <!-- ========================================================== -->
-    <!-- Test: C:/Users/Marco/Documents/GitHub/EAT/gate_files-->
-    <gate:init gate-home="file:gate_files" plugins-home="file:gate_files/plugins"/>
 
-    <!-- Load a file gapp on spring -->
-
-    <gate:duplicate id="gateApplication" return-template="true">
-        <gate:saved-application location="file:gate_files/custom/gapp/geoLocationPipeline06102014v7_fastMode.xgapp" />
-    </gate:duplicate>
-
-    <!-- Define Handler ben,Injection of the controller -->
-   <!--  <beans:bean id="mainHandler"  class="com.github.p4535992.gatebasic.gate.servlet.Gate8Handler" destroy-method="destroy">
-        <beans:property name="application" ref="gateApplication" />
-        <gate:pooled-proxy max-size="3" initial-size="3" />
-    </beans:bean>-->
-
-    <!--<gate:pooled-proxy max-size="3" initial-size="3" />-->
-
-    <!--<gate:pooled-proxy max-size="10" max-idle="3"-->
-                       <!--time-between-eviction-runs-millis="180000"-->
-                       <!--min-evictable-idle-time-millis="90000"-->
-                       <!--when-exhausted-action-name="WHEN_EXHAUSTED_FAIL"-->
-     <!--/>-->
-
-    <!-- Define the processor bean to be pooled -->
-    <beans:bean id="documentProcessor" class="gate.util.LanguageAnalyserDocumentProcessor" destroy-method="cleanup">
-            <beans:property name="analyser" ref="gateApplication" />
-            <gate:pooled-proxy max-size="3" />
-    </beans:bean>
-
-    <!--<beans:bean id="documentProcessor" class="gate.util.LanguageAnalyserDocumentProcessor">
-        <beans:property name="analyser" ref="gateApplication" />
-        <gate:pooled-proxy max-size="${gate.numThreads}" initial-size="${gate.numThreads}" />
-    </beans:bean>
--->
-    <!-- Put the following code  to the web.xml file if is a webapp application-->
-    <!--
-    <listener>
-         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
-    -->
-    <!--
-    <servlet>
-        <servlet-name>mainHandler</servlet-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    -->
 
 </beans:beans>

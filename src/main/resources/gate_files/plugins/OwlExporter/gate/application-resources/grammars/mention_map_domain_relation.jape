@@ -1,0 +1,52 @@
+/*
+OwlExporter --  http://www.semanticsoftware.info/owlexporter
+
+This file is part of the OwlExporter architecture.
+
+Copyright (C) 2009, 2010 Semantic Software Lab, http://www.semanticsoftware.info
+        René Witte
+        Ninus Khamis
+
+The OwlExporter  architecture is free software: you can
+redistribute and/or modify it under the terms of the GNU Affero General
+Public License as published by the Free Software Foundation, either
+version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+Phase: mention_map_domain_relation
+Input: Token OwlExportClassDomain
+Options: control = all
+
+Rule: Person_livesIn_City
+(
+  (({OwlExportClassDomain.className == "Person"}):dom)
+  ({Token.string == "lives"} {Token.string == "in"}): rel)
+  (({OwlExportClassDomain.className == "City"}):ran)
+-->
+{
+  gate.AnnotationSet domain = (gate.AnnotationSet)bindings.get("dom");
+  gate.Annotation domainAnn = (gate.Annotation)domain.iterator().next();	
+	
+  gate.AnnotationSet range = (gate.AnnotationSet)bindings.get("ran");
+  gate.Annotation rangeAnn = (gate.Annotation)range.iterator().next();
+
+  gate.AnnotationSet rel = (gate.AnnotationSet)bindings.get("rel");
+  gate.Annotation relAnn = (gate.Annotation)rel.iterator().next();
+  
+  String propertyName="livesIn";
+  
+  gate.FeatureMap features = Factory.newFeatureMap();
+  features.put("propertyName",propertyName);
+  features.put("domainId",domainAnn.getFeatures().get("representationId"));
+  features.put("rangeId",rangeAnn.getFeatures().get("representationId"));	
+  features.put("kind", "JAPE");		
+  
+  outputAS.add(rel.firstNode(), rel.lastNode(),"OwlExportRelationDomain",features);
+}

@@ -1,0 +1,218 @@
+﻿Imports: {
+  import static gate.Utils.*;
+}
+Phase: Indirizzo
+Input: Token Lookup Split SpaceToken localita indirizzo provincie MyProvincia regioni industriale azienda assicurazione 
+articoloIndeterminativo articoloDeterminativo preposizioni avverbiDiLuogo locuzioni congiunzione trash
+Options: control=all 
+MACRO:CONJ_ITA(
+    (
+	{Lookup.majorType==articoloIndeterminativo}/*(1)un una uno un'*/
+	|{Lookup.majorType==articoloDeterminativo}/*(2)il lo l' la i gli le*/
+	|{Lookup.majorType==preposizioni}/*(3)a agli ai al all' alla alle allo assieme attraverso avanti circa con contro da dagli dai dal dall' dalla dalle dallo*/
+	|{Lookup.majorType==avverbiDiLuogo}/*(4)altrove ci codesto costà costì dappertutto davanti dentro*/
+	|{Lookup.majorType==locuzioni}/*(5)accanto a vicino a davanti a innanzi a lontano da invece di insieme con*/
+	|{Lookup.majorType==congiunzione}/*(6)altresì ancora anzi ciò nonostante*/
+	|{SpaceToken}
+	)
+)
+MACRO:TRASH(
+    (
+	{SpaceToken}
+	|{Split}
+	|{Lookup.majorType==trash}
+	)
+)
+Rule: RuleMyLocalita
+Priority: 10
+  /*localita:
+  Città Arezzo*/
+(
+    ({Lookup.majorType == localita}|{Lookup.majorType == universita})
+):myLocalita
+  -->
+:myLocalita.MyLocalita = {kind = "myLocalita", rule = "RuleMyLocalita"}
+//{
+//    
+//    gate.AnnotationSet matchedAnns= (gate.AnnotationSet) bindings.get("RuleIndirizzo");   
+//   gate.FeatureMap newFeatures= Factory.newFeatureMap();
+//   newFeatures.put("rule","RuleIndirizzo");
+//   outputAS.add(matchedAnns.firstNode(),matchedAnns.lastNode(),"MyIndirizzo", newFeatures);
+//  /* System.out.println("Fine RHS Indirizzo");*/
+//}
+Rule: RuleMyIndirizzo
+Priority: 15
+  /*indrizzo: P.zza S.Marco, 4 - 52100 Firenze*/
+  /*via Banchi di Sotto 55, 53100 Siena ITALIA */
+  /*Dipartimento di  - Sez. Meccanica*/
+  (
+    /*(  
+	   ((TRASH)|(CONJ_ITA)|{Token})
+	   (
+		  ({Token.kind==number,Token.length==1}|{Token.kind==word,Token.orth==upperInitial})
+	   )[0,1]  
+	)[1,3]
+	((TRASH)|(CONJ_ITA))*/
+	({Lookup.majorType == indirizzo})
+    ((TRASH)|(CONJ_ITA))	 
+	(  
+	   ((TRASH)|(CONJ_ITA)|{Token})
+	   (
+		  ({Token.kind==number,Token.length==1}|{Token.kind==number,Token.length==2}|{Token.kind==word,Token.orth==upperInitial})
+                  
+            
+                  ((TRASH)|(CONJ_ITA))[1,8]
+		  ({Token.kind == number,Token.length==5})
+		  ((TRASH)|(CONJ_ITA))[1,3]
+		  ({Lookup.majorType==provincie})	
+	    )[0,1]	
+	)[1,8]
+):myIndirizzo
+  -->
+//:myIndirizzo.MyIndirizzo = {kind = "myIndirizzo", rule = RuleMyIndirizzo}
+{
+        gate.AnnotationSet annSet=(gate.AnnotationSet)bindings.get("myIndirizzo");	
+        gate.Annotation anAnn = (gate.Annotation)annSet.iterator().next();
+        String ind =gate.Utils.stringFor(doc, anAnn);
+        
+        doc.getFeatures().put("kind",(String) ind);
+        doc.getFeatures().put("rule","RuleMyIndirizzo");
+
+        //features.put("kind",(String) edificio);
+	//features.put("rule", "RuleEdificio");
+	outputAS.add(annSet.firstNode(), annSet.lastNode(), "MyIndirizzo", doc.getFeatures());
+}
+/*
+Rule: RuleMyIndirizzo2
+Priority: 15
+  /*indrizzo:
+  66013 Chieti
+(
+    ({Token.kind == number,Token.length==5})
+	((TRASH)|(CONJ_ITA))[1,3]
+	({Lookup.majorType==provincie}|{Token.kind==word,Token.Orth==upperInitial})	
+):myIndirizzo2
+  -->
+:myIndirizzo2.MyIndirizzo = {kind = "myIndirizzo2", rule = "RuleMyIndirizzo2"}
+*/
+Rule: StreetName1
+/*Regola di default di gate per il tracciamento delle strade*/
+(
+ ({Token.kind == number}
+  ({Token.string == ","})? 
+ )?
+ {Token.orth == upperInitial}
+ {Lookup.minorType == "street"}
+)
+:streetAddress -->
+ :streetAddress.MyIndirizzo = {kind = "streetAddress", rule = StreetName1}
+
+
+Rule: POBoxAddress
+/*Regole di default di gate per il tracciamento della casella postale*/
+(
+ (({Token.string == "P"}
+   ({Token.string == "."})? 
+   {Token.string == "O"}
+   ({Token.string == "."})?
+  ) |
+  ({Token.string == "PO"})
+ )
+ {Token.string == "Box"}
+ {Token.kind == number}
+)
+:poBox -->
+ :poBox.MyIndirizzo = {kind = "poBox", rule = POBoxAddress}
+ 
+MACRO: EDIFICIOSUPPORT(  
+	(
+		{Lookup.majorType == provincie}|{Lookup.majorType == regioni}|{Lookup.majorType == localita}|
+		{Lookup.majorType == azienda}|{Lookup.majorType == industriale}|{Lookup.majorType == assicurazione}|
+		{Token.kind==word,Token.orth==upperInitial}|{Lookup.majorType == universita}|{Lookup.majorType == edificio}
+	)
+)
+/*UniFI - Universit� degli Studi di Firenze - Ateneo*/
+Rule: RuleEdificio
+(
+    (
+		(EDIFICIOSUPPORT)
+		((TRASH)|(CONJ_ITA))[1,3]
+	)[0,4]
+    ({Lookup.majorType == edificio}|{Lookup.majorType == industriale}) /*Universita*/
+	(
+		((TRASH)|(CONJ_ITA))[1,3]	
+		(EDIFICIOSUPPORT)	
+	)[0,4]
+):myEdificio
+-->
+//:myEdificio.MyEdificio ={kind="myEdificio", rule = RuleMyEdificio}
+/**{ 
+   gate.AnnotationSet MyHEAD= (gate.AnnotationSet) bindings.get("myEdificio");   
+   gate.FeatureMap newFeatures= Factory.newFeatureMap();
+   newFeatures.put("kind","myEdificio");
+   newFeatures.put("rule","RuleEdificio");
+   outputAS.add(MyHEAD.firstNode(),MyHEAD.lastNode(),"MyEdificio", newFeatures);
+}*/
+{ 
+   //ArrayList<String> array=new ArrayList<String>();
+   //boolean flag=false;
+  // String edificio = "";
+   //this my name of AnnotationSets
+  // array.add("MyHEAD");
+  // array.add("MyFOOTER");
+  // array.add("MyAnnSet");
+//   gate.AnnotationSet annSet=(gate.AnnotationSet)bindings.get("myEdificio");	
+   
+/**
+		if(annSet.size()>0 && annSet!=null){	
+				   gate.Annotation anAnn = (gate.Annotation)annSet.iterator().next();			
+				   try{
+					    edificio = doc.getContent().getContent(anAnn.getStartNode().getOffset(),
+										anAnn.getEndNode().getOffset()).toString();
+						//verifica che la stringa non è nulla, non è vuota e non è composta da soli spaceToken (white space)				
+						if(edificio!=null && !edificio.isEmpty() && !edificio.trim().isEmpty()){ 
+						   //System.out.println(edificio);
+                                                }
+					}catch(InvalidOffsetException ioe){
+						   throw new GateRuntimeException(ioe);
+						   //ioe.printStackTrace();
+					}//try get a content for myEdificioAnnotation
+		}//dateListSize()
+	//FeatureMap features = Factory.newFeatureMap();*/
+       
+        //String edificio = doc.getContent().getContent(anAnn.getStartNode().getOffset(),anAnn.getEndNode().getOffset()).toString();
+        //String edificio =gate.Utils.stringFor(doc, annSet);
+        gate.AnnotationSet annSet=(gate.AnnotationSet)bindings.get("myEdificio");	
+        gate.Annotation anAnn = (gate.Annotation)annSet.iterator().next();
+        String edificio =gate.Utils.stringFor(doc, anAnn);
+       
+        //System.out.println(edificio);
+        
+        doc.getFeatures().put("kind",(String) edificio);
+        doc.getFeatures().put("rule","RuleEdificio");
+
+        //features.put("kind",(String) edificio);
+	//features.put("rule", "RuleEdificio");
+	outputAS.add(annSet.firstNode(), annSet.lastNode(), "MyEdificio", doc.getFeatures());
+}
+
+Rule: TTT
+(
+ (TRASH)
+):ttt
+-->
+:ttt.Trash ={kind="ttt", rule = TTT}
+
+Rule: CCC
+(
+ (CONJ_ITA)
+):ccc
+-->
+:ccc.Conj_ITA ={kind="ccc", rule = CCC}
+
+Rule: EEE
+(
+ (EDIFICIOSUPPORT)
+):eee
+-->
+:eee.Support ={kind="eee", rule = EEE}

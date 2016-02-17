@@ -2,7 +2,7 @@
 ### A MODULE MAVEN WITH MANY UTILITY CLASS FOR THE API GATE VERSION 8###
 ##############################################################
 #########################
-###Last Update: 2016-01-28
+###Last Update: 2016-02-17
 #########################
 NOTE: I'm not a expert programmer so any suggestion or advise is welcome.
 

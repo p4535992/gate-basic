@@ -1,7 +1,6 @@
 package com.github.p4535992.gatebasic.gate.impl.xml;
 
 import com.github.p4535992.gatebasic.gate.annotation.SortedAnnotationList;
-import com.github.p4535992.util.file.FileUtilities;
 import gate.*;
 import gate.corpora.RepositioningInfo;
 
@@ -56,7 +55,7 @@ public class GateXML{
             Set<String> annotTypesRequired = new HashSet<>();
             for (String s : addAnnotTypesRequired) {
                 annotTypesRequired.add(s);
-                System.out.println(s);
+                logger.info(s);
             }
             // annotTypesRequired.add("Person");
             // annotTypesRequired.add("Location");
@@ -68,7 +67,12 @@ public class GateXML{
             ///GENERAZIONE DEI DOCUMENTI
             //String nameGateDocument0 = doc.getName();
             //String fileName0 = "("+count+")"+nameGateDocument0+".html";
-            FileUtilities.toFile(directory);//create file if not exists...
+            if(!directory.exists()) {
+                //create file if not exists...
+                if(!directory.createNewFile()){
+                    logger.warn("Can't create the file "+directory.getAbsolutePath());
+                }
+            }
             logger.info("File write to the path : '" + directory.getAbsolutePath() + "'");
             //after the controller is execute....
             if(originalContent != null && info != null) {

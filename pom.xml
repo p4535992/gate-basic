@@ -70,14 +70,13 @@
         <!-- GATE API -->
         <gate.version>8.1</gate.version>
         <!-- Logging -->
-        <logback.version>1.0.13</logback.version>
-        <org.slf4j.version>1.7.12</org.slf4j.version>
-        <commons-logging.version>1.1.1</commons-logging.version>
+        <org.slf4j.version>1.7.13</org.slf4j.version>
         <!-- SPRING FRAMEWORK -->
         <io.spring.platform-version>1.1.2.RELEASE</io.spring.platform-version>
         <org.springframework.version>4.1.6.RELEASE</org.springframework.version>
-        <!-- DATABASE DRIVER -->
-        <mysql-connector-java.version>5.1.35</mysql-connector-java.version>
+        <spring-boot-starter-logging.version>1.3.0.RELEASE</spring-boot-starter-logging.version>
+        <!-- Apache -->
+        <org.apache.commons-commons-pool2>2.4.2</org.apache.commons-commons-pool2>
         <!-- UTILITY -->
         <com.github.p4535992.utility.version>1.6.8</com.github.p4535992.utility.version>
         <!-- Support -->
@@ -87,10 +86,37 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${org.springframework.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>${org.apache.commons-commons-pool2}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-pool</groupId>
+                <artifactId>commons-pool</artifactId>
+                <version>1.6</version>
+            </dependency>
+            <dependency>
                 <groupId>uk.ac.gate</groupId>
                 <artifactId>gate-core</artifactId>
                 <version>${gate.version}</version>
                 <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
                     <exclusion>
                         <groupId>org.springframework</groupId>
                         <artifactId>spring-aop</artifactId>
@@ -103,31 +129,58 @@
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
                     </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.github.p4535992</groupId>
-                <artifactId>utility</artifactId>
-                <version>${com.github.p4535992.utility.version}</version>
-                <exclusions>
                     <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-aop</artifactId>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <!-- LOGGING -->
+            <!-- jul-to-slf4j + jcl-over-slf4j + log4j-over-slf4j + logback-classic -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-logging</artifactId>
+                <version>${spring-boot-starter-logging.version}</version>
+                <!-- <exclusions>
+                     <exclusion>
+                         <groupId>org.slf4j</groupId>
+                         <artifactId>slf4j-api</artifactId>
+                     </exclusion>
+                 </exclusions>-->
+            </dependency>
+            <!-- The SLF4J - take out because already present in logback classic -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${org.slf4j.version}</version>
+            </dependency>
+            <!-- Since slf4j is a bridge, you need an implementation of it that would
+            redirect all calls to slf4j or JCL. Following is to perform logging using
+            the basic implementation, choose your preferred implementation
+            (it seems you were using logback). -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>runtime</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>com.github.p4535992</groupId>
-            <artifactId>utility</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>${javax.servlet.servlet-api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -136,48 +189,56 @@
         </dependency>
 
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql-connector-java.version}</version>
-            <scope>provided</scope>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!-- Spring JMS and Support -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jms</artifactId>
-            <version>${org.springframework.version}</version>
+            <optional>true</optional>
         </dependency>
-
         <!-- Spring base -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
-            <version>${org.springframework.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <optional>true</optional>
         </dependency>
         <!-- Spring MVC -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>${org.springframework.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>${org.springframework.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.14</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+            <optional>true</optional>
         </dependency>
 
     </dependencies>

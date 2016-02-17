@@ -1,6 +1,5 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
-import com.github.p4535992.util.string.StringUtilities;
 import gate.*;
 
 
@@ -11,9 +10,11 @@ import java.util.*;
  * Semantics of each document of Corpus structure the content into an object
  * Java Keyword For each document from which is extracted a Keyword insert the
  * Keyword in a list to be used later for inclusion in Database.
+ * @deprecated use {@link GateAnnotation81Kit} instead.
  * @author 4535992.
  * @version 2015-11-12.
  */
+@Deprecated
 @SuppressWarnings("unused")
 public class GateAnnotation8Kit {
 
@@ -77,7 +78,7 @@ public class GateAnnotation8Kit {
                     String content; //empty string
                     content = getSingleAnnotationInfo(document, nameAnnotation, nameAnnotationSet);
                     //get the annotation on the first annotation set is have it without check the other annnotation set...
-                    if (!StringUtilities.isNullOrEmpty(content)) {
+                    if (!(content == null || content.isEmpty())) {
                         if(firstAndExit) {
                             //found it the annotation on this annotationSet...
                             mapAnn.put(nameAnnotation,content);
@@ -108,81 +109,27 @@ public class GateAnnotation8Kit {
     public String getSingleAnnotationInfo(Document document,String nameAnnotation,String nameAnnotationSet) {
         String content ="";
         try {
-            AnnotationSet annSet = getAnnotationSetFromDoc(nameAnnotationSet, document);
+            AnnotationSet annSet = GateUtils.getAnnotationSetFromDoc(nameAnnotationSet, document);
             //SystemLog.message("Get content of the Annotation " + nameAnnotation + " on the AnnotationSet " + annSet.getName() + "...");
             //content = getContentLongestFromAnnnotationsOnAnnotationSet(document, nameAnnotation, annSet);         
             Annotation newAnn;
             for(Annotation ann: annSet){
                 if(ann.getType().equals(nameAnnotation)){
                     newAnn = ann;
-                    content = getContentFromAnnotation(document,newAnn);
+                    content = Utils.stringFor(document,newAnn);
                     break;
                 }
             }
-            if(StringUtilities.isNullOrEmpty(content)){
+            if(content == null || content.isEmpty()){
                 content ="";
             }else{
-                content = StringUtilities.cleanHTML(content);
+                content = cleanHTML(content);
             }          
             //content =  getContentLastSingleAnnotationOnAnnotationSet(document, nameAnnotation, annSet);
         }catch(NullPointerException ne){
             //SystemLog.warning("The AnnotationSet "+nameAnnotationSet+" not have a single annotation for this document to the url: "+ document.getSourceUrl());
         }
         return content;
-    }
-
-    public List<Object> getValueOfAnnotationFromDoc(Document doc,String annotatioName){
-        List<Object> list = new ArrayList<>();
-        // obtain the Original markups annotation set
-        AnnotationSet origMarkupsSet = doc.getAnnotations("Original markups");
-        // obtain annotations of type â€™aâ€™
-        AnnotationSet anchorSet = origMarkupsSet.get("a");
-        // iterate over each annotation
-        // obtain its features and print the value of href feature
-        // System.out.println("iterate over each annotation and obtain its features and print the value of href feature...");
-        for (Annotation anchor : anchorSet) {
-            //String href = (String) anchor.getFeatures().get("href");
-            String valueAnn = (String) anchor.getFeatures().get(annotatioName);
-            if(valueAnn != null) {
-                //URL uHref=new URL(doc.getSourceUrl(), href);
-                // resolving href value against the documentâ€™s url
-                if(!(list.contains(valueAnn)))list.add(valueAnn);
-            }//if
-        }//for anchor
-        return list;
-    }
-
-    /**
-     * Method for get all the contents of the annotations from all the same annotations on the same annotationSet.
-     * @param doc gate document.
-     * @param nameAnnotation string name of the annotation.
-     * @param annotationSet string name of the annotationset.
-     * @return list of string where each string is the string content of a  annotation on the document.
-     */
-    public List<String> getContentAllSingleAnnotationOnAnnotationSet(Document doc,String nameAnnotation,AnnotationSet annotationSet) {
-        String content;
-        List<String> stringList = new ArrayList<>(); //support list
-        List<String> finalList = new ArrayList<>();
-        try{
-            //Get all type annotations within the stringNameAnnotation set of annotations date.set...
-            annotationSet = annotationSet.get(nameAnnotation);
-            for(Annotation anAnn: annotationSet){
-                content = Utils.stringFor(doc, anAnn);
-                //avoid duplicate string or substring on the final list...
-                if (!(stringList.contains(content))) {
-                    stringList.add(content);
-                    for (String s : stringList) {
-                        if (!s.contains(content))finalList.add(content);
-                    }//for(String s : stringList)
-                }//!(stringList.contains(content2)
-            }//for
-            return finalList;
-
-        } catch (NullPointerException ep) {
-            logger.info(ep.getMessage(), ep);
-        }
-        return finalList;
-
     }
 
     /**
@@ -237,7 +184,8 @@ public class GateAnnotation8Kit {
             annotationSet = annotationSet.get(nameAnnotation);
             int i = 0;
             for(Annotation annotation: annotationSet){
-                if (annotation == null || StringUtilities.isNullOrEmpty(Utils.stringFor(doc, annotation))) continue;
+                String annotationForDoc = Utils.stringFor(doc, annotation);
+                if (annotationForDoc == null || annotationForDoc.isEmpty()) continue;
                 if(annotation.getType().equals(nameAnnotation)) {
                     begOffset = annotation.getStartNode().getOffset().intValue();
                     endOffset = annotation.getEndNode().getOffset().intValue();
@@ -260,7 +208,7 @@ public class GateAnnotation8Kit {
                 }
                 i++;
             }
-            if(StringUtilities.isNullOrEmpty(content)){
+            if(content == null || content.isEmpty()){
                 return null;
             }else{
                 return content;
@@ -270,71 +218,8 @@ public class GateAnnotation8Kit {
         }
         return null;
     }
-
-    /**
-     * Prende un determinato set di annotazione per un determinato documento.
-     * @param nameAnnotationSet nome del set di annotazioni
-     * @param doc il GATE Document preso in esame
-     * @return il GATE Document preso in esame ma solo la parte coperta dal set di annotazioni
-     */
-    public AnnotationSet getAnnotationSetFromDoc(String nameAnnotationSet, Document doc) {
-        AnnotationSet annSet = doc.getAnnotations(nameAnnotationSet);
-        if(annSet.isEmpty()){
-            return null;
-        }else {
-            return annSet;
-        }
-    }
-
-    /**
-     * Method for get specific annotation from specific annotaset from specific document.
-     * @param doc gate Document.
-     * @param nameAnnotationSet string name of gate AnnotationSet.
-     * @param nameAnnotation string name of gate Annotation.
-     * @return list of gate annotations.
-     */
-    public List<Annotation> getAnnotationsFromDoc(Document doc,String nameAnnotationSet,String nameAnnotation){
-        AnnotationSet annSet = doc.getAnnotations( nameAnnotationSet);
-        if(annSet.isEmpty()){
-            return null;
-        }else {
-            Set<Annotation> newSetAnnotation = new HashSet<>(annSet.get(nameAnnotation));
-            return  new ArrayList<>(newSetAnnotation);
-        }
-    }
-
-    /**
-     * Method get the string content marked up from a aspecific annotation.
-     * @param doc gate document.
-     * @param annotation annotation gate.
-     * @return the string content marked up from the gate annotation.
-     */
-    public String getContentFromAnnotation(Document doc,Annotation annotation){
-        return Utils.stringFor(doc, annotation);
-    }
-
-    /*public Set<String> countAnnotationsOnTheWebPage(Document doc){
-        //codice aggiuntivo utile per avere un'idea del contenuto della pagina org.p4535992.mvc.webapp
-        // obtain a map of all named annotation sets
-        Set<String> annotTypes= null;
-        Map<String, AnnotationSet> namedASes = doc.getNamedAnnotationSets();
-        System.out.println("No. of named Annotation Sets:"+ namedASes.size());
-        // number of annotations each set contains
-        for (String setName : namedASes.keySet()) {
-            // annotation set
-            AnnotationSet aSet = namedASes.get(setName);
-            // number of annotations
-            SystemLog.message("No. of Annotations for " + setName + ":" + aSet.size());
-            // all annotation types
-            annotTypes = aSet.getAllTypes();
-            for(String aType : annotTypes) {
-                System.out.print(" " + aType + ": " + aSet.get(aType).size()+"||");
-            }//for aType
-        }//for setName
-        return annotTypes;
-    }*/
     
-    public static <K,V> boolean isMapValueNullOrInexistent(Map<K,V> map,K key){
+    private <K,V> boolean isMapValueNullOrInexistent(Map<K,V> map,K key){
         V value = map.get(key);
         if (value != null) {
             return false;
@@ -348,6 +233,16 @@ public class GateAnnotation8Kit {
             return true;
             
         }
+    }
+
+    /**
+     * Method to clean a html text to a string text.
+     * @param stringHtml the {@link String} html string of text.
+     * @return the {@link String}  text cleaned.
+     */
+    private String cleanHTML(String stringHtml){
+        return stringHtml.replaceAll("\\r\\n|\\r|\\n", " ").trim();
+        //.replace("\\n\\r", "").replace("\\n","").replace("\\r","").trim())
     }
 
 }//ManageAnnotationAndContent.java

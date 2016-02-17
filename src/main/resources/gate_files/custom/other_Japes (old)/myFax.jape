@@ -1,0 +1,50 @@
+Phase:	Fax
+Input:  Token Lookup Split SpaceToken fax
+Options: control = appelt
+/////////////////////////////////////////////////////////////
+/*+39 055 27571 */
+ Rule:RuleMyFax_4
+ Priority: 10                                                
+(
+  ({Lookup.majorType==fax})[1,1]
+  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+  (
+	  ({Token.string== "("})[0,1]
+	  ({Token.string== "+"})[0,1]
+	  ({Token.string== "("})[0,1]
+	  ({Token.kind == number,Token.length <= "3"})
+	  ({Token.string== ")"})[0,1]
+	  ({Split}|{SpaceToken}|{Token.string=="-"})[0,2]
+	  ({Token.kind == number,Token.length <= "4"})
+	  ({Split}|{SpaceToken}|{Token.string=="-"})[0,2]
+	  ({Token.kind == number,Token.length <= "6"})[0,1]
+  ):fax_4_1
+):fax_4 -->
+ :fax_4_1.MyFax = {kind = "fax_4_1", rule = RuleMyFax_4}
+
+/* FAX 1234 12345*/
+Rule:RuleMyFax_6
+Priority: 10                                                
+( 
+  ({Lookup.majorType==fax})[1,1]
+  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+  (
+    (
+		//({Token.kind == number,Token.length == "4"}|{Token.kind == number,Token.length == "2"})
+		//({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="/"}|{Token.string=="."})[0,2]
+		//({Token.kind == number,Token.length == "5"}|{Token.kind == number,Token.length == "7"}|{Token.kind == number,Token.length == "8"})
+		({Token.string== "+"})[0,1]
+		({Token.kind == number,Token.length <= "4"})
+		({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="/"}|{Token.string=="."})[0,2]
+		({Token.kind == number,Token.length <= "8"})
+	)[0,1]
+	(
+	   ({Token.kind == number,Token.length == "10"}) 
+	)[0,1]
+   ):fax_6_1
+):fax_6 -->
+ :fax_6_1.MyFax = {kind = "fax_6_1", rule = RuleMyFax_6}
+ 
+
+
+

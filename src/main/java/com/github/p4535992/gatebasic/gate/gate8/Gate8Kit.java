@@ -1,19 +1,26 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
-import com.github.p4535992.util.bean.BeansKit;
-import com.github.p4535992.util.file.FileUtilities;
+import com.github.p4535992.gatebasic.util.BeansKit;
 import gate.*;
-import gate.corpora.RepositioningInfo;
+import gate.creole.ANNIEConstants;
+import gate.creole.ResourceInstantiationException;
+import gate.creole.SerialAnalyserController;
 import gate.gui.MainFrame;
+import gate.persist.PersistenceException;
 import gate.util.DocumentProcessor;
 import gate.util.GateException;
 import gate.util.persistence.PersistenceManager;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 /**
  * Created by 4535992 on 17/04/2015.
@@ -29,7 +36,7 @@ public class Gate8Kit {
     /** The Corpus Pipeline application to contain ANNE,Lingpipe,Tools,ecc. */
     private boolean showGate;
     /** Gate Corpus Controller*/
-    private Controller controller;
+    private CorpusController corpusController;
     /** Gapp File */
     private File gappFile;
     /** Gate Document */
@@ -87,13 +94,14 @@ public class Gate8Kit {
         this.procDoc = procDoc;
     }
 
-    public Controller getController() {
-        return controller;
+    public Controller getCorpusController() {
+        return corpusController;
     }
 
-    public void setController(Controller controller) {
-        this.controller = controller;
+    public void setCorpusController(CorpusController controller) {
+        this.corpusController = controller;
     }
+
 
     /**
      * Method for setup the GATE API in EMbedded mode with manual configuration.
@@ -106,20 +114,46 @@ public class Gate8Kit {
      * @param gappFile sting absolute path to the file gapp.
      * @return the gate controller full setted.
      */
-    public Controller setUpGateEmbedded(String directoryFolderHome,String directoryFolderPlugin,
-                            String configFileGate,String configFileUser,String configFileSession,String gappFile){
+    public CorpusController setUpGateEmbedded(String directoryFolderHome,String directoryFolderPlugin,
+                                              String configFileGate,String configFileUser,String configFileSession,String gappFile) {
+        return setUpGateEmbedded(directoryFolderHome,directoryFolderPlugin,configFileGate,configFileUser,configFileSession,gappFile,false);
+    }
+    /**
+     * Method for setup the GATE API in EMbedded mode with manual configuration.
+     * @param directoryFolderHome path to the directory folder where all GATE files are stored.
+     * @param directoryFolderPlugin path to the directory folder where all PLUGIN GATE files are stored.
+     * @param configFileGate path to the file configuration of gate eg gate.xml.
+     * @param configFileUser path to the file configuration of user gate eg user.xml.
+     * @param configFileSession path to the file configuration of where write and save the session of GATE eg gate.session
+     *                          if null is stoed on the user folder on the system.
+     * @param gappFile sting absolute path to the file gapp.
+     * @param useOnlyAbsoluteReference the {@link Boolean} if true you use absolute reference for set the element of gate.
+     * @return the gate controller full setted.
+     */
+    public CorpusController setUpGateEmbedded(String directoryFolderHome,String directoryFolderPlugin,
+                            String configFileGate,String configFileUser,String configFileSession,String gappFile,boolean useOnlyAbsoluteReference){
         //SET GATE EMBEDDED
         try {
             logger.info("Initializing GATE...");
-            if (!directoryFolderHome.startsWith(File.separator))
-                directoryFolderHome = File.separator + directoryFolderHome;
-            if (directoryFolderHome.endsWith(File.separator))
-                directoryFolderHome = directoryFolderHome.substring(0, directoryFolderHome.length() - 1);
+            if(new File(directoryFolderHome).isAbsolute()){
+                if (directoryFolderHome.endsWith(File.separator))
+                    directoryFolderHome = directoryFolderHome.substring(0, directoryFolderHome.length() - 1);
+                baseDirectory = directoryFolderHome;
+            }else {
+                if (!directoryFolderHome.startsWith(File.separator))
+                    directoryFolderHome = File.separator + directoryFolderHome;
+                if (directoryFolderHome.endsWith(File.separator))
+                    directoryFolderHome = directoryFolderHome.substring(0, directoryFolderHome.length() - 1);
+                directoryFolderHome = baseDirectory + directoryFolderHome;
+                baseDirectory = directoryFolderHome;
+            }
+            logger.warn("The base directory you using is :"+baseDirectory);
 
-            directoryFolderHome = baseDirectory + directoryFolderHome;
             if (!new File(directoryFolderHome).exists())
                 throw new IOException("The folder directoryFolderHome " + directoryFolderHome + " of GATE not exists!");
             Gate.setGateHome(new File(directoryFolderHome));
+
+            setUpAndCopyFile(baseDirectory,directoryFolderPlugin,useOnlyAbsoluteReference);
 
             if (!directoryFolderPlugin.startsWith(File.separator))
                 directoryFolderPlugin = File.separator + directoryFolderPlugin;
@@ -131,6 +165,8 @@ public class Gate8Kit {
                 throw new IOException("The folder directoryFolderPlugin " + directoryFolderPlugin + "of GATE not exists!");
             Gate.setPluginsHome(new File(directoryFolderPlugin));
 
+            setUpAndCopyFile(baseDirectory,configFileGate,useOnlyAbsoluteReference);
+
             if (!configFileGate.startsWith(File.separator)) configFileGate = File.separator + configFileGate;
             if (configFileGate.endsWith(File.separator))
                 configFileGate = configFileGate.substring(0, configFileGate.length() - 1);
@@ -140,6 +176,8 @@ public class Gate8Kit {
                 throw new IOException("The configFileGate " + configFileGate + "of GATE not exists!");
             Gate.setSiteConfigFile(new File(configFileGate));
 
+            setUpAndCopyFile(baseDirectory,configFileUser,useOnlyAbsoluteReference);
+
             if (!configFileUser.startsWith(File.separator)) configFileUser = File.separator + configFileUser;
             if (configFileUser.endsWith(File.separator))
                 configFileUser = configFileUser.substring(0, configFileUser.length() - 1);
@@ -148,6 +186,8 @@ public class Gate8Kit {
             if (!new File(configFileUser).exists())
                 throw new IOException("The configFileUser " + configFileUser + " of GATE not exists!");
             Gate.setUserConfigFile(new File(configFileUser));
+
+            setUpAndCopyFile(baseDirectory,configFileSession,useOnlyAbsoluteReference);
 
             if (!configFileSession.startsWith(File.separator)) configFileSession = File.separator + configFileSession;
             if (configFileSession.endsWith(File.separator))
@@ -168,8 +208,18 @@ public class Gate8Kit {
         }catch(GateException e){
             //..Usuallly you got here for bad reading of the session file
             try {
-                FileUtilities.toFile(configFileSession);
-                Gate.init();
+                //FileUtilities.toFile(configFileSession);
+                File config = new File(configFileSession);
+                if(!(config.isFile() && config.exists())) {
+                    try {
+                        if(config.createNewFile()){
+                            Gate.init();
+                        }
+                    } catch (IOException e1) {
+                        logger.error("Can't set the configuration session file:"
+                                +config.getAbsolutePath()+"->"+e.getMessage(),e);
+                    }
+                }
             }catch(GateException ex){
                 logger.error(e.getMessage(),e);
             }
@@ -180,6 +230,21 @@ public class Gate8Kit {
             MainFrame.getInstance().setVisible(true);
         }
         return loadGapp(gappFile);
+    }
+
+    private String setUpAndCopyFile(String gateHome,String resourceGate,boolean useOnlyAbsoluteReference){
+        if(new File(resourceGate).isAbsolute() && !useOnlyAbsoluteReference) {
+            resourceGate = resourceGate.replace(gateHome,"");
+        }else{
+            if(!isFileOnDirectory(gateHome,resourceGate)){
+                logger.warn("Force the copy of the folder directoryFolderPlugin " + resourceGate
+                        + " the directoryFolderHome GATE "+gateHome);
+                if(!copyFileToDirectoryGATE(gateHome,resourceGate)) {
+                    logger.error("Something wrong during the copy of the resource on the GATE directory");
+                }
+            }
+        }
+        return resourceGate;
     }
 
     /**
@@ -193,8 +258,8 @@ public class Gate8Kit {
         if(!base.endsWith(File.separator)) base = base + File.separator;
         if(fileGapp.startsWith(File.separator)) fileGapp = fileGapp.substring(1,fileGapp.length());
         if(fileGapp.endsWith(File.separator)) fileGapp = fileGapp.substring(0,fileGapp.length()-1);
-        loadGapp(base + fileGapp);
-        return (CorpusController)controller;
+        return loadGapp(base + fileGapp);
+        //return (CorpusController)controller;
     } // initAnnie()
 
     /**
@@ -209,7 +274,7 @@ public class Gate8Kit {
             if(fileGapp.endsWith(File.separator)) fileGapp = fileGapp.substring(0,fileGapp.length()-1);
             //File gapp = new File(home.home, "custom/gapp/geoLocationPipelineFast.xgapp");
             if (new File(Gate.getGateHome() +  fileGapp).exists()) {
-                controller = (CorpusController) PersistenceManager.loadObjectFromFile(
+                corpusController = (CorpusController) PersistenceManager.loadObjectFromFile(
                         new File(Gate.getGateHome() + fileGapp));
             } else {
                 throw new IOException("The gapp file not exists");
@@ -219,15 +284,16 @@ public class Gate8Kit {
         }catch(GateException|IOException e){
             logger.warn(e.getMessage(), e);
         }
-        return (CorpusController) controller;
+        return corpusController;
     } // initAnnie()
 
     /**
-     * Method for setup the GATE API in EMbedded mode with spring configuration.
+     * Method for setup the GATE API in Embedded mode with spring configuration.
+     * OLD_NAME: initGateWithSpring
      * @param referencePathResourceFile string reference path to the resource file spring for gate context
      *                                  eg:"gate/gate_context.xml".
      * @param thisClass the reference to the invoke class.
-     * @param idBeanDocumentProcessor string name/id of the bean refrence to DocumentProcessor on the gate context.
+     * @param idBeanDocumentProcessor string name/id of the bean reference to DocumentProcessor on the gate context.
      * @return the DocumentProcessor Controller.
      */
     public DocumentProcessor setUpGateEmbeddedWithSpring(
@@ -237,11 +303,34 @@ public class Gate8Kit {
             ctx = BeansKit.tryGetContextSpring(referencePathResourceFile, thisClass);
             //GATE provides a DocumentProcessor interface suitable for use with Spring pooling
             //procDoc = BeansKit.getBeanFromContext("documentProcessor",DocumentProcessor.class,ctx);
-            procDoc = BeansKit.getBeanFromContext(idBeanDocumentProcessor,DocumentProcessor.class,ctx);
+            //procDoc = BeansKit.getBeanFromContext(idBeanDocumentProcessor,DocumentProcessor.class,ctx);
+            procDoc = ctx.getBean(idBeanDocumentProcessor, DocumentProcessor.class);
         } catch (IOException e) {
             logger.warn(e.getMessage(), e);
         }
         return procDoc;
+    }
+
+    /**
+     * Method for setup the GATE API in Embedded mode with spring configuration.
+     * @param referencePathResourceFile string reference path to the resource file spring for gate context
+     *                                  eg:"gate/gate_context.xml".
+     * @param idBeanDocumentProcessor string name/id of the bean reference to DocumentProcessor on the gate context.
+     * @return the DocumentProcessor Controller.
+     */
+    public DocumentProcessor setUpGateEmbeddedWithSpring(
+            String referencePathResourceFile,String idBeanDocumentProcessor){
+        return setUpGateEmbeddedWithSpring(referencePathResourceFile,Gate8Kit.class,idBeanDocumentProcessor);
+    }
+
+    /**
+     * Method for setup the GATE API in Embedded mode with spring configuration.
+     * @param referencePathResourceFile string reference path to the resource file spring for gate context
+     *                                  eg:"gate/gate_context.xml".
+     * @return the DocumentProcessor Controller.
+     */
+    public DocumentProcessor setUpGateEmbeddedWithSpring(String referencePathResourceFile){
+        return setUpGateEmbeddedWithSpring(referencePathResourceFile,Gate8Kit.class,"documentProcessor");
     }
 
     /**
@@ -254,21 +343,21 @@ public class Gate8Kit {
      * @param gappFile the path to the gapp file user of gate under the directoryFolderHome eg:"custom/gapp/test.xgapp".
      * @return the GATE Controller.
      */
-    public Controller setGate(String directoryFolderHome,String directoryFolderPlugin,
+    public CorpusController setGate(String directoryFolderHome,String directoryFolderPlugin,
                               String configFileGate,String configFileUser,String configFileSession,String gappFile){
-        if(controller==null) {
+        if(corpusController==null) {
             if(gateAlreadySetted) {
-                this.controller = setUpGateEmbedded(directoryFolderHome, directoryFolderPlugin,
+                this.corpusController = setUpGateEmbedded(directoryFolderHome, directoryFolderPlugin,
                         configFileGate, configFileUser, configFileSession, gappFile);
                 gateAlreadySetted = false;
-                return controller;
+                return corpusController;
             }else{
                 logger.warn("The GATE embedded API is already set with Spring Framework and ProcessorDocument!!!");
                 return null;
             }
         }else{
             logger.warn("The GATE embedded API is already set with Corpus Controller!!!");
-            return controller;
+            return corpusController;
         }
     }
 
@@ -297,6 +386,117 @@ public class Gate8Kit {
         }
     }
 
+    public SerialAnalyserController setGateWithANNIE(){
+        // load ANNIE as an application from a gapp file
+        SerialAnalyserController controller = null;
+        try {
+            controller = (SerialAnalyserController)
+                    PersistenceManager.loadObjectFromFile(new File(new File(
+                    Gate.getPluginsHome(), ANNIEConstants.PLUGIN_DIR),
+                    ANNIEConstants.DEFAULT_FILE));
+        } catch (PersistenceException | IOException | ResourceInstantiationException e) {
+           logger.error(e.getMessage(),e);
+        }
+        return controller;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    //Method for make a clean copy of the resources on the Gate Home setted.
+    ////////////////////////////////////////////////////////////////////////
+
+    private Boolean copyFileToDirectoryGATE(String srcFile, String destDir){
+        return copyFileToDirectoryGATE(Paths.get(srcFile),Paths.get(destDir));
+    }
+
+    private Boolean copyFileToDirectoryGATE(Path srcFile, Path destDir){
+        if(destDir == null) {
+            throw new NullPointerException("Destination must not be null");
+        } else if(Files.exists(destDir) && !Files.isDirectory(destDir)) {
+            throw new IllegalArgumentException("Destination \'" + destDir + "\' is not a directory");
+        } else {
+            return copyFile(srcFile, Paths.get(destDir.toString(), srcFile.getFileName().toString()));
+        }
+    }
+
+    private Boolean copyFile(Path srcFile, Path destFile) {
+        try {
+            if (srcFile == null)
+                throw new NullPointerException("Source must not be null");
+            else if (destFile == null)
+                throw new NullPointerException("Destination must not be null");
+            else if (!Files.exists(srcFile))
+                throw new FileNotFoundException("Source \'" + srcFile + "\' does not exist");
+            else if (Files.isDirectory(srcFile))
+                throw new IOException("Source \'" + srcFile + "\' exists but is a directory");
+            else if (getCanonicalPath(srcFile).equals(getCanonicalPath(destFile)))
+                throw new IOException("Source \'" + srcFile + "\' and destination \'" + destFile + "\' are the same");
+            else if (getParentFile(destFile) != null && !getParentFile(destFile).exists() && !getParentFile(destFile).mkdirs())
+                throw new IOException("Destination \'" + destFile + "\' directory cannot be created");
+            else if (Files.exists(destFile) && !canWrite(destFile))
+                throw new IOException("Destination \'" + destFile + "\' exists but is read-only");
+            else
+                Files.copy(srcFile, destFile);
+            return true;
+        }catch(IOException e){
+            logger.error("",e);
+            return false;
+        }
+    }
+
+    private String getCanonicalPath(Path path){
+        try {
+            return new URI(path.toUri().toString()).normalize().getPath();
+        } catch (URISyntaxException e) {
+            try {
+                return path.toFile().getCanonicalPath();
+            } catch (IOException e1) {
+               return path.toUri().toString();
+            }
+        }
+    }
+
+    private File getParentFile(Path path){
+        return path.getParent().toFile();
+    }
+
+    private Boolean canWrite(Path path){
+        return Files.isWritable(path);
+    }
+
+    /**
+     * Method to check if  a file is direct son of the parent directory.
+     * @param directory the {@link File} directory.
+     * @param child the {@link String} path of the son.
+     * @return the {@link Boolean} is true if the file is founded and exists.
+     */
+    public static Boolean isFileOnDirectory(File directory,String child){
+        return new File(directory,child).exists();
+    }
+
+    /**
+     * Method to check if  a file is direct son of the parent directory.
+     * @param directory the {@link String} directory.
+     * @param child the {@link String} path of the son.
+     * @return the {@link Boolean} is true if the file is founded and exists.
+     */
+    public static Boolean isFileOnDirectory(String directory,String child){
+        return new File(directory,child).exists();
+    }
+
+    /**
+     * Method to check if  a file is direct son of the parent directory.
+     * @param directory the {@link Path} directory.
+     * @param child the {@link String} path of the son.
+     * @return the {@link Boolean} is true if the file is founded and exists.
+     */
+    public static Boolean isFileOnDirectory(Path directory,String child){
+        return Files.exists(Paths.get(directory.toAbsolutePath().toString(),child));
+    }
+
+
+
+    //--------------------------------------------------------------------------------------------
+    // SOME UTILITY FOR LOAD THE SPRING CONFIGURATION FILE FOR GATE
     //--------------------------------------------------------------------------------------------
 
 

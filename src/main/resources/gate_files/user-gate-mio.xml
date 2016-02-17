@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!--    Known_plugin_path="file:/C:/Users/Utente/Desktop/WebSDv2/gate/WEB-INF/gate-files/plugins/ANNIE;
+   file:/C:C:\Users\Utente\Desktop\SDv5\src\gate\gate_files\plugins/Tools/;
+   file:/C:/Users/Utente/Desktop/WebApplication2/gate/WEB-INF/gate-files/plugins/LingPipe;
+   file:/C:/Users/Utente/Desktop/WebApplication2/gate/WEB-INF/gate-files/plugins/Tagger_Framework;
+   file:/C:/Users/Utente/Desktop/WebApplication2/gate/WEB-INF/gate-files/plugins/Tagger_Measurements;
+   file:/C:/Users/Utente/Desktop/WebApplication2/gate/WEB-INF/gate-files/plugins/Tagger_Numbers"
+   Load_plugin_path=""-->
+   <!--Le inizializzo con SPRING nel file applicationContext.xml-->
+<!--    src\gate\gate_files\plugins\ANNIE;src\gate\gate_files\plugins\Tagger_Numbers;
+    src\gate\gate_files\plugins\Tagger_Measurements;src\gate\gate_files\plugins\Tools;
+    src\gate\gate_files\plugins\LingPipe;src\gate\gate_files\plugins\Tagger_Framework"-->
+<GATE>  
+   <GATECONFIG Document_add_space_on_unpack="true"
+ Known_plugin_path=""
+ Load_plugin_path=""
+ Look_and_Feel="com.sun.java.swing.plaf.windows.WindowsLookAndFeel"
+ Main_frame_height="772"
+ Main_frame_maximized="false"
+ Main_frame_width="1370"
+ Menus_font="Lucida Sans Unicode#12#false#false"
+ Other_components_font="Lucida Sans Unicode#12#false#false"
+ Save_features_when_preserving_format="false"
+ Save_options_on_exit="true"
+ Save_session_on_exit="true"
+ Text_components_font="Lucida Sans Unicode#12#false#false"
+ docedit_insert_append="true"
+ docedit_insert_prepend="false"
+ docedit_read-only="false"
+ gate.gui.LuceneDataStoreSearchGUI.disableautocompletion="false"
+ gate.gui.MainFrame.browsercommandline=""
+ gate.gui.MainFrame.datastoretype="SerialDataStore: file-based storage using Java serialisation"
+ gate.gui.MainFrame.treeselectview="false"
+ gate.gui.MainFrame.viewselecttree="false"
+ gate.gui.docview.AnnotationSetsView.colours="{body=-2141562113, paragraph=-2130706598, tr=-2144565535, img=-2134239979, Organization=-2130706598, td=-2132703700, LinkToPerson=-2130748673, br=-2130748673, th=-2144534740, PenelopeLink=-2141520038, h1=-2132680404, head=-2132726559, h3=-2130748838, option=-2130748838, h2=-2144588575, FirstPerson=-2141562113, CdLunifi=-2141520038, form=-2144542420, select=-2141520038, abbr=-2141520038, label=-2130760660, table=-2131290859, script=-2130760479, li=-2138644180, input=-2146055659, CourseSection=-2130748838, strong=-2130706598, LinkToPenelope=-2130748838, small=-2132726559, NounNoise=-2144542420, span=-2138643999, Noun=-2130748838, hr=-2144588575, PersonSection=-2144542420, link=-2130714324, div=-2132726740, UnifiCompetence=-2130748838, Verb=-2141520038, meta=-2138690335, Course=-2132680404, title=-2132672724, fieldset=-2130748673, ul=-2132703519, b=-2130706598, a=-2130748838, Location=-2141519873, caption=-2141519873, Token=-2134239979, SpaceToken=-2132726559, Title=-2141562113, i=-2141519873, Split=-2144542239, tbody=-2143172075, _New_=-2130748838, legend=-2132726740, Sentence=-2144588575, p=-2141520038, Lookup=-2132726740, html=-2144542239, em=-2130748838, Person=-2132680404, penelopeLink=-2130748838}"
+ gate.gui.docview.AnnotationSetsView.types="[.NounNoise, .LinkToPenelope, Original markups.a, Original markups.a, .LinkToPerson, .Sentence, .Noun, .Noun, .Noun, .Noun, .Noun, .UnifiCompetence, .UnifiCompetence, .UnifiCompetence, .UnifiCompetence, .Person, .Person, ._New_, .UnifiCompetence, .LinkToPerson, .PersonSection, .PersonSection, .div, .Sentence, .Token, .CourseSection, .CourseSection, .CourseSection, .CourseSection, .CourseSection, .CourseSection, .PersonSection, .PersonSection, .PersonSection, .CourseSection, .PersonSection, .UnifiCompetence, .Lookup, .Lookup, .UnifiCompetence]"
+ runtime.max.memory="3000M"
+ runtime.start.memory="200M"
+/>
+   <!--    gate.swing.XJFileChooser="{lastapplication=P:\Pantaleo\OSIM\Sorgente New\competence_crawler\build\org.p4535992.mvc.webapp\WEB-INF\resource\crawler\competenceExtraction.xgapp,
+gate.persist.SerialDataStore=P:\Pantaleo\OSIM\Sorgente New\competence_crawler\build\org.p4535992.mvc.webapp\WEB-INF\resource\crawler\temp\datastore-chim_store,
+gate.CreoleRegister=P:\Pantaleo\OSIM\Sorgente New\competence_crawler\org.p4535992.mvc.webapp\WEB-INF\resource\crawler\plugins\Tools,
+application.zip.LingPipe ApplicationWebb=P:\Pantaleo\OSIM\Sorgente New\competence_crawler\org.p4535992.mvc.webapp\WEB-INF\resource\crawler\langDetector.zip,
+application.ANNIE=P:\Pantaleo\OSIM\Sorgente New\competence_crawler\build\org.p4535992.mvc.webapp\WEB-INF\resource\crawler\competenceExtraction.xgapp,
+gate.corpora.DocumentImpl=P:\Pantaleo\OSIM\Sorgente New\competence_crawler\build\org.p4535992.mvc.webapp\WEB-INF\resource\crawler\temp\langDocuments\it.txt,
+application.LingPipe ApplicationWebb=P:\Pantaleo\OSIM\Sorgente New\competence_crawler\org.p4535992.mvc.webapp\WEB-INF\resource\crawler\langDetector.xgapp,
+applications=ANNIE;LingPipe ApplicationWebb;, application.zip.ANNIE=P:\Pantaleo\OSIM\Sorgente New\competence_crawler\build\org.p4535992.mvc.webapp\WEB-INF\resource\crawler\competenceExtraction.zip}"-->
+    
+</GATE>

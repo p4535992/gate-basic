@@ -1,7 +1,5 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
-import com.github.p4535992.util.file.FileUtilities;
-import com.github.p4535992.util.string.StringUtilities;
 import gate.Corpus;
 import gate.CorpusController;
 import gate.Document;
@@ -15,6 +13,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +26,9 @@ import java.util.Map;
  * Created by 4535992 on 24/06/2015.
  * @author 4535992.
  * @version 2015-11-12.
+ * @deprecated use instead {@link ExtractorInfoGate81}
  */
+@Deprecated
 @SuppressWarnings("unused")
 public class ExtractorInfoGate8 {
 
@@ -33,6 +37,9 @@ public class ExtractorInfoGate8 {
 
     private Corpus corpus;
     private Map<String,Map<String,Map<String,String>>> mapContentDocs;
+    private Map<String,String> mapAnnotation;
+    private Map<String,Map<String,String>> mapAnnotationSet;
+    private Map<String,Map<String,Map<String,String>>> mapDocs;
 
 
     private static ExtractorInfoGate8 instance = null;
@@ -104,10 +111,10 @@ public class ExtractorInfoGate8 {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         try{
             if(url!=null){
-                if(StringUtilities.isNullOrEmpty(nameCorpus)) {
-                    corpus = gc8.createCorpusByUrl(url, "GeoDocuments Corpus");
+                if(nameCorpus == null || nameCorpus.isEmpty()) {
+                    corpus = gc8.createCorpusByURL(url, "GeoDocuments Corpus");
                 }else{
-                    corpus = gc8.createCorpusByUrl(url, nameCorpus);
+                    corpus = gc8.createCorpusByURL(url, nameCorpus);
                 }
             }//if url!=null
             if(corpus == null){return null;}
@@ -154,7 +161,7 @@ public class ExtractorInfoGate8 {
             logger.info("Execute of GATE in process for the url " + url + "...");
             docProcessor.processDocument(doc);
             logger.info("...GATE is been processed");
-            if(StringUtilities.isNullOrEmpty(nameCorpus)) {
+            if(nameCorpus == null || nameCorpus.isEmpty()) {
                 corpus = gc8.createCorpusByDocument(doc, "GeoDocuments Corpus");
             }else{
                 corpus = gc8.createCorpusByDocument(doc, nameCorpus);
@@ -195,10 +202,10 @@ public class ExtractorInfoGate8 {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         try{
             logger.info("Execute of GATE in process for a list of  " + listUrl.size() + " urls...");
-            if (StringUtilities.isNullOrEmpty(nameCorpus)) {
-                corpus = gc8.createCorpusByUrl(listUrl, "GeoDocuments Corpus");
+            if (nameCorpus == null || nameCorpus.isEmpty()) {
+                corpus = gc8.createCorpusByURL(listUrl, "GeoDocuments Corpus");
             } else {
-                corpus = gc8.createCorpusByUrl(listUrl, nameCorpus);
+                corpus = gc8.createCorpusByURL(listUrl, nameCorpus);
             }
             if(corpus == null){return null;}
             else{
@@ -236,7 +243,7 @@ public class ExtractorInfoGate8 {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         Document doc = new DocumentImpl();
         try{
-            if (StringUtilities.isNullOrEmpty(nameCorpus)) {
+            if (nameCorpus == null || nameCorpus.isEmpty()) {
                 corpus = Factory.newCorpus("GeoDocuments Corpus");
             } else {
                 corpus = Factory.newCorpus(nameCorpus);
@@ -354,7 +361,7 @@ public class ExtractorInfoGate8 {
         GateCorpus8Kit gc8 = GateCorpus8Kit.getInstance();
         try{
             if(contentDocument!=null){
-                if(StringUtilities.isNullOrEmpty(nameCorpus)) {
+                if(nameCorpus == null || nameCorpus.isEmpty()) {
                     corpus = gc8.createCorpusByString(contentDocument, "GeoDocuments Corpus");
                 }else{
                     corpus = gc8.createCorpusByString(contentDocument, nameCorpus);
@@ -404,7 +411,7 @@ public class ExtractorInfoGate8 {
             logger.info("Execute of GATE in process for a string content ...");
             docProcessor.processDocument(doc);
             logger.info("...GATE is been processed");
-            if(StringUtilities.isNullOrEmpty(nameCorpus)) {
+            if(nameCorpus == null || nameCorpus.isEmpty()) {
                 corpus = gc8.createCorpusByDocument(doc, "GeoDocuments Corpus");
             }else{
                 corpus = gc8.createCorpusByDocument(doc, nameCorpus);
@@ -442,7 +449,7 @@ public class ExtractorInfoGate8 {
                     try {
                         for (int j = 0; j < list.get(index).size(); j++) {
                             content = support.getContent(index, j, nameAnnotation);
-                            if (!StringUtilities.isNullOrEmpty(content)) {
+                            if (content != null && !content.isEmpty()) {
                                 return content;
                             }
                         }
@@ -481,7 +488,7 @@ public class ExtractorInfoGate8 {
      * @return the list of {@link URL}.
      */
     private List<URL> prepareListURL(File fileOrDirectory){
-        List<File> listFiles = new ArrayList<>();
+        /*List<File> listFiles = new ArrayList<>();
         if(FileUtilities.isDirectoryExists(fileOrDirectory.getAbsolutePath())) {
             listFiles = FileUtilities.getFilesFromDirectory(fileOrDirectory);
         }else{
@@ -489,14 +496,52 @@ public class ExtractorInfoGate8 {
         }
         List<URL> listUrl = new ArrayList<>();
         for(File file: listFiles) {
+            URL url = FileUtilities.toURL(file);
+            if(url!=null)listUrl.add(url);
+        }
+        return listUrl;*/
+        return prepareListURL(fileOrDirectory.toPath());
+    }
+
+    /**
+     * Method to preapre a List of URL froma File or Directoryl
+     * @param fileOrDirectory the {@link File} to inspect.
+     * @return the list of {@link URL}.
+     */
+    private List<URL> prepareListURL(Path fileOrDirectory){
+        List<Path> listFiles = new ArrayList<>();
+        if(Files.exists(fileOrDirectory) && Files.isDirectory(fileOrDirectory)) {
+            listFiles = getPathsFromDirectory(fileOrDirectory);
+        }else{
+            listFiles.add(fileOrDirectory);
+        }
+        List<URL> listUrl = new ArrayList<>();
+        for(Path file: listFiles) {
             try {
-                URL url = FileUtilities.toURL(file);
-                listUrl.add(url);
+                listUrl.add(file.toUri().toURL());
             } catch (MalformedURLException e) {
-                logger.warn(e.getMessage(), e);
+                logger.warn("Can't create a url for the file:"+file.toAbsolutePath().toString());
             }
         }
         return listUrl;
+    }
+
+    /**
+     * Method to read all file ina directory/folder.
+     *
+     * @param directory the {@link File} directory/folder.
+     * @return the  {@link List} of {@link File} in the directory.
+     */
+    public List<Path> getPathsFromDirectory(Path directory) {
+        List<Path> paths = new ArrayList<>();
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(directory.toUri()))) {
+            for (Path path : directoryStream) {
+                paths.add(path);
+            }
+        } catch (IOException e) {
+            logger.error("Listing files in directory: {}", directory, e);
+        }
+        return paths;
     }
 
 }

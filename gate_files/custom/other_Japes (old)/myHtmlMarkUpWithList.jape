@@ -1,0 +1,265 @@
+/*htmlMarkUpWithList.jape
+*
+* Individuiamo e tracciamo le informazioni nel footer di un documento HTML
+*/
+Phase: htmlMarkUpWithList
+Input: Token Split Lookup SpaceToken azienda assicurazione industriale universita regioni provincie indirizzo title head footer h1 h2 h3 h4 h5 h6 
+
+Rule: myHTML
+(
+    /*FUNZIONA ma meno precisa*/
+    /*{provincie within footer}*/
+	
+	/*FUNZIONA */
+	(
+	   ({Token})
+       ({Split}|{SpaceToken})[0,3]
+	)[0,6]
+	(
+	 ({Lookup.majorType==provincie, Lookup within {footer}})
+	 |
+	 ({Lookup.majorType==regioni, Lookup within {footer}})
+	 |
+	 ({Lookup.majorType==indirizzo, Lookup within {footer}})
+	 |
+	 ({Lookup.majorType==provincie, Lookup within {head}})
+	 |
+	 ({Lookup.majorType==regioni, Lookup within {head}})
+	 |
+	 ({Lookup.majorType==indirizzo, Lookup within {head}})
+	 |
+	 ({Lookup.majorType==provincie, Lookup within {title}})
+	 |
+	 ({Lookup.majorType==regioni, Lookup within {title}})
+	 |
+	 ({Lookup.majorType==indirizzo, Lookup within {title}})
+	 |
+	 ({Token, Lookup within {h1}})
+	 |
+	 ({Token, Lookup within {h2}})
+	 |
+	 ({Token, Lookup within {h3}})
+	)
+	(
+	   ({Token})
+       ({Split}|{SpaceToken})[0,3]
+	)[0,6]
+	(
+	   ({Token})
+       ({Split}|{SpaceToken})[0,3]
+	)[0,6]
+   ((HEAD)|(FOOTER)|(TITLE)|(KEYWORD_HTML))
+   ({Split}|{SpaceToken})[0,3] 
+   (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+):myProva
+--> 
+:myProva.MyProva = {kind = "myProva", rule = myHTML}
+//{
+//    System.out.println("Verifica presenza keyword sui TAG Footer e/o Head documento HTML....");
+//    gate.AnnotationSet matchedAnns= (gate.AnnotationSet) bindings.get("myProva");	
+//	if(matchedAnns != null) {
+//		if(matchedAnns.size() > 0) {
+//			System.out.println("footer or head with keyword NOT EMPTY  !!!!");
+//		} else {
+//			System.out.println("footer or head with keyword  EMPTY !");
+//		}
+//		
+//	} else {
+//		System.out.println("footer or head with keyword  = NULL !");
+//	}
+//	gate.FeatureMap newFeatures= Factory.newFeatureMap();
+//	newFeatures.put("rule","htmlKeyword");
+//	outputAS.add(matchedAnns.firstNode(),matchedAnns.lastNode(),"MyHmtl", newFeatures);
+//	/*System.out.println("Fine RHS Footer");*/
+//}
+
+Rule: RuleTitle
+(  
+   (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+  (
+     {Lookup.majorType==provincie,Lookup within {title}}|
+	 {Lookup.majorType==regioni,Lookup within {title}}|
+	 {Lookup.majorType==indirizzo,Lookup within {title}}
+  )
+  ({Split}|{SpaceToken})[0,3] 
+  (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+):myTitle
+--> 
+:myTitle.MyHmtlKeyword = {kind = "myTitle", rule = RuleTitle}
+
+
+Rule: RuleHead
+(
+  (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+  (
+     {Lookup.majorType==provincie,Lookup within {head}}|
+	 {Lookup.majorType==regioni,Lookup within {head}}|
+	 {Lookup.majorType==indirizzo,Lookup within {head}}
+  )
+  ({Split}|{SpaceToken})[0,3] 
+  (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+):myHead
+--> 
+:myHead.MyHmtlKeyword = {kind = "myHead", rule = RuleHead}
+
+
+Rule: RuleFooter
+(  
+  (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+  (
+     {Lookup.majorType==provincie,Lookup within {footer}}|
+	 {Lookup.majorType==regioni,Lookup within {footer}}|
+	 {Lookup.majorType==indirizzo,Lookup within {footer}}
+  )
+  ({Split}|{SpaceToken})[0,3] 
+  (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+):myFooter
+--> 
+:myFooter.MyHmtlKeyword = {kind = "myFooter", rule = RuleFooter}
+
+
+Rule: RuleH1
+(
+   (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+  (
+     {Lookup.majorType==provincie,Lookup within {h1}}|
+	 {Lookup.majorType==regioni,Lookup within {h1}}|
+	 {Lookup.majorType==indirizzo,Lookup within {h1}}
+  )
+  ({Split}|{SpaceToken})[0,3] 
+  (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+):myH1
+--> 
+:myH1.MyHmtlKeyword = {kind = "myH1", rule = RuleH1}
+
+
+Rule: RuleH2
+(
+   (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+  (
+     {Lookup.majorType==provincie,Lookup within {h2}}|
+	 {Lookup.majorType==regioni,Lookup within {h2}}|
+	 {Lookup.majorType==indirizzo,Lookup within {h2}}
+  )
+  ({Split}|{SpaceToken})[0,3] 
+  (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+):myH2
+--> 
+:myH2.MyHmtlKeyword = {kind = "myH2", rule = RuleH2}
+
+
+Rule: RuleH3
+(
+   (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+  (
+     {Lookup.majorType==provincie,Lookup within {h3}}|
+	 {Lookup.majorType==regioni,Lookup within {h3}}|
+	 {Lookup.majorType==indirizzo,Lookup within {h3}}
+  )
+  ({Split}|{SpaceToken})[0,3] 
+  (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+):myH3
+--> 
+:myH3.MyHmtlKeyword = {kind = "myH3", rule = RuleH3}
+
+
+Rule: RuleH4
+(
+   (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+  (
+     {Lookup.majorType==provincie,Lookup within {h4}}|
+	 {Lookup.majorType==regioni,Lookup within {h4}}|
+	 {Lookup.majorType==indirizzo,Lookup within {h4}}
+  )
+  ({Split}|{SpaceToken})[0,3] 
+  (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+):myH4
+--> 
+:myH4.MyHmtlKeyword = {kind = "myH4", rule = RuleH4}
+
+
+Rule: RuleH5
+(
+   (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+  (
+     {Lookup.majorType==provincie,Lookup within {h5}}|
+	 {Lookup.majorType==regioni,Lookup within {h5}}|
+	 {Lookup.majorType==indirizzo,Lookup within {h5}}
+  )
+  ({Split}|{SpaceToken})[0,3] 
+  (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+):myH5
+--> 
+:myH5.MyHmtlKeyword = {kind = "myH5", rule = RuleH5}
+
+
+Rule: RuleH6
+(
+   (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]
+  (
+     {Lookup.majorType==provincie,Lookup within {h6}}|
+	 {Lookup.majorType==regioni,Lookup within {h6}}|
+	 {Lookup.majorType==indirizzo,Lookup within {h6}}
+  )
+  ({Split}|{SpaceToken})[0,3]
+  (
+	 ({Token})
+     ({Split}|{SpaceToken})[0,3]
+	 )[0,6]  
+):myH6
+--> 
+:myH6.MyHmtlKeyword = {kind = "myH6", rule = RuleH6}

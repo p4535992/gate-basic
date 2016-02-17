@@ -1,0 +1,24 @@
+﻿Phase: PartitaIVA
+Input: Token Lookup Split SpaceToken iva
+Options: control=all 
+Rule: RuleIVA
+Priority: 10
+  /*partita IVA:
+   Partita IVA: 12345678901
+   La partita iva dell'azienda bertulucci è 12345678901*/
+    (
+          (
+		({Lookup.majorType==iva})
+		(TRASH)[1,3]
+		({Token.kind == number,Token.length==11}):iva2
+                (TRASH)[1,3]
+           )[1,3]
+    ):iva
+  -->
+ //:iva.MyPartitaIVA = {kind = "iva", rule = "RuleIVA"}
+{ 
+   gate.AnnotationSet matchedAnns= (gate.AnnotationSet) bindings.get("iva2");   
+   gate.FeatureMap newFeatures= Factory.newFeatureMap();
+   newFeatures.put("rule","RuleIVA");
+   outputAS.add(matchedAnns.firstNode(),matchedAnns.lastNode(),"MyPartitaIVA", newFeatures);
+}

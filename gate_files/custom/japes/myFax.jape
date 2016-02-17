@@ -1,0 +1,153 @@
+Phase:	Fax
+Input:  Token Lookup Split SpaceToken telefono fax
+Options: control = appelt
+
+//////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+// Street Rules
+/*+39 055 27571 0 (+39) 06 66177602 o +39 02 36747618/20*/
+ Rule:RuleMyFax_4
+ Priority: 10                                                
+(
+   ({Lookup.majorType==fax,!Lookup.majorType==telefono})[1,1]
+   ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+   (
+      ({Token.string== "("})[0,1]
+	  ({Token.string== "+"})[0,2]
+	  ({Token.string== "("})[0,1]
+	  ({Token.kind == number,Token.length <= "3"})
+	  ({Token.string== ")"})[0,1]
+	  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token,Token.length==1,!Token.kind==number})[0,3]
+	  ({Token.kind == number,Token.length <= "4"})
+	  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token,Token.length==1,!Token.kind==number})[0,3]
+	  ({Token.kind == number,Token.length <= "10"}|{Token.kind == number,Token.length == "8"})[0,1]	  
+	  ({Token.string == "/"}|{Token,Token.length==1,!Token.kind==number}|{SpaceToken})[0,1]
+	  ({Token.kind == number,Token.length <= "5"})[0,1]
+	  
+
+   ):fax_4_1
+):fax_4 -->
+ :fax_4_1.MyFax = {kind = "fax_4_1", rule = RuleMyFax_4}
+ 
+ /*Tel. +39 050 221 8000345*/
+ Rule:RuleMyFax_5
+ Priority: 10                                                
+(
+   ({Lookup.majorType==fax,!Lookup.majorType==telefono})[1,1]
+   ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+   (
+      ({Token.string== "("})[0,1]
+	  ({Token.string== "+"})[0,2]
+	  ({Token.string== "("})[0,1]
+	  ({Token.kind == number,Token.length <= "3"})
+	  ({Token.string== ")"})[0,1]
+	  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token,Token.length==1,!Token.kind==number})[0,3]
+	  ({Token.kind == number,Token.length <= "4"})
+	  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token,Token.length==1,!Token.kind==number})[0,3]
+	  ({Token.kind == number,Token.length <= "10"}|{Token.kind == number,Token.length == "7"})[0,1]	  
+	  ({Token.string == "/"}|{Token,Token.length==1,!Token.kind==number})[0,1]
+	  ({Token.kind == number,Token.length <= "5"})[0,1]
+	  
+
+   ):fax_5_1
+):fax_5 -->
+:fax_5_1.MyFax = {kind = "fax_5_1", rule = RuleMyFax_5}
+ 
+/*Tel. +39 050 221 8000*/
+
+Rule:RuleMyFax_8
+ Priority: 10                                                
+(
+   ({Lookup.majorType==fax,!Lookup.majorType==telefono})[1,1]
+   ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+   (
+      ({Token.string== "("})[0,1]
+	  ({Token.string== "+"})[0,2]
+	  ({Token.string== "("})[0,1]
+	  ({Token.kind == number,Token.length <= "3"})
+	  ({Token.string== ")"})[0,1]
+	  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token,Token.length==1,!Token.kind==number})[0,3]
+	  ({Token.kind == number,Token.length <= "4"})
+	  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token,Token.length==1,!Token.kind==number})[0,3]
+	  ({Token.kind == number,Token.length <= "10"})[0,1]	  
+	  ({Token.string == "/"}|{Token,Token.length==1,!Token.kind==number}|{SpaceToken})[0,1]
+	  ({SpaceToken})[0,2]
+	  ({Token.kind == number,Token.length <= "5"}|{Token.kind == number,Token.length == "4"})[0,1]
+	  
+
+   ):fax_8_1
+):fax_8 -->
+:fax_8_1.MyFax = {kind = "fax_8_1", rule = RuleMyFax_8}
+
+/* tel 1234 12345 o Centralino: 02/89919890*/
+Rule:RuleMyFax_6
+Priority: 10                                                
+( 
+  ({Lookup.majorType==fax,!Lookup.majorType==telefono})[1,1]
+  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+  (
+    (
+		//({Token.kind == number,Token.length == "4"}|{Token.kind == number,Token.length == "2"})
+		//({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="/"}|{Token.string=="."})[0,2]
+		//({Token.kind == number,Token.length == "5"}|{Token.kind == number,Token.length == "7"}|{Token.kind == number,Token.length == "8"})
+		({Token.kind == number,Token.length <= "4"})
+		({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="/"}|{Token.string=="."})[0,2]
+		({Token.kind == number,Token.length <= "8"})
+	)[0,1]
+	(
+	   ({Token.kind == number,Token.length == "10"}) 
+	)[0,1]
+   ):fax_6_1
+):fax_6 -->
+ :fax_6_1.MyFax = {kind = "fax_6_1", rule = RuleMyFax_6}
+
+/*Tel. +39 050 221 8000*/
+Rule:RuleMyFax_7
+Priority: 10                                                
+(
+  ({Lookup.majorType==fax,!Lookup.majorType==telefono})[1,1]
+  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+  (
+	  ({Token.string== "("})[0,1]
+	  ({Token.string== "+"})[0,2]
+	  ({Token.string== "("})[0,1]
+	  ({Token.kind == number,Token.length <= "3"})
+	  ({Token.string== ")"})[0,1]
+	  ({Split}|{SpaceToken}|{Token.string=="-"})[0,2]
+	  ({Token.kind == number,Token.length <= "4"})
+	  ({Split}|{SpaceToken}|{Token.string=="-"})[0,2]
+	  ({Token.kind == number,Token.length <= "8"})[0,1]
+  ):fax_7_1
+):fax_7 -->
+ :fax_7_1.MyFax = {kind = "fax_7_1", rule = RuleMyFax_7}
+ 
+/*Tel. (+39) 050 221 8000*/ 
+Rule:RuleMyFax_9
+Priority: 10                                                
+(
+  ({Lookup.majorType==fax,!Lookup.majorType==telefono})[1,1]
+  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+  (
+	  ({Token.string== "("})[0,1]
+	  ({Token.string== "+"})[0,2]
+	  ({Token.string== "("})[0,1]
+	  ({Token.kind == number,Token.length <= "3"})
+	  (
+	    ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,1]
+		({Token.kind == number})
+	  )[1,6]
+  ):fax_9_1
+):fax_9 -->
+ :fax_9_1.MyFax = {kind = "fax_9_1", rule = RuleMyFax_9}
+ 
+ Rule: KKF
+(
+ {Lookup.majorType == fax}
+):kkf
+-->
+:kkf.FaxSupport ={kind="kkf", rule = KKF}
+ 
+
+
+
