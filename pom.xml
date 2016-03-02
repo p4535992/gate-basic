@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.p4535992</groupId>
     <artifactId>gate-basic</artifactId>
-    <version>1.6.8</version>
+    <version>1.6.9</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -45,13 +45,6 @@
         </license>
     </licenses>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-
     <properties>
         <!-- Generic properties -->
         <downloadSources>true</downloadSources>
@@ -65,8 +58,10 @@
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
         <maven-source-plugin.version>2.3</maven-source-plugin.version>
         <maven-javadoc-plugin.version>2.3</maven-javadoc-plugin.version>
-        <maven-exec-plugin.version>1.2</maven-exec-plugin.version>
+        <maven-exec-plugin.version>1.4.0</maven-exec-plugin.version>
         <maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
+        <tomcat7-maven-plugin.version>2.2</tomcat7-maven-plugin.version>
+        <nbm-maven-plugin.version>4.1</nbm-maven-plugin.version>
         <!-- GATE API -->
         <gate.version>8.1</gate.version>
         <!-- Logging -->
@@ -77,14 +72,21 @@
         <spring-boot-starter-logging.version>1.3.0.RELEASE</spring-boot-starter-logging.version>
         <!-- Apache -->
         <org.apache.commons-commons-pool2>2.4.2</org.apache.commons-commons-pool2>
+        <commons-pool.commons-pool.version>1.6</commons-pool.commons-pool.version>
         <!-- UTILITY -->
         <com.github.p4535992.utility.version>1.6.8</com.github.p4535992.utility.version>
         <!-- Support -->
-        <javax.servlet.servlet-api.version>2.5</javax.servlet.servlet-api.version>
+        <javax.servlet.servlet-api.version>2.5</javax.servlet.servlet-api.version>   
     </properties>
 
     <dependencyManagement>
         <dependencies>
+             <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.1</version>
+                <optional>true</optional>
+            </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
@@ -96,17 +98,19 @@
                     </exclusion>
                 </exclusions>
                 <type>pom</type>
-                <scope>import</scope>
+                <scope>import</scope>    
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-pool2</artifactId>
                 <version>${org.apache.commons-commons-pool2}</version>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>commons-pool</groupId>
                 <artifactId>commons-pool</artifactId>
-                <version>1.6</version>
+                <version>${commons-pool.commons-pool.version}</version>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>uk.ac.gate</groupId>
@@ -121,6 +125,7 @@
                         <groupId>org.springframework</groupId>
                         <artifactId>spring-aop</artifactId>
                     </exclusion>
+                    <!--
                     <exclusion>
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-log4j12</artifactId>
@@ -129,11 +134,13 @@
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
                     </exclusion>
+                    -->
                     <exclusion>
                         <groupId>junit</groupId>
                         <artifactId>junit</artifactId>
                     </exclusion>
                 </exclusions>
+                <optional>true</optional>
             </dependency>
             <!-- LOGGING -->
             <!-- jul-to-slf4j + jcl-over-slf4j + log4j-over-slf4j + logback-classic -->
@@ -147,12 +154,14 @@
                          <artifactId>slf4j-api</artifactId>
                      </exclusion>
                  </exclusions>-->
+                <optional>true</optional>
             </dependency>
             <!-- The SLF4J - take out because already present in logback classic -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${org.slf4j.version}</version>
+                <optional>true</optional>
             </dependency>
             <!-- Since slf4j is a bridge, you need an implementation of it that would
             redirect all calls to slf4j or JCL. Following is to perform logging using
@@ -178,8 +187,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>compile</scope>
+            <version>4.12</version> 
             <optional>true</optional>
         </dependency>
 
@@ -191,13 +199,11 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-            <optional>true</optional>
+            <artifactId>commons-pool</artifactId>        
         </dependency>
 
         <!-- Spring JMS and Support -->
@@ -228,16 +234,37 @@
             <artifactId>spring-web</artifactId>
             <optional>true</optional>
         </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <optional>true</optional>
-        </dependency>
-
+        
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>        
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>     
+        </dependency>
+
+        <!-- MAVEN PLUGIN DEPENDENCY-->
+        <dependency>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>${maven-exec-plugin.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-jdk14</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-nop</artifactId>
+                </exclusion>
+            </exclusions>
             <optional>true</optional>
         </dependency>
 
@@ -246,23 +273,46 @@
 
     <build>
         <plugins>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>${maven-exec-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>java</goal>
+                            <goal>exec</goal>
                         </goals>
                     </execution>
                 </executions>
-                <!--
                 <configuration>
-                    <mainClass>C:\apache-camel-2.11.0\examples\camel-example-smooks-
-                  integration\src\main\java\example\Main< /mainClass>
+                    <executable>java</executable>
+                    <includeProjectDependencies>true</includeProjectDependencies>
+                    <includePluginDependencies>false</includePluginDependencies>
+                    <classpathScope>compile</classpathScope>
+                    <mainClass>com.github.p4535992.main.home.Main</mainClass>
+                    <arguments>
+                    </arguments>
+                    &lt;!&ndash;<systemProperties>
+                        <systemProperty>
+                            <key>myproperty</key>
+                            <value>myvalue</value>
+                        </systemProperty>
+                    </systemProperties>&ndash;&gt;
                 </configuration>
-                -->
+            </plugin>-->
+
+            <!-- To use the plugin goals in your POM or parent POM -->
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>${tomcat7-maven-plugin.version}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <version>${nbm-maven-plugin.version}</version>
+                <extensions>true</extensions>
             </plugin>
 
             <plugin>

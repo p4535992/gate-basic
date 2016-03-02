@@ -4,10 +4,84 @@
 #########################
 ###Last Update: 2016-02-17
 #########################
-NOTE: I'm not a expert programmer so any suggestion or advise is welcome.
+This project has the purpose to wrapp all the information extract with gate in a Map Structure, for make readable 
+to other project without use GATE directly
+##### NOTE: I'm not a expert programmer so any suggestion or advise is welcome.
 
 [![Release](https://img.shields.io/github/release/p4535992/gate-basic.svg?label=maven)](https://jitpack.io/p4535992/gate-basic)
-
+### Example version 1.6.9
+Example code, set up Gate embedded to the project with API GATE.
+Note: By default the base directory is given from "System.getProperty("user.dir")" the root folder of the project, if
+you want change ou must invoke setBaseDirectory(String pathToTheDirectory) before invoke setUpGateEmbedded.
+```java
+        //Class for process a document with GATE and get a result with only the st String value
+        //name Document -> name AnnotationSet -> name Annotation -> string content.
+        ExtractorInfoGate81 eig8 = ExtractorInfoGate81.getInstance();
+        //create a list of annotation (you know they exists on the gate document,otherwise you get null result).....
+        List<String> listAnn =  new ArrayList<>(Arrays.asList("MyRegione","MyPhone","MyFax","MyEmail","MyPartitaIVA",
+                "MyLocalita","MyIndirizzo","MyEdificio","MyProvincia"));
+        //create a list of annotationSet (you know they exists on the gate document,otherwise you get null result).....
+        List<String> listAnnSet = new ArrayList<>(Arrays.asList("MyFOOTER","MyHEAD","MySpecialID","MyAnnSet"));
+        //Extract all the information given from a URL in a specific object,
+        //there are method for works with java.io.File File or Directory
+        //Store the result on of the extraction on a GateSupport Object
+        Gate8Kit gate8Kit = Gate8Kit.getInstance();
+        CorpusController controller = gate8Kit.setUpGateEmbedded(System.getProperty("user.dir")+File.separator+"gate_files", "plugins", "gate.xml", "user-gate.xml", "gate.session",
+                "custom/gapp/geoLocationPipeline06102014v7_fastMode.xgapp");
+        GateSupport2 support = GateSupport2.getInstance(
+                eig8.extractorGATE(
+                        new URL("http://www.unifi.it"),controller,"corpus_test_1",listAnnSet,listAnn,true)
+        );
+```
+Example code, set up Gate embedded to the project with Spring Framework (the parameter class just help us to find the
+resources file).
+```java
+        //Class for process a document with GATE and get a result with only the st String value
+        //name Document -> name AnnotationSet -> name Annotation -> string content.
+        ExtractorInfoGate81 eig8 = ExtractorInfoGate81.getInstance();
+        //create a list of annotation (you know they exists on the gate document,otherwise you get null result).....
+        List<String> listAnn =  new ArrayList<>(Arrays.asList("MyRegione","MyPhone","MyFax","MyEmail","MyPartitaIVA",
+                "MyLocalita","MyIndirizzo","MyEdificio","MyProvincia"));
+        //create a list of annotationSet (you know they exists on the gate document,otherwise you get null result).....
+        List<String> listAnnSet = new ArrayList<>(Arrays.asList("MyFOOTER","MyHEAD","MySpecialID","MyAnnSet"));
+        //Extract all the information given from a URL in a specific object,
+        //there are method for works with java.io.File File or Directory
+        //Store the result on of the extraction on a GateSupport Object
+        Gate8Kit gate8Kit = Gate8Kit.getInstance();
+        DocumentProcessor procDoc = gate8Kit.setUpGateEmbeddedWithSpring("gate/gate-beans.xml");
+```
+GateSupport2 enable many feature for retrieve the content from a gate Document.
+I made up this object just for retrieve the informations by integer index.
+```java
+        //Now you can get the content from a specific document, specific AnnotationSet, specific Annotation.
+        //or loop by using a index int.
+        String content0 = support.getSingleContent("http://www.unifi.it", "MyAnnSet", "MyIndirizzo"); // "P.azza Guido Monaco"
+        String content1 = support.getSingleContent(0,"MyAnnSet", "MyIndirizzo"); // "P.azza Guido Monaco"
+        String content2 = support.getSingleContent(0,0,"MyIndirizzo"); // "P.azza Guido Monaco"
+        String content3 = support.getSingleContent(0,0,0); // "+39 055 27571"
+        //Other function with some wrapped object of GATE API.
+        //Get Documents on the First Corpus saved on the GateSupport wrapped object
+        List<MapDocument> mapDocument = support.getCorpus(0);
+        List<String> contents = null;
+        for(MapDocument doc: mapDocument) {
+            //Get AnnotationSet on the first Document of the Corpus saved on the GateSupport wrapped object
+            List<MapAnnotationSet> mapAnnotationSets = support.getDocument(0);
+            for(MapAnnotationSet annSet: mapAnnotationSets){
+                //Get Annotation from AnnotationSet on the first Document of the Corpus saved on the GateSupport wrapped object
+                List<MapAnnotation> mapAnnotations = support.getAnnotationSet(0);
+                for(MapAnnotation ann: mapAnnotations){
+                    //Get List of Content Annotation from AnnotationSet on the
+                    // first Document of the Corpus saved on the GateSupport wrapped object
+                    contents = support.getContent(0,0,0);
+                    break;
+                }
+                break;
+            }
+            break;
+        }
+        String content4 = contents.get(0); // "+39 055 27571"
+```
+### OLD EXAMPLE 1.6.8
 Example code 1, extract information with gate:
 ```java
 

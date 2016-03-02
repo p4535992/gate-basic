@@ -3,9 +3,8 @@ package com.github.p4535992.gatebasic.gate.gate8;
 import com.github.p4535992.gatebasic.object.MapAnnotation;
 import com.github.p4535992.gatebasic.object.MapAnnotationSet;
 import com.github.p4535992.gatebasic.object.MapDocument;
-import com.sun.istack.internal.Nullable;
+import javax.annotation.Nullable;
 import gate.*;
-import gate.corpora.DocumentImpl;
 import gate.creole.ExecutionException;
 import gate.util.DocumentProcessor;
 import gate.util.GateException;
@@ -21,7 +20,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by 4535992 on 24/06/2015.
@@ -37,9 +35,9 @@ public class ExtractorInfoGate81 {
     private Corpus corpus;
     private Controller controller;
     private MapDocument mapContentDocs;
-    private MapAnnotation mapAnnotation;
-    private MapAnnotationSet mapAnnotationSet;
-    private MapDocument mapDocs;
+    //private MapAnnotation mapAnnotation;
+    //private MapAnnotationSet mapAnnotationSet;
+    //private MapDocument mapDocs;
 
 
     private static ExtractorInfoGate81 instance = null;
@@ -117,8 +115,8 @@ public class ExtractorInfoGate81 {
      * @param url                the {@link URL} the url address to the documents you want to analize.
      * @param controller         the {@link CorpusController} with loaded a gapp file.
      * @param nameCorpus         the @Nullable {@link String} name of the corpus gate.
-     * @param nameAnnotations    @Nullable {@link List} of {@link String} of annotation you want to get from the document.
-     * @param nameAnnotationsSet @Nullable {@link List} of {@link String} of annotationSet you want to get from the document
+     * @param nameAnnotations    the {@link List} of {@link String} of annotation you want to get from the document.
+     * @param nameAnnotationsSet the {@link List} of {@link String} of annotationSet you want to get from the document
      *                           if param firstAndExit is true the list priority is given from the
      *                           index so the first element has more priority of the others element.
      * @param firstAndExit       the {@link Boolean} is  true stop searching on other AnnotationSet hte same AnnotationType.
@@ -135,13 +133,13 @@ public class ExtractorInfoGate81 {
      * Method to read all the processed result of GATE on the document referenced from the url.
      * @param url the {@link URL} address to the documents you want to analyze.
      * @param docProcessor a {@link DocumentProcessor} with loaded a GAPP file using Spring framework.
-     * @param nameCorpus (optional) name of the corpus gate.
-     * @param nameAnnotations (optional) list of annotation you want to get from the document.
-     * @param nameAnnotationsSet (optional) list of annotationSet you want to get from the document
+     * @param nameCorpus the {@link String} (optional) name of the corpus gate.
+     * @param nameAnnotations the {@link List} of the the {@link String}(optional) list of annotation you want to get from the document.
+     * @param nameAnnotationsSet the {@link List} of the the {@link String}(optional) list of annotationSet you want to get from the document
      *                           if param firstAndExit is true the list priority is given from the
      *                           index so the first element has more priority of the others element.
-     * @param firstAndExit if true stop searching on other AnnotationSet for the same AnnotationType.
-     * @return a map with all the string value you intend to extract from the documents.t.
+     * @param firstAndExit the {@link Boolean} is true if stop searching on other AnnotationSet for the same AnnotationType.
+     * @return the {@link MapDocument} a map with all the string value you intend to extract from the documents.t.
      */
     public MapDocument extractorGATE(
             URL url, DocumentProcessor docProcessor,@Nullable String nameCorpus,
@@ -155,9 +153,9 @@ public class ExtractorInfoGate81 {
      *
      * @param listUrl            the {@link List} of {@link URL} the url address to the documents you want to analize.
      * @param controller         the {@link CorpusController} with loaded a gapp file.
-     * @param nameCorpus         the @Nullable {@link String} name of the corpus gate.
-     * @param nameAnnotations    @Nullable {@link List} of {@link String} of annotation you want to get from the document.
-     * @param nameAnnotationsSet @Nullable {@link List} of {@link String} of annotationSet you want to get from the document
+     * @param nameCorpus         the {@link String} name of the corpus gate.
+     * @param nameAnnotations    the {@link List} of {@link String} of annotation you want to get from the document.
+     * @param nameAnnotationsSet the {@link List} of {@link String} of annotationSet you want to get from the document
      *                           if param firstAndExit is true the list priority is given from the
      *                           index so the first element has more priority of the others element.
      * @param firstAndExit       the {@link Boolean} is  true stop searching on other AnnotationSet hte same AnnotationType.
@@ -192,9 +190,9 @@ public class ExtractorInfoGate81 {
      * Method to read all the processed result of GATE on the document referenced from the url to a local file.
      * @param fileOrDirectory the {@link File} url address to a local file document you want to analyze.
      * @param controller the {@link CorpusController} with loaded a gapp file.
-     * @param nameCorpus the @Nullable {@link String} name of the corpus gate.
-     * @param nameAnnotations @Nullable {@link List} of {@link String} of annotation you want to get from the document.
-     * @param nameAnnotationsSet @Nullable {@link List} of {@link String} of annotationSet you want to get from the document
+     * @param nameCorpus the {@link String} name of the corpus gate.
+     * @param nameAnnotations {@link List} of {@link String} of annotation you want to get from the document.
+     * @param nameAnnotationsSet {@link List} of {@link String} of annotationSet you want to get from the document
      *                           if param firstAndExit is true the list priority is given from the
      *                           index so the first element has more priority of the others element.
      * @param firstAndExit the {@link Boolean} is  true stop searching on other AnnotationSet hte same AnnotationType.
@@ -212,9 +210,9 @@ public class ExtractorInfoGate81 {
      * Method to read all the processed result of GATE on the document referenced from the url to a local file.
      * @param fileOrDirectory the {@link File} url address to a local file document you want to analize.
      * @param docProcessor the {@link DocumentProcessor}  with loaded a gapp file using Spring framework.
-     * @param nameCorpus the @Nullable {@link String} name of the corpus gate.
-     * @param nameAnnotations @Nullable {@link List} of {@link String} of annotation you want to get from the document.
-     * @param nameAnnotationsSet @Nullable {@link List} of {@link String} of annotationSet you want to get from the document
+     * @param nameCorpus the {@link String} name of the corpus gate.
+     * @param nameAnnotations {@link List} of {@link String} of annotation you want to get from the document.
+     * @param nameAnnotationsSet {@link List} of {@link String} of annotationSet you want to get from the document
      *                           if param firstAndExit is true the list priority is given from the
      *                           index so the first element has more priority of the others element.
      * @param firstAndExit the {@link Boolean} is true stop searching on other AnnotationSet hte same AnnotationType.
@@ -231,9 +229,9 @@ public class ExtractorInfoGate81 {
      * Method to read all the processed result of GATE on the document referenced from the url.
      * @param contentDocument the {@link String} content a local file document you want to analyze.
      * @param controller the {@link CorpusController} with loaded a gapp file.
-     * @param nameCorpus the @Nullable {@link String} name of the corpus gate.
-     * @param nameAnnotations @Nullable {@link List} of {@link String} of annotation you want to get from the document.
-     * @param nameAnnotationsSet @Nullable {@link List} of {@link String} of annotationSet you want to get from the document
+     * @param nameCorpus the {@link String} name of the corpus gate.
+     * @param nameAnnotations {@link List} of {@link String} of annotation you want to get from the document.
+     * @param nameAnnotationsSet {@link List} of {@link String} of annotationSet you want to get from the document
      *                           if param firstAndExit is true the list priority is given from the
      *                           index so the first element has more priority of the others element.
      * @param firstAndExit the {@link Boolean} is  true stop searching on other AnnotationSet hte same AnnotationType.
@@ -250,9 +248,9 @@ public class ExtractorInfoGate81 {
      * Method to read all the processed result of GATE on the document referenced from the url.
      * @param contentDocument the {@link String} content a local file document you want to analyze.
      * @param docProcessor the {@link DocumentProcessor}  with loaded a gapp file using Spring framework.
-     * @param nameCorpus the @Nullable {@link String} name of the corpus gate.
-     * @param nameAnnotations @Nullable {@link List} of {@link String} of annotation you want to get from the document.
-     * @param nameAnnotationsSet @Nullable {@link List} of {@link String} of annotationSet you want to get from the document
+     * @param nameCorpus the {@link String} name of the corpus gate.
+     * @param nameAnnotations {@link List} of {@link String} of annotation you want to get from the document.
+     * @param nameAnnotationsSet {@link List} of {@link String} of annotationSet you want to get from the document
      *                           if param firstAndExit is true the list priority is given from the
      *                           index so the first element has more priority of the others element.
      * @param firstAndExit the {@link Boolean} is  true stop searching on other AnnotationSet hte same AnnotationType.
@@ -288,15 +286,15 @@ public class ExtractorInfoGate81 {
                     }
                 }
             } else if (processor instanceof CorpusController) {
-                CorpusController controller = (CorpusController) processor;
+                CorpusController corpusController = (CorpusController) processor;
                 for (Object obj : objectForCreateTheCorpus) {
                     if (obj != null) {
                         Document doc = gc8.createDoc(obj);
                         corpus.add(doc);
                     }
                 }
-                setCorpus(corpus, controller);
-                execute(controller);
+                setCorpus(corpus, corpusController);
+                execute(corpusController);
             } else {
                 logger.error("...the object :" + processor.getClass().getName() + " must be a CorpusController or a DocumentProcessor");
                 return null;
@@ -365,8 +363,8 @@ public class ExtractorInfoGate81 {
     /**
      * Method to read all the processed result of GATE on a Corpus.
      * @param corpus the {@link Corpus} gate we want analyze.
-     * @param nameAnnotations @Nullable {@link List} of {@link String} of annotation you want to get from the document.
-     * @param nameAnnotationsSet @Nullable {@link List} of {@link String} of annotationSet you want to get from the document
+     * @param nameAnnotations {@link List} of {@link String} of annotation you want to get from the document.
+     * @param nameAnnotationsSet {@link List} of {@link String} of annotationSet you want to get from the document
      * @param firstAndExit the {@link Boolean} is true if stop searching on other AnnotationSet hte same AnnotationType.
      * @return the {@link MapDocument} a map with all the string value you intend to extract from the documents of the corpus.
      */

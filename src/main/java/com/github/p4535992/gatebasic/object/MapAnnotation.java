@@ -317,7 +317,29 @@ public class MapAnnotation {
         return theMapContent;
     }
 
+    public String getName(Integer indexAnnotation) {
+        int i = 0;
+        for (Map.Entry<String, List<MapContent>> entry : mapAnnotations.entrySet()) {
+            if (i == indexAnnotation) {
+                return entry.getKey();
+            }
+            i++;
+        }
+        return null;
+    }
 
+    public String getName(String nameAnnotation) {
+        for (Map.Entry<String, List<MapContent>> entry : mapAnnotations.entrySet()) {
+            if (Objects.equals(entry.getKey(), nameAnnotation)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    public String getName() {
+        return annotationName;
+    }
 
     @Override
     public String toString() {

@@ -109,7 +109,8 @@ public class GateXML{
                         } // if
                     } // for
                 }// if size*/
-                StringBuilder editableContent = supportCreateXMLWithInfo(newSetAnnotation,sortedAnnotations,tags,originalContent,info);
+                StringBuilder editableContent =
+                        supportCreateXMLWithInfo(newSetAnnotation,sortedAnnotations,tags,originalContent,info);
                 try (FileWriter writer = new FileWriter(directory)) {
                     writer.write(editableContent.toString());
                 }

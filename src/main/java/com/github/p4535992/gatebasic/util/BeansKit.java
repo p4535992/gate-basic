@@ -1,6 +1,6 @@
 package com.github.p4535992.gatebasic.util;
 
-import com.sun.istack.internal.Nullable;
+import javax.annotation.Nullable;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
@@ -30,7 +30,7 @@ public class BeansKit implements  org.springframework.context.ResourceLoaderAwar
     private static final org.slf4j.Logger logger =
             org.slf4j.LoggerFactory.getLogger( BeansKit.class);
 
-    private static BeansKit instance = new BeansKit();
+    private static final BeansKit instance = new BeansKit();
 
     private BeansKit(){}
 
@@ -63,7 +63,7 @@ public class BeansKit implements  org.springframework.context.ResourceLoaderAwar
         // bean configuration XML file in CLASSPATH.
         //You can force with the fileSystem using "file:" instead of "classpath:".
         try {
-            context = new ClassPathXmlApplicationContext(filePaths);
+            context = new ClassPathXmlApplicationContext(filePaths,true);
         } catch (Exception e0) {
             if (e0.getCause().getMessage().contains("has already been set")) {
                 logger.warn(e0.getMessage() + "->" + e0.getCause());
@@ -86,12 +86,13 @@ public class BeansKit implements  org.springframework.context.ResourceLoaderAwar
                                 if (Files.exists(path) && path.toRealPath() != null) {
                                     files.add(path.toAbsolutePath().toString());
                                 } else {
-                                    logger.warn("The resource with path:" + path.toString());
+                                    logger.warn("The resource with path:" + path.toString()+" not exists");
                                 }
                             }
                             if (!files.isEmpty()) {
                                 context = new FileSystemXmlApplicationContext(files.toArray(new String[files.size()]), true);
                             } else {
+                                logger.warn("The paths used are reference 0 resources return NULL value");
                                 return null;
                             }
                         } catch (Exception e3) {

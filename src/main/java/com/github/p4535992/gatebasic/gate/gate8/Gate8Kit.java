@@ -20,7 +20,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 /**
  * Created by 4535992 on 17/04/2015.
@@ -36,7 +35,7 @@ public class Gate8Kit {
     /** The Corpus Pipeline application to contain ANNE,Lingpipe,Tools,ecc. */
     private boolean showGate;
     /** Gate Corpus Controller*/
-    private CorpusController corpusController;
+    private Controller controller;
     /** Gapp File */
     private File gappFile;
     /** Gate Document */
@@ -95,11 +94,11 @@ public class Gate8Kit {
     }
 
     public Controller getCorpusController() {
-        return corpusController;
+        return controller;
     }
 
     public void setCorpusController(CorpusController controller) {
-        this.corpusController = controller;
+        this.controller = controller;
     }
 
 
@@ -128,10 +127,11 @@ public class Gate8Kit {
      *                          if null is stoed on the user folder on the system.
      * @param gappFile sting absolute path to the file gapp.
      * @param useOnlyAbsoluteReference the {@link Boolean} if true you use absolute reference for set the element of gate.
-     * @return the gate controller full setted.
+     * @return the gate controller full set.
      */
     public CorpusController setUpGateEmbedded(String directoryFolderHome,String directoryFolderPlugin,
-                            String configFileGate,String configFileUser,String configFileSession,String gappFile,boolean useOnlyAbsoluteReference){
+                            String configFileGate,String configFileUser,String configFileSession,
+                                              String gappFile,boolean useOnlyAbsoluteReference){
         //SET GATE EMBEDDED
         try {
             logger.info("Initializing GATE...");
@@ -144,12 +144,13 @@ public class Gate8Kit {
                     directoryFolderHome = File.separator + directoryFolderHome;
                 if (directoryFolderHome.endsWith(File.separator))
                     directoryFolderHome = directoryFolderHome.substring(0, directoryFolderHome.length() - 1);
-                directoryFolderHome = baseDirectory + directoryFolderHome;
+                this.baseDirectory = System.getProperty("user.dir") + File.separator;
+                directoryFolderHome = baseDirectory  + directoryFolderHome;
                 baseDirectory = directoryFolderHome;
             }
             logger.warn("The base directory you using is :"+baseDirectory);
 
-            if (!new File(directoryFolderHome).exists())
+            if (!Files.exists(Paths.get(directoryFolderHome))|| Files.isDirectory(Paths.get(directoryFolderHome)) )
                 throw new IOException("The folder directoryFolderHome " + directoryFolderHome + " of GATE not exists!");
             Gate.setGateHome(new File(directoryFolderHome));
 
@@ -229,7 +230,7 @@ public class Gate8Kit {
             //Work with graphic GATE interface
             MainFrame.getInstance().setVisible(true);
         }
-        return loadGapp(gappFile);
+        return (CorpusController) loadGapp(gappFile);
     }
 
     private String setUpAndCopyFile(String gateHome,String resourceGate,boolean useOnlyAbsoluteReference){
@@ -238,7 +239,7 @@ public class Gate8Kit {
         }else{
             if(!isFileOnDirectory(gateHome,resourceGate)){
                 logger.warn("Force the copy of the folder directoryFolderPlugin " + resourceGate
-                        + " the directoryFolderHome GATE "+gateHome);
+                        + " to the directoryFolderHome GATE "+gateHome);
                 if(!copyFileToDirectoryGATE(gateHome,resourceGate)) {
                     logger.error("Something wrong during the copy of the resource on the GATE directory");
                 }
@@ -249,11 +250,11 @@ public class Gate8Kit {
 
     /**
      * Method for load a gapp file and generate the controller for this session of gate.
-     * @param base string base directory/folder.
-     * @param fileGapp string filepath ot the gapp file.
-     * @return corpus controller of the gapp file.
+     * @param base the {@link String} base directory/folder.
+     * @param fileGapp the {@link String} filepath ot the gapp file.
+     * @return the {@link Controller} of gate of the gapp file.
      */
-    public CorpusController loadGapp(String base,String fileGapp){
+    public Controller loadGapp(String base,String fileGapp){
         if(!base.startsWith(File.separator)) base = File.separator + base;
         if(!base.endsWith(File.separator)) base = base + File.separator;
         if(fileGapp.startsWith(File.separator)) fileGapp = fileGapp.substring(1,fileGapp.length());
@@ -264,17 +265,17 @@ public class Gate8Kit {
 
     /**
      * Method for load a gapp file and generate the controller for this session of gate.
-     * @param fileGapp string filepath ot the gapp file.
-     * @return corpus controller of the gapp file.
+     * @param fileGapp the {@link String} filepath ot the gapp file.
+     * @return the {@link Controller} of gate of the gapp file.
      */
-    public CorpusController loadGapp(String fileGapp){
+    public Controller loadGapp(String fileGapp){
         logger.info("Loading file .gapp/.xgapp...");
         try {
             if(!fileGapp.startsWith(File.separator)) fileGapp = File.separator + fileGapp;
             if(fileGapp.endsWith(File.separator)) fileGapp = fileGapp.substring(0,fileGapp.length()-1);
             //File gapp = new File(home.home, "custom/gapp/geoLocationPipelineFast.xgapp");
             if (new File(Gate.getGateHome() +  fileGapp).exists()) {
-                corpusController = (CorpusController) PersistenceManager.loadObjectFromFile(
+                controller = (Controller) PersistenceManager.loadObjectFromFile(
                         new File(Gate.getGateHome() + fileGapp));
             } else {
                 throw new IOException("The gapp file not exists");
@@ -284,7 +285,7 @@ public class Gate8Kit {
         }catch(GateException|IOException e){
             logger.warn(e.getMessage(), e);
         }
-        return corpusController;
+        return controller;
     } // initAnnie()
 
     /**
@@ -304,7 +305,15 @@ public class Gate8Kit {
             //GATE provides a DocumentProcessor interface suitable for use with Spring pooling
             //procDoc = BeansKit.getBeanFromContext("documentProcessor",DocumentProcessor.class,ctx);
             //procDoc = BeansKit.getBeanFromContext(idBeanDocumentProcessor,DocumentProcessor.class,ctx);
-            procDoc = ctx.getBean(idBeanDocumentProcessor, DocumentProcessor.class);
+            try{
+                procDoc = ctx.getBean(idBeanDocumentProcessor, DocumentProcessor.class);
+            }catch(java.lang.IllegalStateException e){
+                try {
+                    procDoc = ctx.getBean(DocumentProcessor.class);
+                }catch(Exception e2){
+                    logger.error(e2.getMessage(),e2);
+                }
+            }
         } catch (IOException e) {
             logger.warn(e.getMessage(), e);
         }
@@ -345,19 +354,19 @@ public class Gate8Kit {
      */
     public CorpusController setGate(String directoryFolderHome,String directoryFolderPlugin,
                               String configFileGate,String configFileUser,String configFileSession,String gappFile){
-        if(corpusController==null) {
+        if(controller ==null) {
             if(gateAlreadySetted) {
-                this.corpusController = setUpGateEmbedded(directoryFolderHome, directoryFolderPlugin,
+                this.controller = setUpGateEmbedded(directoryFolderHome, directoryFolderPlugin,
                         configFileGate, configFileUser, configFileSession, gappFile);
                 gateAlreadySetted = false;
-                return corpusController;
+                return (CorpusController) controller;
             }else{
                 logger.warn("The GATE embedded API is already set with Spring Framework and ProcessorDocument!!!");
                 return null;
             }
         }else{
             logger.warn("The GATE embedded API is already set with Corpus Controller!!!");
-            return corpusController;
+            return (CorpusController) controller;
         }
     }
 

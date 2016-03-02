@@ -1,17 +1,16 @@
 package com.github.p4535992.gatebasic.gate;
 
 import com.github.p4535992.gatebasic.gate.gate8.*;
-import com.github.p4535992.gatebasic.jms.GATEProcessor;
+import com.github.p4535992.gatebasic.object.MapAnnotation;
+import com.github.p4535992.gatebasic.object.MapAnnotationSet;
 import com.github.p4535992.gatebasic.object.MapDocument;
-import com.github.p4535992.gatebasic.util.BeansKit;
 import gate.CorpusController;
 import gate.Document;
 import gate.util.DocumentProcessor;
 import gate.util.GateException;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.context.ApplicationContext;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -46,7 +45,8 @@ public class Test_initGate {
         //there are method for works with java.io.File File or Directory
         //Store the result on of the extraction on a GateSupport Object
         Gate8Kit gate8Kit = Gate8Kit.getInstance();
-        CorpusController controller = gate8Kit.setUpGateEmbedded(System.getProperty("user.dir")+"gate_files", "plugins", "gate.xml", "user-gate.xml", "gate.session",
+        CorpusController controller = gate8Kit.setUpGateEmbedded(System.getProperty("user.dir")+ File.separator+"gate_files",
+                "plugins", "gate.xml", "user-gate.xml", "gate.session",
                 "custom/gapp/geoLocationPipeline06102014v7_fastMode.xgapp");
         GateSupport2 support = GateSupport2.getInstance(
                 eig8.extractorGATE(
@@ -107,11 +107,38 @@ public class Test_initGate {
         String content0 = support.getSingleContent("http://www.unifi.it", "MyAnnSet", "MyIndirizzo"); // "P.azza Guido Monaco"
         String content1 = support.getSingleContent(0,"MyAnnSet", "MyIndirizzo"); // "P.azza Guido Monaco"
         String content2 = support.getSingleContent(0,0,"MyIndirizzo"); // "P.azza Guido Monaco"
-        String content3 = support.getSingleContent(0,0,0); // "P.azza Guido Monaco"
-        //Other function with some wrapped object of AGTE API.
-        List<MapDocument> mapDocument = support.getCorpus(0);
+        String content3 = support.getSingleContent(0,0,0); // "+39 055 27571"
+        //Other function with some wrapped object of GATE API.
 
-        String s = "";
+        //Get Documents on the First Corpus saved on the GateSupport wrapped object
+        List<MapDocument> mapDocument = support.getCorpus(0);
+        List<String> contents = null;
+        for(MapDocument doc: mapDocument) {
+            //Get AnnotationSet on the first Document of the Corpus saved on the GateSupport wrapped object
+            List<MapAnnotationSet> mapAnnotationSets = support.getDocument(0);
+            for(MapAnnotationSet annSet: mapAnnotationSets){
+                //Get Annotation from AnnotationSet on the first Document of the Corpus saved on the GateSupport wrapped object
+                List<MapAnnotation> mapAnnotations = support.getAnnotationSet(0);
+                for(MapAnnotation ann: mapAnnotations){
+                    //Get List of Content Annotation from AnnotationSet on the
+                    // first Document of the Corpus saved on the GateSupport wrapped object
+                    contents = support.getContent(0,0,0);
+                    break;
+                }
+                break;
+            }
+            break;
+        }
+        String content4 = contents.get(0); // "+39 055 27571"
+    }
+
+    @Test
+    public void setUpWithGateAPI() throws MalformedURLException, GateException {
+        Gate8Kit gate8Kit = Gate8Kit.getInstance();
+        DocumentProcessor procDoc = gate8Kit.setUpGateEmbeddedWithSpring("gate/gate-beans.xml");
+        Document doc = GateCorpus8Kit.getInstance().createDoc(new URL("http://www.unifi.it"));
+        procDoc.processDocument(doc);
+
     }
 
     /*

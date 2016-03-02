@@ -12,29 +12,29 @@
 	<logger name="org.springframework" level="warn" additivity="false">
 		<appender-ref ref="STDOUT" />
 	</logger>
-	
-	<logger name="com.github.p4535992" level="debug" additivity="false">
+
+	<logger name="com.github.p4535992" level="info" additivity="false">
 		<appender-ref ref="STDOUT" />
 	</logger>
 
-	<logger name="gate" level="WARN" additivity="false">
+	<!-- GATE Logging -->
+	<logger name="gate" level="info">
+		<appender-ref ref="STDOUT" />
+	</logger>
+	<logger name="gate.creole.SerialController" level="info">
+		<appender-ref ref="STDOUT" />
+	</logger>
+	<logger name="gate.jape" level="info">
+		<appender-ref ref="STDOUT" />
+	</logger>
+	<logger name="gate.util.profile.Profiler" level="info">
+		<appender-ref ref="STDOUT" />
+	</logger>
+	<logger name="gate.jape.SinglePhaseTransducer" level="info">
 		<appender-ref ref="STDOUT" />
 	</logger>
 
-    <!-- GATE Logging -->
-    <logger name="gate" level="info" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </logger>
-    <logger name="gate.jape" level="info" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </logger>
-    <logger name="gate.creole.SerialController" level="info" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </logger>
-    <logger name="gate.util.profile.Profiler" level="info" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </logger>
-	 
+
 	<root level="error">
 		<appender-ref ref="STDOUT" />
 	</root>

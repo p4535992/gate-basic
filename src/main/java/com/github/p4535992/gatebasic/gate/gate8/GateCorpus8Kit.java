@@ -1,7 +1,6 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
-
-import com.sun.istack.internal.Nullable;
+import javax.annotation.Nullable;
 import gate.*;
 import gate.corpora.DocumentImpl;
 import gate.creole.ResourceInstantiationException;
@@ -56,65 +55,95 @@ public class GateCorpus8Kit {
     }
 
     /**
-     * Crea un Corpus di Documenti Gate.
-     * @param  url url to the web document.
-     * @param  nomeCorpus corpus gate to set.
-     * @return corpus gate fulled.
-     * @throws  IOException error.
-     * @throws  ResourceInstantiationException error.
+     * Method to create a Corpus Gate with a Document contained the URL resource.
+     * @param  url the {@link URL} to the web document.
+     * @param  nomeCorpus the {@link String} name of the {@link Corpus} gate to set.
+     * @return the {@link Corpus} gate fulled.
      */
-    public Corpus createCorpusByURL(URL url,String nomeCorpus) throws IOException, ResourceInstantiationException{
-        corpus = Factory.newCorpus(nomeCorpus);
-        doc = createDoc(url);
-        if(doc != null) {
-            corpus.add(doc);//add a document to the corpus
+    public Corpus createCorpusByURL(URL url,String nomeCorpus){
+        try {
+            corpus = Factory.newCorpus(nomeCorpus);
+            doc = createDoc(url);
+            if (doc != null) {
+                corpus.add(doc);//add a document to the corpus
+            }
+            logger.info("Loaded a corpus of: " + corpus.size() + " files");
+            return corpus;
+        }catch( ResourceInstantiationException e){
+            logger.error(e.getMessage(),e);
+            return null;
         }
-        logger.info("Loaded a corpus of: " + corpus.size() + " files");
-        return corpus;
+    } // createCorpus
+
+    /**
+     * Method to create a Corpus Gate with a Document contained the String message.
+     * @param  content the {@link String} of the web document.
+     * @param  nomeCorpus the {@link String} gate to set.
+     * @return the {@link Corpus} gate fulled.
+     */
+    public Corpus createCorpusByString(String content,String nomeCorpus){
+        try{
+            corpus = Factory.newCorpus(nomeCorpus);
+            doc = createDoc(content);
+            if(doc != null) {
+                corpus.add(doc);//add a document to the corpus
+            }
+            logger.info("Loaded a corpus of: " + corpus.size() + " files");
+            return corpus;
+        }catch( ResourceInstantiationException e){
+            logger.error(e.getMessage(),e);
+            return null;
+        }
     } // createCorpus
     
    /**
-    * Crea un Corpus di Documenti Gate
-    * @param  listUrl list of url to set of web document.
-    * @param  nomeCorpus name of the corpus gate.
-    * @return corpus gate fulled.
-    * @throws  IOException error.
-    * @throws  ResourceInstantiationException error.
+    * Method to create a Corpus Gate.
+    * @param  listUrl the {@link List} of {@link URL} to set of web document.
+    * @param  nomeCorpus the {@link String} name of the corpus gate.
+    * @return the {@link Corpus} gate fulled.
     */  
-    public Corpus createCorpusByURL(List<URL> listUrl,String nomeCorpus) throws IOException, ResourceInstantiationException{
-        corpus = Factory.newCorpus(nomeCorpus);
-        Integer indice = 0;
-        for (URL url : listUrl) {
-            doc = createDoc(url, indice);
-            if (doc != null) {
-                corpus.add(doc);//add a document to the corpus
-                indice++;
-            }
-        } // for each corpus
-        logger.info("The Corpus has:" + indice + " document create from urls address.");
-        return corpus;
+    public Corpus createCorpusByURL(List<URL> listUrl,String nomeCorpus){
+        try{
+            corpus = Factory.newCorpus(nomeCorpus);
+            Integer indice = 0;
+            for (URL url : listUrl) {
+                doc = createDoc(url, indice);
+                if (doc != null) {
+                    corpus.add(doc);//add a document to the corpus
+                    indice++;
+                }
+            } // for each corpus
+            logger.info("The Corpus has:" + indice + " document create from urls address.");
+            return corpus;
+        }catch( ResourceInstantiationException e){
+            logger.error(e.getMessage(),e);
+            return null;
+        }
     } // createCorpus
 
 
     /**
      * Method for create a Corpus Gate from a single file or directory/folder.
-     * @param fileOrDirectory file or directory to put in the corpus.
+     * @param fileOrDirectory the {@link File} file or directory to put in the corpus.
      * @param nameCorpus name of hte Corpus gate.
      * @return corpus gate.
-     * @throws ResourceInstantiationException throw if any error is occurred.
-     * @throws IOException throw if any error is occurred.
      */
-    public Corpus createCorpusByFile(File fileOrDirectory,String nameCorpus) throws ResourceInstantiationException, IOException {
-        if(fileOrDirectory.isDirectory() && fileOrDirectory.isDirectory()){
-            List<File> listFiles = getFilesFromDirectory(fileOrDirectory);
-            return createCorpusByFile(listFiles,nameCorpus);
-        }else {
-            corpus = Factory.newCorpus(nameCorpus);
-            doc = createDoc(fileOrDirectory.toURI().toURL());
-            if (doc != null) {
-                corpus.add(doc);//add a document to the corpus
+    public Corpus createCorpusByFile(File fileOrDirectory,String nameCorpus){
+        try {
+            if (fileOrDirectory.isDirectory() && fileOrDirectory.isDirectory()) {
+                List<File> listFiles = getFilesFromDirectory(fileOrDirectory);
+                return createCorpusByFile(listFiles, nameCorpus);
+            } else {
+                corpus = Factory.newCorpus(nameCorpus);
+                doc = createDoc(fileOrDirectory.toURI().toURL());
+                if (doc != null) {
+                    corpus.add(doc);//add a document to the corpus
+                }
+                return corpus;
             }
-            return corpus;
+        }catch(MalformedURLException| ResourceInstantiationException e){
+            logger.error(e.getMessage(),e);
+            return null;
         }
     }
 
@@ -123,36 +152,42 @@ public class GateCorpus8Kit {
      * @param listFiles list of files you want put in a gate corpus.
      * @param nameCorpus string name of Corpus Gate.
      * @return corpus of gate fill with the document.
-     * @throws ResourceInstantiationException throw if any error is occurred.
-     * @throws IOException throw if any error is occurred.
      */
-    public Corpus createCorpusByFile(List<File> listFiles,String nameCorpus)throws ResourceInstantiationException, IOException {
-        corpus = Factory.newCorpus(nameCorpus);
-        Integer indice = 0;
-        for(File file : listFiles) {
-            doc = createDoc(file.toURI().toURL(),indice);
-            //Document doc = Factory.newDocument(docFile.toURL(), "utf-8");
-            if (doc != null) {
-                corpus.add(doc);//add a document to the corpus
-                indice++;
+    public Corpus createCorpusByFile(List<File> listFiles,String nameCorpus){
+        try {
+            corpus = Factory.newCorpus(nameCorpus);
+            Integer indice = 0;
+            for (File file : listFiles) {
+                doc = createDoc(file.toURI().toURL(), indice);
+                //Document doc = Factory.newDocument(docFile.toURL(), "utf-8");
+                if (doc != null) {
+                    corpus.add(doc);//add a document to the corpus
+                    indice++;
+                }
             }
+            return corpus;
+        }catch(IOException| ResourceInstantiationException e){
+            logger.error(e.getMessage(),e);
+            return null;
         }
-        return corpus;
     }
 
     /**
      * Method for create a Corpus Gate from a Document Gate.
-     * @param doc document Gate to add to the Corpus.
-     * @param nomeCorpus string name of Corpus Gate.
-     * @return corpus of gate fill with the document.
-     * @throws ResourceInstantiationException throw if any error is occurred.
+     * @param doc the {@link Document} Gate to add to the Corpus.
+     * @param nomeCorpus the {@link String} name of Corpus Gate.
+     * @return the {@link Corpus} of gate fill with the document.
      */
-    public Corpus createCorpusByDocument(Document doc,String nomeCorpus)
-            throws ResourceInstantiationException{
-        corpus = Factory.newCorpus(nomeCorpus);
-        corpus.add(doc);//add a document to the corpus
-        logger.info("Loaded a corpus of: " + corpus.size() + " files");
-        return corpus;
+    public Corpus createCorpusByDocument(Document doc,String nomeCorpus){
+        try{
+            corpus = Factory.newCorpus(nomeCorpus);
+            corpus.add(doc);//add a document to the corpus
+            logger.info("Loaded a corpus of: " + corpus.size() + " files");
+            return corpus;
+        }catch(ResourceInstantiationException e){
+            logger.error(e.getMessage(),e);
+            return null;
+        }
     } // createCorpus
 
     /**
@@ -167,24 +202,6 @@ public class GateCorpus8Kit {
         corpus = Factory.newCorpus(nomeCorpus);
         for(Document document: listDoc) {
             corpus.add(document);//add a document to the corpus
-        }
-        logger.info("Loaded a corpus of: " + corpus.size() + " files");
-        return corpus;
-    } // createCorpus
-
-    /**
-     * Crea un Corpus di Documenti Gate.
-     * @param  content string of the web document.
-     * @param  nomeCorpus corpus gate to set.
-     * @return corpus gate fulled.
-     * @throws  IOException error.
-     * @throws  ResourceInstantiationException error.
-     */
-    public Corpus createCorpusByString(String content,String nomeCorpus) throws IOException, ResourceInstantiationException{
-        corpus = Factory.newCorpus(nomeCorpus);
-        doc = createDoc(content);
-        if(doc != null) {
-            corpus.add(doc);//add a document to the corpus
         }
         logger.info("Loaded a corpus of: " + corpus.size() + " files");
         return corpus;
@@ -226,7 +243,7 @@ public class GateCorpus8Kit {
             datastore.saveACorpusOnTheDataStore(corpus);
             datastore.closeDataStore();
         } finally {
-            //code for merge all the corpus in the datstore in a unique corpus.
+            //code for merge all the corpus in the datastore in a unique corpus.
             datastore.openDataStore();
             List<Corpus> listCorpus = datastore.loadAllCorpusOnTheDataStore();
             if (listCorpus.size() > 1) {
@@ -311,8 +328,12 @@ public class GateCorpus8Kit {
 
     /**
      * Method for create gate document from a url object.
-     * @param message string to a web page or file.
-     * @return document gate.
+     * @param message the {@link String} to a web page or file.
+     * @param preserveOriginalContent the {@link Boolean} for the preserveOriginalContent.
+     * @param collectRepositioningInfo the {@link Boolean} for the collectRepositioningInfo.
+     * @param encoding the {@link Charset} for the cotnent of the gate Docuemnt.
+     * @param resourceName the {@link String} name of the resource.
+     * @return document the {@link Document} of gate.
      */
     public Document createDoc(String message,
                               @Nullable Boolean preserveOriginalContent,@Nullable Boolean collectRepositioningInfo,
@@ -349,8 +370,12 @@ public class GateCorpus8Kit {
 
     /**
      * Method to create a gate document from a string.
-     * @param url the {@link URL} message.
-     * @return the {@link Document} gate.
+     * @param url the {@link URL} to a web page or file.
+     * @param preserveOriginalContent the {@link Boolean} for the preserveOriginalContent.
+     * @param collectRepositioningInfo the {@link Boolean} for the collectRepositioningInfo.
+     * @param encoding the {@link Charset} for the cotnent of the gate Docuemnt.
+     * @param resourceName the {@link String} name of the resource.
+     * @return document the {@link Document} of gate.
      */
     public Document createDoc(URL url,
                               @Nullable Boolean preserveOriginalContent,@Nullable Boolean collectRepositioningInfo,
@@ -472,6 +497,8 @@ public class GateCorpus8Kit {
         out.write(docXMLString);
         out.close();
     }
+
+    //SUPPORT METHODS
 
     /**
      * Method to read all file ina directory/folder.

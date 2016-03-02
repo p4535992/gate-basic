@@ -101,15 +101,15 @@ public class GateAnnotation8Kit {
 
     /**
      * Method for get the content of annotation with a specific methods.
-     * @param document gate document.
-     * @param nameAnnotation strin name of the Annotation.
-     * @param nameAnnotationSet string name of the AnnotationSet.
-     * @return string content of the Annotation.
+     * @param document the {@link Document}gate.
+     * @param nameAnnotation the {@link String} of name of the {@link Annotation}.
+     * @param nameAnnotationSet the {@link String} of name of the {@link AnnotationSet}
+     * @return the {@link String} of the content of the {@link Annotation}.
      */
     public String getSingleAnnotationInfo(Document document,String nameAnnotation,String nameAnnotationSet) {
         String content ="";
         try {
-            AnnotationSet annSet = GateUtils.getAnnotationSetFromDoc(nameAnnotationSet, document);
+            AnnotationSet annSet = GateUtils.getAnnotationSetFromDoc(document,nameAnnotationSet);
             //SystemLog.message("Get content of the Annotation " + nameAnnotation + " on the AnnotationSet " + annSet.getName() + "...");
             //content = getContentLongestFromAnnnotationsOnAnnotationSet(document, nameAnnotation, annSet);         
             Annotation newAnn;
@@ -134,10 +134,10 @@ public class GateAnnotation8Kit {
 
     /**
      * Method for get the last content of the last annotation from all the same annotations on the same annotationSet.
-     * @param doc gate document.
-     * @param nameAnnotation string name of the annotation.
-     * @param annotationSet string name of the annotationset.
-     * @return  string content fo the annotation.
+     * @param doc the {@link Document}gate.
+     * @param nameAnnotation the {@link String} of name of the {@link Annotation}.
+     * @param annotationSet the {@link AnnotationSet}
+     * @return the {@link String} of the content of the {@link Annotation}.
      */
     public String getContentLastSingleAnnotationOnAnnotationSet(Document doc,String nameAnnotation,AnnotationSet annotationSet){
         int x = 0;
@@ -169,10 +169,10 @@ public class GateAnnotation8Kit {
 
     /**
      * Method for get the most longest content merged from all the same annotations on the same annotationSet.
-     * @param doc gate document.
-     * @param nameAnnotation string name of the annotation.
-     * @param annotationSet string name of the annotationset.
-     * @return string most longest content from the same annotations.
+     * @param doc the {@link Document}gate.
+     * @param nameAnnotation the {@link String} of name of the {@link Annotation}.
+     * @param annotationSet the {@link AnnotationSet}
+     * @return the {@link String} of the content of the {@link Annotation}.
      */
     public String getContentLongestFromAnnotationsOnAnnotationSet(Document doc,String nameAnnotation,AnnotationSet annotationSet){
         long begOffset,endOffset;

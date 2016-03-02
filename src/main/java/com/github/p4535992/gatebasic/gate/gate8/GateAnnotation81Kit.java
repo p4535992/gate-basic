@@ -4,7 +4,7 @@ import com.github.p4535992.gatebasic.object.MapAnnotation;
 import com.github.p4535992.gatebasic.object.MapAnnotationSet;
 import com.github.p4535992.gatebasic.object.MapContent;
 import com.github.p4535992.gatebasic.object.MapDocument;
-import com.sun.istack.internal.Nullable;
+import javax.annotation.Nullable;
 import gate.*;
 
 import java.util.*;
@@ -115,7 +115,7 @@ public class GateAnnotation81Kit {
     public MapContent getSingleAnnotationInfo(Document document,String nameAnnotationSet,String nameAnnotation) {
         MapContent content = new MapContent("");
         try {
-            AnnotationSet annSet = GateUtils.getAnnotationSetFromDoc(nameAnnotationSet, document);
+            AnnotationSet annSet = GateUtils.getAnnotationSetFromDoc(document,nameAnnotationSet);
             //SystemLog.message("Get content of the Annotation " + nameAnnotation + " on the AnnotationSet " + annSet.getName() + "...");
             //content = getContentLongestFromAnnnotationsOnAnnotationSet(document, nameAnnotation, annSet);         
             if(annSet != null){

@@ -127,7 +127,7 @@ public class ExtractorInfoGate8 {
                 return extractorGATE(corpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
             }//else
         }//try
-        catch(GateException|RuntimeException|IOException e){
+        catch(GateException|RuntimeException e){
             logger.error(e.getMessage(), e);
         }
         finally{
@@ -216,7 +216,7 @@ public class ExtractorInfoGate8 {
                 return extractorGATE(corpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
             }//else
         }//try
-        catch(GateException|RuntimeException|IOException e){
+        catch(GateException|RuntimeException e){
             logger.error(e.getMessage(), e);
         }
         finally{
@@ -377,7 +377,7 @@ public class ExtractorInfoGate8 {
                 return extractorGATE(corpus,nameAnnotations,nameAnnotationsSet,firstAndExit);
             }//else
         }//try
-        catch(GateException|RuntimeException|IOException e){
+        catch(GateException|RuntimeException e){
             logger.error(e.getMessage(), e);
         }
         finally{

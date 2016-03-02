@@ -339,6 +339,30 @@ public class MapDocument {
         return theMapAnnotationSet;
     }
 
+    public String getName(Integer indexDocument) {
+        int i = 0;
+        for (Map.Entry<String, List<MapAnnotationSet>> entry : mapDocs.entrySet()) {
+            if (i == indexDocument) {
+                return entry.getKey();
+            }
+            i++;
+        }
+        return null;
+    }
+
+    public String getName(String nameAnnotationSet) {
+        for (Map.Entry<String, List<MapAnnotationSet>> entry : mapDocs.entrySet()) {
+            if (Objects.equals(entry.getKey(), nameAnnotationSet)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    public String getName() {
+        return docName;
+    }
+
 
     @Override
     public String toString() {

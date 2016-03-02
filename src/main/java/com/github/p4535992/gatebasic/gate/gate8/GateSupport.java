@@ -9,8 +9,10 @@ import java.util.Map;
  * Created by 4535992 on 25/06/2015.
  * @author 4535992
  * @version 2015-11-12
+ * @deprecated  use {@link GateSupport2} instead.
  */
 @SuppressWarnings("unused")
+@Deprecated
 public class GateSupport {
 
     private static final org.slf4j.Logger logger =

@@ -119,8 +119,8 @@ public class GateDataStore8Kit {
            Corpus persistCorp = (Corpus)Factory.createResource("gate.corpora.SerialCorpusImpl", corpFeatures);
            logger.info( "Corpus " + persistCorp.getName() + " loaded on the datastore...");
            return persistCorp;
-
        }
+
        /**
         * Metho to delete corpus from datastore.
         * @param persistCorp corpus gate to delete.
@@ -197,7 +197,7 @@ public class GateDataStore8Kit {
                   sds  = (SerialDataStore)Factory.createDataStore("gate.persist.SerialDataStore",DS_DIR);
                   sds.setName(NAME_DATASTORE);
                   sds.open();
-                  logger.info( "Try to opne the Datastore directory:" + DS_DIR + "...");
+                  logger.info( "Open the Datastore directory:" + DS_DIR);
               } catch (PersistenceException ex) {
                   logger.info( ex.getMessage(), ex);
               }
@@ -282,7 +282,7 @@ public class GateDataStore8Kit {
        //fm[DataStore.LR_ID_FEATURE_NAME] = corpusIds[0];
        //List docIds = ds.getLrIds("gate.corpora.DocumentImpl");
        for(int i =0; i < corpusIds.size(); i++){
-           System.out.println("("+i+")"+"ID CORPUS:"+ corpusIds.get(i));
+           logger.info("("+i+")"+"ID CORPUS:"+ corpusIds.get(i));
            FeatureMap fm = Factory.newFeatureMap();
            fm.put(DataStore.DATASTORE_FEATURE_NAME, sds);
            fm.put(DataStore.LR_ID_FEATURE_NAME, corpusIds.get(i));

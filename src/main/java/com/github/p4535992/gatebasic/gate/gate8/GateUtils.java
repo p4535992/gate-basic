@@ -1,12 +1,9 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
-import gate.Annotation;
-import gate.AnnotationSet;
-import gate.Document;
-import gate.Utils;
+import gate.*;
 import gate.corpora.DocumentStaxUtils;
-import org.apache.commons.io.FileUtils;
-
+import gate.creole.ResourceInstantiationException;
+import gate.creole.tokeniser.DefaultTokeniser;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +17,7 @@ import java.util.Set;
  * @author 4535992.
  * Just a mirror class for {@link Utils} class of gate.
  */
+//@@TODO NEED SOME IMPROVEMENT AND INTEGRATION WITH THE PROJECT
 public class GateUtils {
 
     private static final org.slf4j.Logger logger =
@@ -46,12 +44,12 @@ public class GateUtils {
     }
 
     /**
-     * Prende un determinato set di annotazione per un determinato documento.
-     * @param nameAnnotationSet nome del set di annotazioni
-     * @param doc il GATE Document preso in esame
-     * @return il GATE Document preso in esame ma solo la parte coperta dal set di annotazioni
+     * Method to get a AnnotationSet from a Document gate.
+     * @param nameAnnotationSet the {@link String} name of the AnnotationSet.
+     * @param doc the {@link Document} of gate.
+     * @return the {@link AnnotationSet} of GATE founded.
      */
-    public static AnnotationSet getAnnotationSetFromDoc(String nameAnnotationSet, Document doc) {
+    public static AnnotationSet getAnnotationSetFromDoc(Document doc,String nameAnnotationSet) {
         AnnotationSet annSet = doc.getAnnotations(nameAnnotationSet);
         if(annSet.isEmpty()){
             logger.warn("The AnnotationSet "+nameAnnotationSet+ " not have any Annotation for the current document.");
@@ -62,19 +60,53 @@ public class GateUtils {
     }
 
     /**
+     * Method to get a specific List of Annotation from a AnnotationSet in the gate Document.
+     * @param doc the {@link Document of GATE}.
+     * @return the {@link List} of {@link Annotation} of GATE founded.
+     */
+    public static List<Annotation> getAnnotationsFromDoc(Document doc) {
+        AnnotationSet annSet = doc.getAnnotations();
+        if(annSet.isEmpty()){
+            logger.warn("The Document "+doc.getName()+ " not have any Annotation for the current document.");
+            return null;
+        }else {
+            //return annSet;
+            return toAnnotations(annSet);
+        }
+    }
+
+    /**
+     * Method to get a specific List of Annotation from a AnnotationSet in the gate Document.
+     * @param doc the {@link Document of GATE}
+     * @param nameAnnotationSet the {@link String} name of the {@link AnnotationSet}.
+     * @return the {@link List} of {@link Annotation} of GATE founded.
+     */
+    public static List<Annotation> getAnnotationsFromDoc(Document doc,String nameAnnotationSet) {
+        AnnotationSet annSet = doc.getAnnotations(nameAnnotationSet);
+        if(annSet.isEmpty()){
+            logger.warn("The AnnotationSet "+nameAnnotationSet+ " not have any Annotation for the current document.");
+            return null;
+        }else {
+            //return annSet;
+            return toAnnotations(annSet);
+        }
+    }
+
+    /**
      * Method for get specific annotation from specific annotaset from specific document.
-     * @param doc gate Document.
-     * @param nameAnnotationSet string name of gate AnnotationSet.
-     * @param nameAnnotation string name of gate Annotation.
-     * @return list of gate annotations.
+     * Method to get a specific List of Annotation from a AnnotationSet in the gate Document.
+     * @param doc the {@link Document of GATE}
+     * @param nameAnnotationSet the {@link String} name of the {@link AnnotationSet}.
+     * @param nameAnnotation the {@link String} name of the {@link Annotation}.
+     * @return the {@link List} of {@link Annotation} of GATE founded.
      */
     public static List<Annotation> getAnnotationsFromDoc(Document doc, String nameAnnotationSet, String nameAnnotation){
         AnnotationSet annSet = doc.getAnnotations( nameAnnotationSet);
         if(annSet.isEmpty()){
+            logger.warn("The AnnotationSet "+annSet.getName()+ " not have any Annotation for the current document.");
             return null;
         }else {
-            Set<Annotation> newSetAnnotation = new HashSet<>(annSet.get(nameAnnotation));
-            return  new ArrayList<>(newSetAnnotation);
+            return toAnnotations(annSet,nameAnnotation);
         }
     }
 
@@ -83,27 +115,10 @@ public class GateUtils {
      * OLD_NAME: getValueOfAnnotationFromDoc
      * @param doc the {@link Document} of gate.
      * @param annotationName the {@link Annotation} of gate.
-     * @return the {@link List} of {@link Object} Feature.
+     * @return the {@link List} of {@link Object} Feature of GATE founded.
      */
     public static List<String> getContentFromDoc(Document doc,String annotationName){
-        List<String> list = new ArrayList<>();
-        // obtain the Original markups annotation set
-        AnnotationSet origMarkupsSet = doc.getAnnotations("Original markups");
-        // obtain annotations of type â€™aâ€™
-        AnnotationSet anchorSet = origMarkupsSet.get("a");
-        // iterate over each annotation
-        // obtain its features and print the value of href feature
-        // System.out.println("iterate over each annotation and obtain its features and print the value of href feature...");
-        for (Annotation anchor : anchorSet) {
-            //String href = (String) anchor.getFeatures().get("href");
-            String valueAnn = String.valueOf(anchor.getFeatures().get(annotationName));
-            if(valueAnn != null) {
-                //URL uHref=new URL(doc.getSourceUrl(), href);
-                // resolving href value against the documentâ€™s url
-                if(!(list.contains(valueAnn)))list.add(valueAnn);
-            }//if
-        }//for anchor
-        return list;
+       return getContentFromDoc(doc,"Original markups",annotationName);
     }
 
     public static List<String> getContentFromDoc(Document doc,String annotationSet,String annotationName){
@@ -114,7 +129,6 @@ public class GateUtils {
         AnnotationSet anchorSet = origMarkupsSet.get("a");
         // iterate over each annotation
         // obtain its features and print the value of href feature
-        // System.out.println("iterate over each annotation and obtain its features and print the value of href feature...");
         for (Annotation anchor : anchorSet) {
             //String href = (String) anchor.getFeatures().get("href");
             String valueAnn =  String.valueOf(anchor.getFeatures().get(annotationName));
@@ -187,12 +201,98 @@ public class GateUtils {
             types.add(ann); // and whatever others you're interested in
         }
         try {
-            FileUtils.write(outputFile, document.toXml(document.getAnnotations().get(types), true));
+            org.apache.commons.io.FileUtils.write(outputFile, document.toXml(document.getAnnotations().get(types), true));
         } catch (IOException e) {
             logger.error(e.getMessage(),e);
         }
         return outputFile;
     }
+
+    public static String generateSym() {
+        return Gate.genSym();
+    }
+
+    public static List<Annotation> toAnnotations(AnnotationSet annotationSet){
+        Set<Annotation> newSetAnnotation = new HashSet<>(annotationSet.get());
+        return new ArrayList<>( newSetAnnotation);
+    }
+
+    public static List<Annotation> toAnnotations(AnnotationSet annotationSet,Annotation annotation){
+        Set<Annotation> newSetAnnotation = new HashSet<>(annotationSet.get(annotation.getType()));
+        return new ArrayList<>( newSetAnnotation);
+    }
+
+    public static List<Annotation> toAnnotations(AnnotationSet annotationSet,String nameAnnotation){
+        Set<Annotation> newSetAnnotation = new HashSet<>(annotationSet.get(nameAnnotation));
+        return new ArrayList<>( newSetAnnotation);
+    }
+
+    public static List<Annotation> toAnnotations(AnnotationSet annotationSet,List<String> listAnnotations){
+        Set<Annotation> newSetAnnotation = new HashSet<>(annotationSet.get(new HashSet<>(listAnnotations)));
+        return new ArrayList<>( newSetAnnotation);
+    }
+
+    public static Annotation toAnnotation(AnnotationSet annotationSet,Integer indexAnnotation){
+        return annotationSet.get(indexAnnotation);
+    }
+
+    public static Object toFeature(Annotation annotation,String annotationName){
+        return annotation.getFeatures().get(annotationName);
+    }
+
+    public static Object toFeature(Annotation annotation){
+        return annotation.getFeatures().get(annotation.getType());
+    }
+
+    public static ProcessingResource createDefaultTokenizer(Document doc) throws ResourceInstantiationException {
+        //create a default tokeniser
+        FeatureMap params = Factory.newFeatureMap();
+        params = Factory.newFeatureMap();
+        params.put(DefaultTokeniser.DEF_TOK_DOCUMENT_PARAMETER_NAME, doc);
+        ProcessingResource tokeniser = (ProcessingResource) Factory.createResource(
+                "gate.creole.tokeniser.DefaultTokeniser", params
+        );
+        return tokeniser;
+    }
+
+    /*
+     If you need to duplicate other resources, use the two-argument
+     Factory.duplicate, passing the ctx as the second parameter, to preserve object graph
+     two calls to Factory.duplicate(r, ctx) for the same resource r in the same context ctx will return the same duplicate.
+     calls to the single argument Factory.duplicate(r) or to the
+     two-argument version with different contexts will return different duplicates.
+     Can call the default duplicate algorithm (bypassing the CustomDuplication check) via Factory.defaultDuplicate
+     it is safe to call defaultDuplicate(this, ctx), but calling duplicate(this, ctx) from within its own custom
+     duplicate will cause infinite recursion!  
+     */
+    public Resource duplicate(Factory.DuplicationContext ctx, List<ProcessingResource> prList)throws ResourceInstantiationException {
+        // duplicate this controller in the default way - this handles subclasses nicely
+        Controller c = (Controller) Factory.defaultDuplicate((Resource) this, ctx);
+        // duplicate each of our PRs
+        List<ProcessingResource> newPRs = new ArrayList<>();
+        for(ProcessingResource pr : prList) {
+            newPRs.add((ProcessingResource)Factory.duplicate(pr, ctx));
+        }
+        // and set this duplicated list as the PRs of the copy
+        c.setPRs(newPRs);
+        return c;
+    }
+
+    /*
+     * @return a {@link org.springframework.context.support.PropertySourcesPlaceholderConfigurer}
+     * so that placeholders are correctly populated
+     * @throws Exception exception if the file is not found or cannot be opened or read
+     */
+    /*@Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() throws Exception {
+        PropertySourcesPlaceholderConfigurer propConfig = new PropertySourcesPlaceholderConfigurer();
+        org.springframework.core.io.Resource[] resources = new UrlResource[]
+                {new UrlResource("file:${user.home}/.config/api.properties")};
+        propConfig.setLocations(resources);
+        propConfig.setIgnoreResourceNotFound(true);
+        propConfig.setIgnoreUnresolvablePlaceholders(true);
+        return propConfig;
+    }*/
 
 
 
