@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.p4535992</groupId>
     <artifactId>gate-basic</artifactId>
-    <version>1.6.9</version>
+    <version>1.6.10</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -74,7 +74,7 @@
         <org.apache.commons-commons-pool2>2.4.2</org.apache.commons-commons-pool2>
         <commons-pool.commons-pool.version>1.6</commons-pool.commons-pool.version>
         <!-- UTILITY -->
-        <com.github.p4535992.utility.version>1.6.9</com.github.p4535992.utility.version>
+        <com.github.p4535992.utility.version>1.6.10</com.github.p4535992.utility.version>
         <!-- Support -->
         <javax.servlet.servlet-api.version>2.5</javax.servlet.servlet-api.version>   
     </properties>
