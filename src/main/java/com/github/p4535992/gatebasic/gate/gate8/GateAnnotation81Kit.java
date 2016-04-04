@@ -127,11 +127,23 @@ public class GateAnnotation81Kit {
                         break;
                     }
                 }
+                if(content.isEmpty()){
+                    logger.warn("AnnotationSet -> "+nameAnnotationSet+" -> "+nameAnnotation+" is empty for this document to the url: "+ document.getSourceUrl());
+                }
             }
+            //Not very sure about that
+           /* else{
+                List<String> contents = GateUtils.getContentFromDoc(document, nameAnnotationSet,nameAnnotation);
+                if(contents.get(0) != null || !contents.get(0).isEmpty()){
+                    content.setContent(contents.get(0));
+                }
+            }*/
             if(content.isEmpty())content.setContent("");
             //content =  getContentLastSingleAnnotationOnAnnotationSet(document, nameAnnotation, annSet);
         }catch(NullPointerException ne){
-            logger.warn("The AnnotationSet "+nameAnnotationSet+" not have a single annotation for this document to the url: "+ document.getSourceUrl());
+            logger.warn("AnnotationSet -> "+nameAnnotationSet+": is empty for this document to the url: "+ document.getSourceUrl());
+        }catch(Exception e){
+            logger.error(e.getMessage(),e);
         }
         return content;
     }

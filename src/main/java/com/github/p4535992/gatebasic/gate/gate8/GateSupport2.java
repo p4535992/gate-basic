@@ -172,8 +172,7 @@ public class GateSupport2 {
                 }
             }
         }
-        logger.warn("The document with the name:" + nameDocument + " not exists on this map of " +
-                "the result of GATE, return NULL");
+        logger.warn("Document:" + nameDocument + " not exists on this map of the result of GATE, return NULL");
         return null;
     }
 
@@ -347,21 +346,19 @@ public class GateSupport2 {
             //Search annotationSet
             MapAnnotationSet theMapAnnotationSet = mapDocs.find(nameDocument,nameAnnotationSet);
             if(theMapAnnotationSet==null || theMapAnnotationSet.size() == 0){
-                logger.error("Can't find any AnnotationSet with Name:"+
-                        nameAnnotationSet+ " for the Document with Name "+nameDocument+" return empty list");
+                logger.error("AnnotationSet:"+nameAnnotationSet+ " -> Document with Name:"+nameDocument+" return empty list");
                 return list;
             }
             //Search Annotation
             MapAnnotation theMapAnnotation = theMapAnnotationSet.find(nameAnnotation);
             if(theMapAnnotation==null || theMapAnnotation.size() == 0){
-                logger.error("Can't find any Annotation with Name:"+
-                        nameAnnotation+ " for the AnnotationSet with Name "+nameAnnotationSet+" return empty list");
+                logger.error("Annotation:"+nameAnnotation+ " -> AnnotationSet:"+nameAnnotationSet+" return empty list");
                 return list;
             }
             //Search Content
             List<MapContent> theMapContent = theMapAnnotation.get(nameAnnotation);
             if(theMapContent==null || theMapContent.isEmpty()){
-                logger.error("Can't find the any Content for the Annotation:"+nameAnnotation+ " return empty list");
+                logger.error("Annotation:"+nameAnnotation+ " return empty list");
                 return list;
             }
             for(MapContent content : theMapContent){
@@ -382,21 +379,19 @@ public class GateSupport2 {
             //Search annotationSet
             MapAnnotationSet theMapAnnotationSet = mapDocs.find(indexDocument,nameAnnotationSet);
             if(theMapAnnotationSet==null || theMapAnnotationSet.size() == 0){
-                logger.error("Can't find any AnnotationSet with Name:"+
-                        nameAnnotationSet+ " for the Document with Index "+indexDocument+" return empty list");
+                logger.error("AnnotationSet:"+nameAnnotationSet+" -> Document with Index:"+indexDocument+" return empty list");
                 return list;
             }
             //Search Annotation
             MapAnnotation theMapAnnotation = theMapAnnotationSet.find(nameAnnotation);
             if(theMapAnnotation==null || theMapAnnotation.size() == 0){
-                logger.error("Can't find any Annotation with Name:"+
-                        nameAnnotation+ " for the AnnotationSet with Name "+nameAnnotationSet+" return empty list");
+                logger.error("Annotation:"+nameAnnotation+ " -> AnnotationSet:"+nameAnnotationSet+" return empty list");
                 return list;
             }
             //Search Content
             List<MapContent> theMapContent = theMapAnnotation.get(nameAnnotation);
             if(theMapContent==null || theMapContent.isEmpty()){
-                logger.error("Can't find the any Content for the Annotation with Name"+nameAnnotation+ " return empty list");
+                logger.error("Annotation:"+nameAnnotation+ " return empty list");
                 return list;
             }
             for(MapContent content : theMapContent){
@@ -417,22 +412,20 @@ public class GateSupport2 {
             //Search annotationSet
             MapAnnotationSet theMapAnnotationSet = mapDocs.find(indexDocument,indexAnnotationSet);
             if(theMapAnnotationSet==null || theMapAnnotationSet.size() == 0){
-                logger.error("Can't find any AnnotationSet with Index:"+
-                        indexAnnotationSet+ " for the Document with Index "+indexDocument+" return empty list");
-                return list;
+                logger.warn("AnnotationSet with Index:"+indexAnnotationSet+ " -> Document with Index:"+indexDocument+" return empty list");
+                return Collections.singletonList("");
             }
             //Search Annotation
             MapAnnotation theMapAnnotation = theMapAnnotationSet.find(nameAnnotation);
             if(theMapAnnotation==null || theMapAnnotation.size() == 0){
-                logger.error("Can't find any Annotation with Name:"+
-                        nameAnnotation+ " for the AnnotationSet with Index "+indexAnnotationSet+" return empty list");
-                return list;
+                logger.warn("Annotation:"+nameAnnotation+ " -> AnnotationSet with Index:"+indexAnnotationSet+" return empty list");
+                return Collections.singletonList("");
             }
             //Search Content
             List<MapContent> theMapContent = theMapAnnotation.get(nameAnnotation);
             if(theMapContent==null || theMapContent.isEmpty()){
-                logger.error("Can't find the any Content for the Annotation with Name"+nameAnnotation+ " return empty list");
-                return list;
+                logger.warn("Annotation:"+nameAnnotation+ " return empty list");
+                return Collections.singletonList("");
             }
             for(MapContent content : theMapContent){
                 list.add(content.getContent());
@@ -452,21 +445,19 @@ public class GateSupport2 {
             //Search annotationSet
             MapAnnotationSet theMapAnnotationSet = mapDocs.find(indexDocument,indexAnnotationSet);
             if(theMapAnnotationSet==null || theMapAnnotationSet.size() == 0){
-                logger.error("Can't find any AnnotationSet with Index:"+
-                        indexAnnotationSet+ " for the Document with Index "+indexDocument+" return empty list");
+                logger.warn("AnnotationSet with Index:"+indexAnnotationSet+ " -> Document with Index:"+indexDocument+" return empty list");
                 return list;
             }
             //Search Annotation
             MapAnnotation theMapAnnotation = theMapAnnotationSet.find(indexAnnotation);
             if(theMapAnnotation==null || theMapAnnotation.size() == 0){
-                logger.error("Can't find any Annotation with Index:"+
-                        indexAnnotation+ " for the AnnotationSet with Index "+indexAnnotationSet+" return empty list");
+                logger.warn("Annotation with Index:"+indexAnnotation+ " -> AnnotationSet with Index:"+indexAnnotationSet+" return empty list");
                 return list;
             }
             //Search Content
             List<MapContent> theMapContent = theMapAnnotation.get(indexAnnotation);
             if(theMapContent==null || theMapContent.isEmpty()){
-                logger.error("Can't find the any Content for the Annotation with Index"+indexAnnotation+ " return empty list");
+                logger.warn("Annotation with Index:"+indexAnnotation+ " return empty list");
                 return list;
             }
             for(MapContent content : theMapContent){

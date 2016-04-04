@@ -52,7 +52,7 @@ public class GateUtils {
     public static AnnotationSet getAnnotationSetFromDoc(Document doc,String nameAnnotationSet) {
         AnnotationSet annSet = doc.getAnnotations(nameAnnotationSet);
         if(annSet.isEmpty()){
-            logger.warn("The AnnotationSet "+nameAnnotationSet+ " not have any Annotation for the current document.");
+            logger.warn("AnnotationSet -> "+nameAnnotationSet+ " not have any Annotation for the current document.");
             return null;
         }else {
             return annSet;
@@ -67,7 +67,7 @@ public class GateUtils {
     public static List<Annotation> getAnnotationsFromDoc(Document doc) {
         AnnotationSet annSet = doc.getAnnotations();
         if(annSet.isEmpty()){
-            logger.warn("The Document "+doc.getName()+ " not have any Annotation for the current document.");
+            logger.warn("Document -> "+doc.getName()+ " not have any Annotation for the current document.");
             return null;
         }else {
             //return annSet;
@@ -84,7 +84,7 @@ public class GateUtils {
     public static List<Annotation> getAnnotationsFromDoc(Document doc,String nameAnnotationSet) {
         AnnotationSet annSet = doc.getAnnotations(nameAnnotationSet);
         if(annSet.isEmpty()){
-            logger.warn("The AnnotationSet "+nameAnnotationSet+ " not have any Annotation for the current document.");
+            logger.warn("AnnotationSet -> "+nameAnnotationSet+ " not have any Annotation for the current document.");
             return null;
         }else {
             //return annSet;
@@ -103,7 +103,7 @@ public class GateUtils {
     public static List<Annotation> getAnnotationsFromDoc(Document doc, String nameAnnotationSet, String nameAnnotation){
         AnnotationSet annSet = doc.getAnnotations( nameAnnotationSet);
         if(annSet.isEmpty()){
-            logger.warn("The AnnotationSet "+annSet.getName()+ " not have any Annotation for the current document.");
+            logger.warn("AnnotationSet -> "+annSet.getName()+ " not have any Annotation for the current document.");
             return null;
         }else {
             return toAnnotations(annSet,nameAnnotation);
@@ -125,8 +125,8 @@ public class GateUtils {
         List<String> list = new ArrayList<>();
         // obtain the Original markups annotation set
         AnnotationSet origMarkupsSet = doc.getAnnotations(annotationSet);
-        // obtain annotations of type â€™aâ€™
-        AnnotationSet anchorSet = origMarkupsSet.get("a");
+        // obtain annotations of type â€™aâ€™ AnnotationSet anchorSet = origMarkupsSet.get("a")
+        AnnotationSet anchorSet = origMarkupsSet.get(annotationName);
         // iterate over each annotation
         // obtain its features and print the value of href feature
         for (Annotation anchor : anchorSet) {

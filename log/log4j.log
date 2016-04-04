@@ -1,0 +1,17 @@
+2016-03-28 15:54:54 gate.util.spring.Init : Initialising GATE
+2016-03-28 15:54:54 gate.Gate : Using H:\Marco 2016-04\EAT 1.6.10\EAT\gate-basic\target\classes\gate_files as GATE home
+2016-03-28 15:54:54 gate.Gate : Using H:\Marco 2016-04\EAT 1.6.10\EAT\gate-basic\target\classes\gate_files\plugins as installed plug-ins directory.
+2016-03-28 15:54:54 gate.Gate : Using H:\Marco 2016-04\EAT 1.6.10\EAT\gate-basic\target\classes\gate_files\gate.xml as site configuration file.
+2016-03-28 15:54:54 gate.Gate : Using H:\Marco 2016-04\EAT 1.6.10\EAT\gate-basic\target\classes\gate_files\user-gate.xml as user configuration file
+2016-03-28 15:54:54 gate.Gate : Using C:\Users\Utente\gate.session as user session file
+2016-03-28 15:54:56 gate.creole.CreoleRegisterImpl : CREOLE plugin loaded: file:/H:/Marco%202016-04/EAT%201.6.10/EAT/gate-basic/target/classes/gate_files/plugins/Tools/
+2016-03-28 15:54:56 gate.creole.CreoleRegisterImpl : CREOLE plugin loaded: file:/H:/Marco%202016-04/EAT%201.6.10/EAT/gate-basic/target/classes/gate_files/plugins/LingPipe/
+2016-03-28 15:54:56 gate.creole.CreoleRegisterImpl : CREOLE plugin loaded: file:/H:/Marco%202016-04/EAT%201.6.10/EAT/gate-basic/target/classes/gate_files/plugins/ANNIE/
+2016-03-28 15:54:56 gate.creole.CreoleRegisterImpl : CREOLE plugin loaded: file:/H:/Marco%202016-04/EAT%201.6.10/EAT/gate-basic/target/classes/gate_files/plugins/JAPE_Plus/
+2016-03-28 15:54:56 gate.creole.CreoleRegisterImpl : CREOLE plugin loaded: file:/H:/Marco%202016-04/EAT%201.6.10/EAT/gate-basic/target/classes/gate_files/plugins/Tagger_Framework/
+2016-03-28 15:55:02 gate.util.spring.Init : GATE already initialised
+2016-03-28 15:55:06 gate.Gate : Using H:\Marco 2016-04\EAT 1.6.10\EAT\gate-basic\target\classes\gate_files as GATE home
+2016-03-28 15:55:06 gate.Gate : Using H:\Marco 2016-04\EAT 1.6.10\EAT\gate-basic\target\classes\gate_files\plugins as installed plug-ins directory.
+2016-03-28 15:55:06 gate.Gate : Using H:\Marco 2016-04\EAT 1.6.10\EAT\gate-basic\target\classes\gate_files\gate.xml as site configuration file.
+2016-03-28 15:55:06 gate.Gate : Using H:\Marco 2016-04\EAT 1.6.10\EAT\gate-basic\target\classes\gate_files\user-gate.xml as user configuration file
+2016-03-28 15:55:06 gate.Gate : Using C:\Users\Utente\gate.session as user session file

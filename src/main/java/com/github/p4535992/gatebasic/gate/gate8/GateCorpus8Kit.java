@@ -331,7 +331,7 @@ public class GateCorpus8Kit {
      * @param message the {@link String} to a web page or file.
      * @param preserveOriginalContent the {@link Boolean} for the preserveOriginalContent.
      * @param collectRepositioningInfo the {@link Boolean} for the collectRepositioningInfo.
-     * @param encoding the {@link Charset} for the cotnent of the gate Docuemnt.
+     * @param encoding the {@link Charset} for the content of the gate Document.
      * @param resourceName the {@link String} name of the resource.
      * @return document the {@link Document} of gate.
      */
@@ -339,6 +339,8 @@ public class GateCorpus8Kit {
                               @Nullable Boolean preserveOriginalContent,@Nullable Boolean collectRepositioningInfo,
                               @Nullable Charset encoding, @Nullable String resourceName){
         try {
+            doc = new DocumentImpl();
+
             Date date = new Date();
             if(preserveOriginalContent ==null) preserveOriginalContent =true;
             if(collectRepositioningInfo == null) collectRepositioningInfo = true;
@@ -346,13 +348,16 @@ public class GateCorpus8Kit {
             FeatureMap feats = Factory.newFeatureMap();
             feats.put("date", date);
             feats.put(Document.DOCUMENT_STRING_CONTENT_PARAMETER_NAME, message);
-            doc = new DocumentImpl();
-            //doc = Factory.newDocument(message);
+
             doc.setPreserveOriginalContent(preserveOriginalContent);
             doc.setCollectRepositioningInfo(collectRepositioningInfo);
             doc.setName(resourceName);
             doc.setFeatures(feats);
-            return (Document) doc.init();
+            doc = (Document) doc.init();
+            if(doc.getContent() == null || doc.getContent().toString().isEmpty()){
+                doc = Factory.newDocument(message);
+            }
+            return doc;
         }catch(ResourceInstantiationException e){
             logger.error("Can't create the Gate Document",e);
             return null;
@@ -397,7 +402,11 @@ public class GateCorpus8Kit {
             doc.setCollectRepositioningInfo(collectRepositioningInfo);
             doc.setName(resourceName);
             doc.setFeatures(feats);
-            return (Document) doc.init();
+            doc = (Document) doc.init();
+            if(doc.getContent() == null || doc.getContent().toString().isEmpty()){
+                doc = Factory.newDocument(url);
+            }
+            return doc;
         }catch(ResourceInstantiationException e){
             logger.error("Can't create the Gate Document",e);
             return null;
