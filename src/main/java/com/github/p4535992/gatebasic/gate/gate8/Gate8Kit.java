@@ -136,23 +136,29 @@ public class Gate8Kit {
         try {
             logger.info("Initializing GATE...");
             if(new File(directoryFolderHome).isAbsolute()){
-                if (directoryFolderHome.endsWith(File.separator))
-                    directoryFolderHome = directoryFolderHome.substring(0, directoryFolderHome.length() - 1);
+                /*if (directoryFolderHome.endsWith(File.separator))
+                    directoryFolderHome = directoryFolderHome.substring(0, directoryFolderHome.length() - 1);*/
+                if (!directoryFolderHome.endsWith(File.separator))
+                    directoryFolderHome = directoryFolderHome+File.separator;
                 baseDirectory = directoryFolderHome;
             }else {
                 if (!directoryFolderHome.startsWith(File.separator))
                     directoryFolderHome = File.separator + directoryFolderHome;
-                if (directoryFolderHome.endsWith(File.separator))
-                    directoryFolderHome = directoryFolderHome.substring(0, directoryFolderHome.length() - 1);
-                this.baseDirectory = System.getProperty("user.dir") + File.separator;
+               /* if (directoryFolderHome.endsWith(File.separator))
+                    directoryFolderHome = directoryFolderHome.substring(0, directoryFolderHome.length() - 1);*/
+                if (!directoryFolderHome.endsWith(File.separator))
+                    directoryFolderHome = directoryFolderHome+File.separator;
+                this.baseDirectory = System.getProperty("user.dir");
                 directoryFolderHome = baseDirectory  + directoryFolderHome;
                 baseDirectory = directoryFolderHome;
             }
             logger.warn("The base directory you using is :"+baseDirectory);
 
-            if (!Files.exists(Paths.get(directoryFolderHome))|| Files.isDirectory(Paths.get(directoryFolderHome)) )
-                throw new IOException("The folder directoryFolderHome " + directoryFolderHome + " of GATE not exists!");
-            Gate.setGateHome(new File(directoryFolderHome));
+          /*  Path path = Paths.get(directoryFolderHome);
+            if (!Files.exists(path)|| Files.isDirectory(path))*/
+            if (!new File(directoryFolderHome).exists())
+                throw new IOException("The folder directoryFolderHome " + baseDirectory + " of GATE not exists!");
+            Gate.setGateHome(new File(baseDirectory));
 
             setUpAndCopyFile(baseDirectory,directoryFolderPlugin,useOnlyAbsoluteReference);
 
