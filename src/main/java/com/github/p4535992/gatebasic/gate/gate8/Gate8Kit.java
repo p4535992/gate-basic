@@ -135,24 +135,24 @@ public class Gate8Kit {
         //SET GATE EMBEDDED
         try {
             logger.info("Initializing GATE...");
-            if(new File(directoryFolderHome).isAbsolute()){
+            if (new File(directoryFolderHome).isAbsolute()) {
                 /*if (directoryFolderHome.endsWith(File.separator))
                     directoryFolderHome = directoryFolderHome.substring(0, directoryFolderHome.length() - 1);*/
                 if (!directoryFolderHome.endsWith(File.separator))
-                    directoryFolderHome = directoryFolderHome+File.separator;
+                    directoryFolderHome = directoryFolderHome + File.separator;
                 baseDirectory = directoryFolderHome;
-            }else {
+            } else {
                 if (!directoryFolderHome.startsWith(File.separator))
                     directoryFolderHome = File.separator + directoryFolderHome;
                /* if (directoryFolderHome.endsWith(File.separator))
                     directoryFolderHome = directoryFolderHome.substring(0, directoryFolderHome.length() - 1);*/
                 if (!directoryFolderHome.endsWith(File.separator))
-                    directoryFolderHome = directoryFolderHome+File.separator;
+                    directoryFolderHome = directoryFolderHome + File.separator;
                 this.baseDirectory = System.getProperty("user.dir");
-                directoryFolderHome = baseDirectory  + directoryFolderHome;
+                directoryFolderHome = baseDirectory + directoryFolderHome;
                 baseDirectory = directoryFolderHome;
             }
-            logger.warn("The base directory you using is :"+baseDirectory);
+            logger.warn("The base directory you using is :" + baseDirectory);
 
           /*  Path path = Paths.get(directoryFolderHome);
             if (!Files.exists(path)|| Files.isDirectory(path))*/
@@ -160,47 +160,65 @@ public class Gate8Kit {
                 throw new IOException("The folder directoryFolderHome " + baseDirectory + " of GATE not exists!");
             Gate.setGateHome(new File(baseDirectory));
 
-            setUpAndCopyFile(baseDirectory,directoryFolderPlugin,useOnlyAbsoluteReference);
+            setUpAndCopyFile(baseDirectory, directoryFolderPlugin, useOnlyAbsoluteReference);
 
-            if (!directoryFolderPlugin.startsWith(File.separator))
-                directoryFolderPlugin = File.separator + directoryFolderPlugin;
-            if (directoryFolderPlugin.endsWith(File.separator))
-                directoryFolderPlugin = directoryFolderPlugin.substring(0, directoryFolderPlugin.length() - 1);
+            if (new File(directoryFolderPlugin).isAbsolute()) {
+                setUpAndCopyFile(new File(directoryFolderPlugin).getParent(), new File(directoryFolderPlugin).getName(), useOnlyAbsoluteReference);
+            }else{
+                setUpAndCopyFile(baseDirectory, directoryFolderPlugin, useOnlyAbsoluteReference);
+                if (!directoryFolderPlugin.startsWith(File.separator))
+                    directoryFolderPlugin = File.separator + directoryFolderPlugin;
+                if (directoryFolderPlugin.endsWith(File.separator))
+                    directoryFolderPlugin = directoryFolderPlugin.substring(0, directoryFolderPlugin.length() - 1);
 
-            directoryFolderPlugin = directoryFolderHome + directoryFolderPlugin;
+                directoryFolderPlugin = directoryFolderHome + directoryFolderPlugin;
+            }
             if (!new File(directoryFolderPlugin).exists())
                 throw new IOException("The folder directoryFolderPlugin " + directoryFolderPlugin + "of GATE not exists!");
             Gate.setPluginsHome(new File(directoryFolderPlugin));
 
-            setUpAndCopyFile(baseDirectory,configFileGate,useOnlyAbsoluteReference);
+            if (new File(configFileGate).isAbsolute()) {
+                setUpAndCopyFile(new File(configFileGate).getParent(), new File(configFileGate).getName(), useOnlyAbsoluteReference);
+            }else {
+                setUpAndCopyFile(baseDirectory, configFileGate, useOnlyAbsoluteReference);
+                if (!configFileGate.startsWith(File.separator)) configFileGate = File.separator + configFileGate;
+                if (configFileGate.endsWith(File.separator))
+                    configFileGate = configFileGate.substring(0, configFileGate.length() - 1);
 
-            if (!configFileGate.startsWith(File.separator)) configFileGate = File.separator + configFileGate;
-            if (configFileGate.endsWith(File.separator))
-                configFileGate = configFileGate.substring(0, configFileGate.length() - 1);
-
-            configFileGate = directoryFolderHome + configFileGate;
+                configFileGate = directoryFolderHome + configFileGate;
+            }
             if (!new File(configFileGate).exists())
                 throw new IOException("The configFileGate " + configFileGate + "of GATE not exists!");
             Gate.setSiteConfigFile(new File(configFileGate));
 
-            setUpAndCopyFile(baseDirectory,configFileUser,useOnlyAbsoluteReference);
+            if (new File(configFileUser).isAbsolute()) {
+                setUpAndCopyFile(new File(configFileUser).getParent(), new File(configFileUser).getName(), useOnlyAbsoluteReference);
+            }else {
+                setUpAndCopyFile(baseDirectory, configFileUser, useOnlyAbsoluteReference);
 
-            if (!configFileUser.startsWith(File.separator)) configFileUser = File.separator + configFileUser;
-            if (configFileUser.endsWith(File.separator))
-                configFileUser = configFileUser.substring(0, configFileUser.length() - 1);
+                if (!configFileUser.startsWith(File.separator)) configFileUser = File.separator + configFileUser;
+                if (configFileUser.endsWith(File.separator))
+                    configFileUser = configFileUser.substring(0, configFileUser.length() - 1);
 
-            configFileUser = directoryFolderHome + configFileUser;
+                configFileUser = directoryFolderHome + configFileUser;
+            }
             if (!new File(configFileUser).exists())
                 throw new IOException("The configFileUser " + configFileUser + " of GATE not exists!");
             Gate.setUserConfigFile(new File(configFileUser));
 
-            setUpAndCopyFile(baseDirectory,configFileSession,useOnlyAbsoluteReference);
 
-            if (!configFileSession.startsWith(File.separator)) configFileSession = File.separator + configFileSession;
-            if (configFileSession.endsWith(File.separator))
-                configFileSession = configFileSession.substring(0, configFileSession.length() - 1);
+            if (new File(configFileSession).isAbsolute()) {
+                setUpAndCopyFile(new File(configFileSession).getParent(), new File(configFileSession).getName(), useOnlyAbsoluteReference);
+            }else {
+                setUpAndCopyFile(baseDirectory, configFileSession, useOnlyAbsoluteReference);
 
-            configFileSession = directoryFolderHome + configFileSession;
+                if (!configFileSession.startsWith(File.separator))
+                    configFileSession = File.separator + configFileSession;
+                if (configFileSession.endsWith(File.separator))
+                    configFileSession = configFileSession.substring(0, configFileSession.length() - 1);
+
+                configFileSession = directoryFolderHome + configFileSession;
+            }
             if (!new File(configFileSession).exists())
                 throw new IOException("The configFileSession " + configFileSession + " of GATE not exists!");
             Gate.setUserSessionFile(new File(configFileSession));
