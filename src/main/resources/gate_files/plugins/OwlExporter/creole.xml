@@ -1,6 +1,0 @@
-<CREOLE-DIRECTORY ID="OwlExporter" VERSION="3.2" GATE-MIN="7.0"
-        DESCRIPTION="Populates OWL ontologies from GATE annotations"
-        HELPURL="http://www.semanticsoftware.info/owlexporter">
-     <JAR SCAN="true">gate/plugins/OwlExporter/OwlExporter.jar</JAR>
-     <JAR SCAN="true">OwlExporterDemo.jar</JAR>
-</CREOLE-DIRECTORY>
