@@ -293,8 +293,9 @@ public class Gate8Kit {
      * @return the {@link Controller} of gate of the gapp file.
      */
     public Controller loadGapp(String fileGapp){
-        logger.info("Loading file .gapp/.xgapp...");
+        logger.info("Loading file .gapp/.xgapp from "+fileGapp+"...");
         try {
+            if(new File(fileGapp).isAbsolute()) fileGapp = fileGapp.replace(Gate.getGateHome().getAbsolutePath(),"");
             if(!fileGapp.startsWith(File.separator)) fileGapp = File.separator + fileGapp;
             if(fileGapp.endsWith(File.separator)) fileGapp = fileGapp.substring(0,fileGapp.length()-1);
             //File gapp = new File(home.home, "custom/gapp/geoLocationPipelineFast.xgapp");
@@ -302,7 +303,7 @@ public class Gate8Kit {
                 controller = (Controller) PersistenceManager.loadObjectFromFile(
                         new File(Gate.getGateHome() + fileGapp));
             } else {
-                throw new IOException("The gapp file not exists");
+                throw new IOException("The gapp file not exists on "+fileGapp);
             }
             //CorpusController  con = (CorpusController) PersistenceManager.loadObjectFromFile(gapp);
             logger.info("... file .gapp/.xgapp loaded!");
