@@ -1,0 +1,275 @@
+Imports: {
+  import static gate.Utils.*;
+}
+/**
+ * dott. Paolo Verdi
+ * Ditta Flex S.r.l.
+ * /////////////////////////
+ * scala A interno 4
+ * via Gioachino Rossini 40 
+ * Casella Postale 1234
+ * 84011 AMALFI SA
+ */
+Phase: Indirizzo
+Input: Token Lookup Split SpaceToken localita indirizzo provincie MyProvincia regioni industriale azienda assicurazione email
+articoloIndeterminativo articoloDeterminativo preposizioni avverbiDiLuogo locuzioni congiunzione trash localita banche Url
+Options: control = appelt 
+MACRO:CONJ_ITA(
+    (
+	{Lookup.majorType==articoloIndeterminativo}/*(1)un una uno un'*/
+	|{Lookup.majorType==articoloDeterminativo}/*(2)il lo l' la i gli le*/
+	|{Lookup.majorType==preposizioni}/*(3)a agli ai al all' alla alle allo assieme attraverso avanti circa con contro da dagli dai dal dall' dalla dalle dallo*/
+	|{Lookup.majorType==avverbiDiLuogo}/*(4)altrove ci codesto costà costì dappertutto davanti dentro*/
+	|{Lookup.majorType==locuzioni}/*(5)accanto a vicino a davanti a innanzi a lontano da invece di insieme con*/
+	|{Lookup.majorType==congiunzione}/*(6)altresì ancora anzi ciò nonostante*/
+	|{Lookup.majorType==conjunction}
+    )
+)
+MACRO:TRASH(
+    ({Split}|{Lookup.majorType==trash})
+)
+MACRO:CONJ_UNIVERSAL_ITA(
+        ({SpaceToken}|{Token.kind!=word,Token.length==1}|{Token.kind!=number,Token.length==1})
+        (
+           ((TRASH)|(CONJ_ITA))
+           ({SpaceToken}|{Token.kind!=word,Token.length==1}|{Token.kind!=number,Token.length==1})
+        )[0,1]
+)
+
+
+/**scala A interno 4*/
+Rule: RuleMyIndirizzo0
+Priority: 15
+(
+   ({Lookup.majorType == indirizzo})
+   ((CONJ_UNIVERSAL_ITA))[1,3]
+   ({Token.kind==number,Token.length==1}|{Token.kind==number,Token.length==2}|{Token.kind==word,Token.length==1}|{Token.kind==word,Token.length==2})
+   ({Lookup.majorType == indirizzo})
+   ({Token.kind==number,Token.length==1}|{Token.kind==number,Token.length==2})
+   
+):myIndirizzo0
+  -->
+:myIndirizzo0.MyIndirizzo = {kind = "myIndirizzo0", rule = "RuleMyIndirizzo0"}
+/////////////////////////////////
+//RITOCCO INDIRIZZO VERSIONE 8///
+/////////////////////////////////
+/**84011 AMALFI SA*/
+Rule: RuleMyIndirizzo1
+Priority: 15
+(
+    ({Lookup.majorType == indirizzo})[1,1]
+	(
+		(CONJ_UNIVERSAL_ITA)[1,3]
+		({Token.kind == word,Token.string !="email",Token.string !="e-mail",Token.string !="Email",Token.string !="E-mail",Token.string !="EMAIL",Token.string !="E-MAIL"})
+		//({Token.kind == word,!Lookup.majorType == email,!Lookup.majorType == url})
+		(CONJ_UNIVERSAL_ITA)[1,3]
+    )[1,8]
+	(
+		(CONJ_UNIVERSAL_ITA)[1,3]
+		({Token.kind==number,Token.length<=3})
+    )[0,1]
+	(
+		(CONJ_UNIVERSAL_ITA)[1,3]
+		({Token.kind == number,Token.length==5})[0,1]
+	)[0,1]
+    (
+		(CONJ_UNIVERSAL_ITA)[1,3]
+		({Token.kind==word,Token.length==2,Token.orth==upperInitial})
+    )[0,1]
+	(
+		(CONJ_UNIVERSAL_ITA)[1,3]
+		({Token.kind==number,Token.length<=3})
+    )[0,1]
+):myIndirizzo1
+  -->
+:myIndirizzo1.MyIndirizzo = {kind = "myIndirizzo1", rule = RuleMyIndirizzo1}
+
+/**via Gioachino Rossini 40c -  P.zza S.Marco 4*/
+Rule: RuleMyIndirizzo2
+Priority: 15
+(
+   ({Lookup.majorType == indirizzo})
+   (
+        ((CONJ_UNIVERSAL_ITA))[1,3]
+        ({Token.kind==word,Token.orth==upperInitial,Token.length>=2,Token.string !="email",Token.string !="e-mail",Token.string !="Email",Token.string !="E-mail",Token.string !="EMAIL",Token.string !="E-MAIL"})
+        //({Token.kind == word,!Lookup.majorType == email,!Lookup.majorType == url})
+   )[1,5]
+   (
+        ((CONJ_UNIVERSAL_ITA))[1,3]
+        ({Token.kind==number,Token.length==2}|{Token.kind==number,Token.length==1}|{Token.kind==number,Token.length==3})
+        (
+            (CONJ_UNIVERSAL_ITA)[0,1]
+            ({Token.kind==word,Token.length==1})
+        )[0,1]
+   )[0,1]
+  /**secondo piano*/
+  (
+    (CONJ_UNIVERSAL_ITA)[1,3]
+	 ({Token.kind==word}|{Token.kind==number})
+	 ({Token.string=="°"})[0,1]
+	 (CONJ_UNIVERSAL_ITA)[0,3]
+	 ({Token.string==~"[Pp]iano"}|{Token.string==~"[Ll]ivello"}|{Token.string==~"[Pp]iano terra"}|{Token.string==~"[Pp]"}|{Token.string==~"[Ll]"})[1,1]
+     /* aula 23 */
+	 (
+	  (CONJ_UNIVERSAL_ITA)[1,3]	
+	  ({Token.string==~"[Aa]ula"}|{Token.string==~"[Ss]tanza"})[1,1]
+	  (CONJ_UNIVERSAL_ITA)[0,3]	
+	  ({Token.kind==number})
+	 )[0,1]	  
+  )[0,1]
+  /**84011 AMALFI SA*/
+  (
+   (CONJ_UNIVERSAL_ITA)[1,3]
+   ({Token.kind == number,Token.length==5})[0,1]
+  )[0,1]
+   (
+     (CONJ_UNIVERSAL_ITA)[1,3]
+	 ({Token.kind==word,!Lookup.majorType == localita}|{Token.kind==number})
+	 ({Token.string=="°"})[0,1]
+	 (CONJ_UNIVERSAL_ITA)[0,3]
+	 ({Token.string==~"[Pp]iano"}|{Token.string==~"[Ll]ivello"}|{Token.string==~"[Pp]iano terra"}|{Token.string==~"[Pp]"}|{Token.string==~"[Ll]"})[1,1]
+     /* aula 23 */
+	 (
+	  (CONJ_UNIVERSAL_ITA)[1,3]	
+	  ({Token.string==~"[Aa]ula"}|{Token.string==~"[Ss]tanza"})[1,1]
+	  (CONJ_UNIVERSAL_ITA)[0,3]	
+	  ({Token.kind==number})
+	 )[0,1]
+   )[0,1]
+   
+   
+):myIndirizzo2
+  -->
+:myIndirizzo2.MyIndirizzo = {kind = "myIndirizzo2", rule = "RuleMyIndirizzo2"}
+
+/**Latitudine: N 41.89547*/
+Rule: RuleMyIndirizzo4
+Priority: 15
+(
+   ({Lookup.majorType == indirizzo})
+   (
+        (
+          (CONJ_UNIVERSAL_ITA)[1,1]
+          ({Token.kind==word,Token.orth==upperInitial,Token.length==1})
+        )[0,1]
+        (
+          (CONJ_UNIVERSAL_ITA)[1,1]
+          ({Token.kind==number,Token.length==2})
+          ({Token.string=="."})
+          ({Token.kind==number})
+        )
+   )[1,2]
+):myIndirizzo4
+  -->
+:myIndirizzo4.MyIndirizzo = {kind = "myIndirizzo4", rule = "RuleMyIndirizzo4"}
+
+Rule: StreetName1
+/*Regola di default di gate per il tracciamento delle strade*/
+(
+ ({Token.kind == number}
+  ({Token.string == ","})? 
+ )?
+ {Token.orth == upperInitial}
+ {Lookup.minorType == "street"}
+)
+:streetAddress -->
+ :streetAddress.MyIndirizzo = {kind = "streetAddress", rule = StreetName1}
+
+
+Rule: POBoxAddress
+/*Regole di default di gate per il tracciamento della casella postale*/
+(
+ (({Token.string == "P"}
+   ({Token.string == "."})? 
+   {Token.string == "O"}
+   ({Token.string == "."})?
+  ) |
+  ({Token.string == "PO"})
+ )
+ {Token.string == "Box"}
+ {Token.kind == number}
+)
+:poBox -->
+ :poBox.MyIndirizzo = {kind = "poBox", rule = POBoxAddress}
+ 
+MACRO: EDIFICIOSUPPORT(  
+	(
+		{Lookup.majorType == provincie}|{Lookup.majorType == regioni}|{Lookup.majorType == localita}|
+		{Lookup.majorType == azienda}|{Lookup.majorType == industriale}|{Lookup.majorType == assicurazione}|
+		{Token.kind==word,Token.orth==upperInitial}|{Lookup.majorType == universita}|{Lookup.majorType == edificio}|{Lookup.majorType == banche}|
+		{Token.kind == word, Token.orth == allCaps}
+		
+	)
+)
+/*UniFI - Universit� degli Studi di Firenze - Ateneo*/
+Rule: RuleEdificio
+(
+    (
+       (EDIFICIOSUPPORT)
+       (CONJ_UNIVERSAL_ITA)[1,4]
+    )[0,4]
+    ({Lookup.majorType == edificio}|{Lookup.majorType == universita}) /*Universita*/
+    (
+       (CONJ_UNIVERSAL_ITA)[1,4]	
+       (EDIFICIOSUPPORT)	
+     )[0,6]
+):myEdificio
+-->
+:myEdificio.MyEdificio = {kind = "myEdificio", rule = "RuleEdificio"}
+
+
+Rule: TTT
+(
+ (TRASH)
+):ttt
+-->
+:ttt.Trash ={kind="ttt", rule = TTT}
+
+Rule: CCC
+(
+ (CONJ_ITA)
+):ccc
+-->
+:ccc.Conj_ITA ={kind="ccc", rule = CCC}
+
+Rule: EEE
+(
+ (EDIFICIOSUPPORT)
+):eee
+-->
+:eee.EdificioSupport ={kind="eee", rule = EEE}
+
+Rule: XXX
+(
+ (CONJ_UNIVERSAL_ITA)
+):xxx
+-->
+:xxx.Conj_ITA_Universal ={kind="xxx", rule = XXX}
+
+Rule: YYY
+(
+ ({Token.kind == word, Token.orth == allCaps})
+):yyy
+-->
+:yyy.Upper ={kind="yyy", rule = YYY}
+
+Rule: ZZZ
+(
+ {Lookup.majorType == indirizzo}
+):zzz
+-->
+:zzz.IndirizzoSupport ={kind="zzz", rule = ZZZ}
+
+Rule: UUU
+(
+ {Lookup.majorType == Url}
+):uuu
+-->
+:uuu.UrlSupport ={kind="uuu", rule = UUU}
+
+Rule: MMM
+(
+ {Lookup.majorType == email}
+):mmm
+-->
+:mmm.EmailSupport ={kind="mmm", rule = MMM}

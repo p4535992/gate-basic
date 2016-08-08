@@ -1,0 +1,22 @@
+Phase: LookupRename
+Input: Lookup
+Options: control = appelt
+
+Rule: RenameLookup
+(
+  {Lookup.type == instance}
+
+):match
+-->
+:match{  
+  AnnotationSet theAnnots = bindings.get("match");  
+  if(theAnnots != null && theAnnots.size() != 0) {  
+    Annotation theLookup = theAnnots.iterator().next();  
+    FeatureMap theFeatures = theLookup.getFeatures();
+    theFeatures.put("class", theFeatures.get("classURI"));  
+    theFeatures.put("inst", theFeatures.get("URI"));  
+  }  
+} 
+
+//:lookup.Lookup = {class = :lookup.Lookup.classURI, inst = :lookup.Lookup.URI}
+//cannot use this nicer location as it always creates a new annot on the RHS

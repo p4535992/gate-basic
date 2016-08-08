@@ -11,6 +11,7 @@ import gate.util.DocumentProcessor;
 import gate.util.GateException;
 import gate.util.persistence.PersistenceManager;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,7 +40,7 @@ public class Gate8Kit {
     /** Gapp File */
     private File gappFile;
     /** Gate Document */
-    private Document gateDoc;
+    //private Document gateDoc;
     /** Gate processor document */
     private DocumentProcessor procDoc;
     /** Base Directory for Gate Files*/
@@ -157,8 +158,12 @@ public class Gate8Kit {
           /*  Path path = Paths.get(directoryFolderHome);
             if (!Files.exists(path)|| Files.isDirectory(path))*/
             if (!new File(directoryFolderHome).exists())
-                throw new IOException("The folder directoryFolderHome " + baseDirectory + " of GATE not exists!");
-            Gate.setGateHome(new File(baseDirectory));
+                throw new IOException("The folder directoryFolderHome " + directoryFolderHome + " of GATE not exists!");
+            Gate.setGateHome(new File(directoryFolderHome));
+            logger.warn("The GATE_HOME you using is :" + directoryFolderHome);
+
+            if (directoryFolderHome.endsWith(File.separator))
+                directoryFolderHome = directoryFolderHome.substring(0, directoryFolderHome.length() - 1);
 
             setUpAndCopyFile(baseDirectory, directoryFolderPlugin, useOnlyAbsoluteReference);
 
@@ -176,7 +181,7 @@ public class Gate8Kit {
             if (!new File(directoryFolderPlugin).exists())
                 throw new IOException("The folder directoryFolderPlugin " + directoryFolderPlugin + "of GATE not exists!");
             Gate.setPluginsHome(new File(directoryFolderPlugin));
-
+            logger.warn("The GATE_PLUGIN_HOME you using is :" + directoryFolderPlugin);
             if (new File(configFileGate).isAbsolute()) {
                 setUpAndCopyFile(new File(configFileGate).getParent(), new File(configFileGate).getName(), useOnlyAbsoluteReference);
             }else {
@@ -190,7 +195,7 @@ public class Gate8Kit {
             if (!new File(configFileGate).exists())
                 throw new IOException("The configFileGate " + configFileGate + "of GATE not exists!");
             Gate.setSiteConfigFile(new File(configFileGate));
-
+            logger.warn("The GATE_SITE_CONFIG_FILE you using is :" + configFileGate);
             if (new File(configFileUser).isAbsolute()) {
                 setUpAndCopyFile(new File(configFileUser).getParent(), new File(configFileUser).getName(), useOnlyAbsoluteReference);
             }else {
@@ -205,7 +210,7 @@ public class Gate8Kit {
             if (!new File(configFileUser).exists())
                 throw new IOException("The configFileUser " + configFileUser + " of GATE not exists!");
             Gate.setUserConfigFile(new File(configFileUser));
-
+            logger.warn("The GATE_USER_CONFIG_FILE you using is :" + configFileGate);
 
             if (new File(configFileSession).isAbsolute()) {
                 setUpAndCopyFile(new File(configFileSession).getParent(), new File(configFileSession).getName(), useOnlyAbsoluteReference);
@@ -222,6 +227,7 @@ public class Gate8Kit {
             if (!new File(configFileSession).exists())
                 throw new IOException("The configFileSession " + configFileSession + " of GATE not exists!");
             Gate.setUserSessionFile(new File(configFileSession));
+            logger.warn("The GATE_USER_SESSION_FILE you using is :" + configFileGate);
         } catch(IllegalStateException e){
             logger.warn("Some configuration file of GATE is has already been set:"+e.getMessage(), e);
         }catch(IOException e) {
@@ -233,7 +239,6 @@ public class Gate8Kit {
         }catch(GateException e){
             //..Usuallly you got here for bad reading of the session file
             try {
-                //FileUtilities.toFile(configFileSession);
                 File config = new File(configFileSession);
                 if(!(config.isFile() && config.exists())) {
                     try {
@@ -324,9 +329,9 @@ public class Gate8Kit {
      */
     public DocumentProcessor setUpGateEmbeddedWithSpring(
             String referencePathResourceFile,Class<?> thisClass,String idBeanDocumentProcessor){
-        ApplicationContext ctx;
+        GenericApplicationContext ctx;
         try {
-            ctx = BeansKit.tryGetContextSpring(referencePathResourceFile, thisClass);
+            ctx = (GenericApplicationContext) BeansKit.tryGetContextSpring(referencePathResourceFile, thisClass);
             //GATE provides a DocumentProcessor interface suitable for use with Spring pooling
             //procDoc = BeansKit.getBeanFromContext("documentProcessor",DocumentProcessor.class,ctx);
             //procDoc = BeansKit.getBeanFromContext(idBeanDocumentProcessor,DocumentProcessor.class,ctx);
@@ -334,6 +339,7 @@ public class Gate8Kit {
                 procDoc = ctx.getBean(idBeanDocumentProcessor, DocumentProcessor.class);
             }catch(java.lang.IllegalStateException e){
                 try {
+                    ctx.refresh();
                     procDoc = ctx.getBean(DocumentProcessor.class);
                 }catch(Exception e2){
                     logger.error(e2.getMessage(),e2);

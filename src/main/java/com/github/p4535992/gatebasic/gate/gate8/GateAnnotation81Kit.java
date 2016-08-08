@@ -2,7 +2,7 @@ package com.github.p4535992.gatebasic.gate.gate8;
 
 import com.github.p4535992.gatebasic.object.MapAnnotation;
 import com.github.p4535992.gatebasic.object.MapAnnotationSet;
-import com.github.p4535992.gatebasic.object.MapContent;
+
 import com.github.p4535992.gatebasic.object.MapDocument;
 import javax.annotation.Nullable;
 import gate.*;
@@ -46,7 +46,7 @@ public class GateAnnotation81Kit {
              @Nullable List<String> listNameAnnotation, boolean firstAndExit) {
          Iterator<Document> iter = corpus.iterator();
          MapDocument mapDocs = new MapDocument();
-         MapAnnotationSet mapAnnSet = new MapAnnotationSet(); //AnnotationSet -> Annotation,Content
+         MapAnnotationSet mapAnnSet = new MapAnnotationSet(mapDocs); //AnnotationSet -> Annotation,Content
          MapAnnotation mapAnn = new MapAnnotation();
          while (iter.hasNext()) {
             Document document = iter.next();
@@ -81,7 +81,7 @@ public class GateAnnotation81Kit {
              //get content from all the annotation in alll the annotaiotn set sorted....
             for (String nameAnnotation : listNameAnnotation) { //for each annotation...
                 for(String nameAnnotationSet: listNameAnnotationSet) {//for each annotation set...
-                    MapContent content; //empty string
+                    String content; //empty string
                     content = getSingleAnnotationInfo(document,  nameAnnotationSet,nameAnnotation);
                     //get the annotation on the first annotation set is have it without check the other annnotation set...
                     if (!content.isEmpty()) {
@@ -110,20 +110,20 @@ public class GateAnnotation81Kit {
      * @param document the {@link Document} gate.
      * @param nameAnnotation the {@link String} name of the Annotation.
      * @param nameAnnotationSet the {@link String} name of the AnnotationSet.
-     * @return the {@link MapContent} string content of the Annotation.
+     * @return the {@link String} string content of the Annotation.
      */
-    public MapContent getSingleAnnotationInfo(Document document,String nameAnnotationSet,String nameAnnotation) {
-        MapContent content = new MapContent("");
+    public String getSingleAnnotationInfo(Document document,String nameAnnotationSet,String nameAnnotation) {
+        String content = "";
         try {
             AnnotationSet annSet = GateUtils.getAnnotationSetFromDoc(document,nameAnnotationSet);
-            //SystemLog.message("Get content of the Annotation " + nameAnnotation + " on the AnnotationSet " + annSet.getName() + "...");
+            logger.debug("Get content of the Annotation " + nameAnnotation + " on the AnnotationSet " + annSet.getName() + "...");
             //content = getContentLongestFromAnnnotationsOnAnnotationSet(document, nameAnnotation, annSet);         
             if(annSet != null){
                 Annotation newAnn;
                 for (Annotation ann : annSet) {
                     if (ann.getType().equals(nameAnnotation)) {
                         newAnn = ann;
-                        content.setContent(Utils.stringFor(document, newAnn));
+                        content = Utils.stringFor(document, newAnn);
                         break;
                     }
                 }
@@ -138,7 +138,7 @@ public class GateAnnotation81Kit {
                     content.setContent(contents.get(0));
                 }
             }*/
-            if(content.isEmpty())content.setContent("");
+            if(content.isEmpty())content = "";
             //content =  getContentLastSingleAnnotationOnAnnotationSet(document, nameAnnotation, annSet);
         }catch(NullPointerException ne){
             logger.warn("AnnotationSet -> "+nameAnnotationSet+": is empty for this document to the url: "+ document.getSourceUrl());
@@ -156,7 +156,7 @@ public class GateAnnotation81Kit {
      * @return the {@link String} string content of the Annotation.
      */
     public String getSingleAnnotationInfo(Document document,AnnotationSet nameAnnotationSet,Annotation nameAnnotation) {
-        return getSingleAnnotationInfo(document,nameAnnotationSet.getName(),nameAnnotation.getType()).getContent();
+        return getSingleAnnotationInfo(document,nameAnnotationSet.getName(),nameAnnotation.getType());
     }
 
     /**
@@ -167,7 +167,7 @@ public class GateAnnotation81Kit {
      * @return the {@link String} string content of the Annotation.
      */
     public String getSingleAnnotationInfoString(Document document,String nameAnnotationSet,String nameAnnotation) {
-        return getSingleAnnotationInfo(document,nameAnnotationSet,nameAnnotation).getContent();
+        return getSingleAnnotationInfo(document,nameAnnotationSet,nameAnnotation);
     }
 
     /**

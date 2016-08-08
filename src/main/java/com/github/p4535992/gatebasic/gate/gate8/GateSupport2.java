@@ -1,6 +1,10 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
 import com.github.p4535992.gatebasic.object.*;
+import gate.Annotation;
+import gate.AnnotationSet;
+import gate.Corpus;
+import gate.Document;
 
 import java.util.*;
 
@@ -23,7 +27,7 @@ public class GateSupport2 {
     private List<MapAnnotationSet> listMapAnnotationSet;
     private List<MapAnnotation> listMapAnnotation;
     private List<MapDocument> listMapDocs;
-    private List<MapContent> listMapContent;
+    private List<String> listMapContent;
 
     private String content;
 
@@ -43,7 +47,11 @@ public class GateSupport2 {
     protected GateSupport2(MapCorpus mapCorpus,String nameDocument) {
         setIfNull();
         this.mapCorpus = mapCorpus;
-        this.listMapDocs = mapCorpus.get(nameDocument);
+        for(Document doc : mapCorpus.getList(nameDocument)){
+            this.listMapDocs.add((MapDocument) doc);
+        }
+        //this.listMapDocs = mapCorpus.getList(nameDocument);
+
       /*  this.listMapAnnotationSet =
         this.listMapAnnotation = mapAnnotationSet.getListAnnotations();
         this.listMapContent*/
@@ -74,7 +82,7 @@ public class GateSupport2 {
     private void setIfNull(){
         if(mapCorpus == null) mapCorpus = new MapCorpus();
         if(mapDocs == null) mapDocs = new MapDocument();
-        if(mapAnnotationSet == null) mapAnnotationSet = new MapAnnotationSet();
+        if(mapAnnotationSet == null) mapAnnotationSet = new MapAnnotationSet(mapDocs);
         if(mapAnnotation == null) mapAnnotation = new MapAnnotation();
         if(listMapContent == null) listMapContent = new ArrayList<>();
         if(listMapAnnotation == null) listMapAnnotation = new ArrayList<>();
@@ -88,7 +96,10 @@ public class GateSupport2 {
 
     public List<MapDocument> getCorpus(){
         if(mapCorpus!=null && mapCorpus.size() >0) {
-            this.listMapDocs = mapCorpus.getListDocument();
+            for(Document doc : mapCorpus.getListDocument()){
+                this.listMapDocs.add((MapDocument) doc);
+            }
+            //this.listMapDocs = mapCorpus.getListDocument();
             return listMapDocs;
         }else{
             logger.warn("The MapDocument is NULL or EMPTY, set up a valid MapDocument for extract something useful");
@@ -107,7 +118,10 @@ public class GateSupport2 {
                     "exists on this map of the result of GATE, return NULL");
             return null;
         }
-        this.listMapDocs = mapCorpus.get(index);
+        for(Document doc : mapCorpus.getList(index)){
+            this.listMapDocs.add((MapDocument) doc);
+        }
+        //this.listMapDocs = mapCorpus.get(index);
         return listMapDocs;
         //return mapCorpus.get(index);
     }
@@ -141,7 +155,7 @@ public class GateSupport2 {
                     "exists on this map of the result of GATE, return NULL");
              return null;
         }
-        this.listMapAnnotationSet = mapDocs.get(index);
+        this.listMapAnnotationSet = mapDocs.getList(index);
         return listMapAnnotationSet;
         //return mapDocs.get(index);
     }
@@ -213,7 +227,7 @@ public class GateSupport2 {
         //List<MapAnnotation> list = new ArrayList<>(mapAnnotationSet.values());
         //this.mapAnnotation = list.get(index);
         //return list.get(index);
-        return mapAnnotationSet.get(index);
+        return mapAnnotationSet.getList(index);
     }
 
 
@@ -228,7 +242,11 @@ public class GateSupport2 {
 
     public List<MapAnnotation> getAnnotationSet(String nameAnnotationSet,boolean ignorecase){
         if(mapAnnotationSet == null || mapAnnotationSet.isEmpty()){
-            mapAnnotationSet = new MapAnnotationSet(listMapAnnotation);
+            List<Annotation> listAnn = new ArrayList<>();
+            for(Annotation ann: listMapAnnotation){
+                listAnn.add(ann);
+            }
+            mapAnnotationSet = new MapAnnotationSet((Document)mapDocs,listAnn);
         }
 
         for(Map.Entry<String,List<MapAnnotation>> entryAnnSet: mapAnnotationSet.entrySet()){
@@ -252,9 +270,9 @@ public class GateSupport2 {
     // GET ANNOTATION
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public List<MapContent> getAnnotation(){
+    public List<String> getAnnotation(){
         if(mapDocs!=null && mapDocs.size() >0) {
-            List<MapContent> list = new ArrayList<>();
+            List<String> list = new ArrayList<>();
             for(MapAnnotationSet entry: mapDocs.getListAnnotationSets()){
                 for(MapAnnotation entry2: entry.getListAnnotations()) {
                     list.addAll(entry2.getListContents());
@@ -269,12 +287,12 @@ public class GateSupport2 {
         }
     }
 
-    public List<MapContent> getAnnotation(Integer index, MapAnnotation mapAnnotation ){
+    public List<String> getAnnotation(Integer index, MapAnnotation mapAnnotation ){
         this.mapAnnotation = mapAnnotation;
         return getAnnotation(index);
     }
 
-    public List<MapContent> getAnnotation(Integer index){
+    public List<String> getAnnotation(Integer index){
         if(mapAnnotation.isEmpty()){
             mapAnnotation = listMapAnnotation.get(0);
         }
@@ -283,24 +301,24 @@ public class GateSupport2 {
                     " on this map of the result of GATE, return NULL");
             return null;
         }
-        return mapAnnotation.get(index);
+        return mapAnnotation.getList(index);
     }
 
-    public List<MapContent> getAnnotation(String nameAnnotation,MapAnnotation mapAnnotation ) {
+    public List<String> getAnnotation(String nameAnnotation,MapAnnotation mapAnnotation ) {
         this.mapAnnotation = mapAnnotation;
         return getAnnotation(nameAnnotation,false);
     }
 
-    public List<MapContent> getAnnotation(String nameAnnotation) {
+    public List<String> getAnnotation(String nameAnnotation) {
         return getAnnotation(nameAnnotation,false);
     }
 
-    public List<MapContent> getAnnotation(String nameAnnotation,boolean ignorecase){
+    public List<String> getAnnotation(String nameAnnotation,boolean ignorecase){
         if(mapAnnotation == null || mapAnnotation.isEmpty()){
             mapAnnotation = new MapAnnotation(listMapContent);
         }
 
-        for(Map.Entry<String,List<MapContent>> entryAnn: mapAnnotation.entrySet()){
+        for(Map.Entry<String,List<String>> entryAnn: mapAnnotation.entrySet()){
             if(ignorecase){
                 if(entryAnn.getKey().equalsIgnoreCase(nameAnnotation) ||
                         entryAnn.getKey().toLowerCase().contains(nameAnnotation.toLowerCase())){
@@ -327,8 +345,8 @@ public class GateSupport2 {
             List<String> list = new ArrayList<>();
             for(MapAnnotationSet entry: mapDocs.getListAnnotationSets()){
                 for(MapAnnotation entry2: entry.getListAnnotations()) {
-                    for(MapContent entry3: entry2.getListContents()) {
-                        list.add(entry3.getContent());
+                    for(String entry3: entry2.getListContents()) {
+                        list.add(entry3);
                     }
                 }
             }
@@ -356,13 +374,13 @@ public class GateSupport2 {
                 return list;
             }
             //Search Content
-            List<MapContent> theMapContent = theMapAnnotation.get(nameAnnotation);
+            List<String> theMapContent = theMapAnnotation.getList(nameAnnotation);
             if(theMapContent==null || theMapContent.isEmpty()){
                 logger.error("Annotation:"+nameAnnotation+ " return empty list");
                 return list;
             }
-            for(MapContent content : theMapContent){
-                list.add(content.getContent());
+            for(String content : theMapContent){
+                list.add(content);
             }
             return list;
         }catch(NullPointerException ne){
@@ -389,13 +407,13 @@ public class GateSupport2 {
                 return list;
             }
             //Search Content
-            List<MapContent> theMapContent = theMapAnnotation.get(nameAnnotation);
+            List<String> theMapContent = theMapAnnotation.getList(nameAnnotation);
             if(theMapContent==null || theMapContent.isEmpty()){
                 logger.error("Annotation:"+nameAnnotation+ " return empty list");
                 return list;
             }
-            for(MapContent content : theMapContent){
-                list.add(content.getContent());
+            for(String content : theMapContent){
+                list.add(content);
             }
             return list;
         }catch(NullPointerException ne){
@@ -422,13 +440,13 @@ public class GateSupport2 {
                 return Collections.singletonList("");
             }
             //Search Content
-            List<MapContent> theMapContent = theMapAnnotation.get(nameAnnotation);
+            List<String> theMapContent = theMapAnnotation.getList(nameAnnotation);
             if(theMapContent==null || theMapContent.isEmpty()){
                 logger.warn("Annotation:"+nameAnnotation+ " return empty list");
                 return Collections.singletonList("");
             }
-            for(MapContent content : theMapContent){
-                list.add(content.getContent());
+            for(String content : theMapContent){
+                list.add(content);
             }
             return list;
         }catch(NullPointerException ne){
@@ -455,13 +473,13 @@ public class GateSupport2 {
                 return list;
             }
             //Search Content
-            List<MapContent> theMapContent = theMapAnnotation.get(indexAnnotation);
+            List<String> theMapContent = theMapAnnotation.getList(indexAnnotation);
             if(theMapContent==null || theMapContent.isEmpty()){
                 logger.warn("Annotation with Index:"+indexAnnotation+ " return empty list");
                 return list;
             }
-            for(MapContent content : theMapContent){
-                list.add(content.getContent());
+            for(String content : theMapContent){
+                list.add(content);
             }
             return list;
         }catch(NullPointerException ne){

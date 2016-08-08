@@ -1,0 +1,162 @@
+Phase:	myEmailPhase
+Input:  Token Lookup SpaceToken Split email
+Options: control = appelt
+
+/////////////////////////////////////////////////////////
+MACRO: EMAIL(
+
+
+ (
+  ({Token.String=="email"}|{Lookup.majorType == email})
+  ({Split}|{SpaceToken}|{Token.String==":"})?
+  ({Split}|{SpaceToken})?
+ )?
+ 
+ (
+  {Token.kind == word}|
+  {Token.kind == number}
+ )+
+ (
+  {Token.string == "_"}
+ )?
+ ({Token.string == "."})?
+  ({Token.kind == word}|
+   {Token.kind == number}|
+   {Token.string == "_"}
+  )*
+ 
+ ({Token.string == "@"}|
+   (
+   ({SpaceToken})?({Token.string == "AT"}|{Token.string == "at"})({SpaceToken})?
+   )
+ )		
+ (
+  {Token.kind == word}|
+  {Token.kind == symbol}|
+  {Token.kind == punctuation}|
+  {Token.kind == number}
+ )
+ ({Token.string == "."})?
+ (
+  {Token.kind == word}|
+  {Token.kind == symbol}|
+  {Token.kind == punctuation}|
+  {Token.kind == number}
+ )*
+ ({Token.string == "."})?
+(
+  {Token.kind == word}|
+  {Token.kind == symbol}|
+  {Token.kind == punctuation}|
+  {Token.kind == number}
+ )?
+({Token.string == "."})?
+ (
+  {Token.string == "."}		
+  (
+   {Token.kind == word}|
+   {Token.kind == number}	
+  )
+  ({Token.string == "."})?
+  (
+   {Token.kind == word}|
+   {Token.kind == number}	
+  )?
+  ({Token.string == "."})?
+  (
+   {Token.kind == word}|
+   {Token.kind == number}	
+  )?
+ )
+ ({Split}|{SpaceToken})?
+)
+
+
+MACRO: EMAIL3(
+	({Token.string=="urp"}|{Token.string=="pec"})
+	({Split}|{SpaceToken}|{Token.string==":"})[0,1]
+        ({Token.kind == word}|{Token.string=="."})*
+        ({SpaceToken})[1,1]
+)
+
+Rule: myEMAIL_ADDRESS2
+Priority: 20
+(
+  (
+    ({Token.String=="email"}|{Lookup.majorType==email})
+    ({Split}|{SpaceToken}|{Token.String==":"})[0,3]
+  )[0,1]
+  ((EMAIL)|(EMAIL3)):myEmail2_1
+):myEmail2 -->
+:myEmail2_1.MyEmail = {kind = "myEmail2_1", rule = myEMAIL_ADDRESS2}
+
+Rule: myEMAIL_ADDRESS3
+Priority: 20
+(
+  ({Lookup.majorType==email}|{Token.String==~"[Ee]mail"}|{Token.String==~"[Mm]ail"})[1,1]
+  ({Split}|{SpaceToken}|{Token.string==":"})[0,3]
+  (
+    (
+        ({Token.kind==word})
+        ({Split}|{SpaceToken}|{Token.string=="."})[0,3]
+    )[1,7]
+	(	
+			({SpaceToken})[0,3]
+			({Token.string == "@"}|{Token.string == "AT"}|{Token.string == "at"}|{Token.string == "[AT]"}|{Token.string == "[at]"})	
+			({SpaceToken})[0,3]
+	)[0,1]	
+    (
+       ({Token.kind==word})
+       ({Split}|{SpaceToken}|{Token.string=="."})[0,2]
+    )[0,3]	 
+	({Token.kind==word,Token.length<=3,Token.orth==lowerCase}|{Token,Token.length<=3,Token.orth==lowerCase})[1,1]
+   ):myEmail3_1
+):myEmail3 -->
+:myEmail3_1.MyEmail = {kind = "myEmail3_1", rule = myEMAIL_ADDRESS3}
+
+/*mail: segreteria [at] biologia.unipi.it*/
+Rule: myEMAIL_ADDRESS4
+Priority: 10
+(
+  ({Lookup.majorType==email})[1,1]
+  ({Split}|{SpaceToken}|{Token.string==":"})[0,3]
+  (
+	   (
+		 ({Token})[0,20]
+		 ({Split}|{SpaceToken}|{Token.string=="."})[0,2]
+	   )[0,2]	 
+	   ({Token.string == "@"}|{Token.string == "AT"}|{Token.string == "at"}|{Token.string == "[AT]"}|{Token.string == "[at]"})[1,1]
+	   ({Split}|{SpaceToken}|{Token.string=="."})[0,2]
+	   //({Token.kind==word,Token.length<=3,Token.orth==lowerCase})[1,1]
+	   (
+		 ({Token})[0,20]
+		 ({Split}|{SpaceToken}|{Token.string=="."})[0,2]
+	   )[0,3]
+	   ({Token.kind==word,Token.length<=3,Token.orth==lowerCase})[1,1]
+	):myEmail4_1
+):myEmail4 -->
+:myEmail4_1.MyEmail = {kind = "myEmail4_1", rule = myEMAIL_ADDRESS4}
+/*email scuola sc-saluteumana.unifi.it*/
+Rule: myEMAIL_ADDRESS5
+Priority: 10
+(
+  ({Lookup.majorType==email})[1,1]
+  ({Split}|{SpaceToken}|{Token.string==":"})[0,3]
+  (   
+	   ({Token}|{Split}|{SpaceToken}|{Token.string=="."})[0,20]			  	 
+	   ({Token.string == "@"}|{Token.string == "AT"}|{Token.string == "at"}|{Token.string == "[AT]"}|{Token.string == "[at]"}|{Token, Token.length==1})[1,1]
+	   ({Split}|{SpaceToken}|{Token.string=="."})[0,2]
+	   //({Token.kind==word,Token.length<=3,Token.orth==lowerCase})[1,1]	  
+	   ({Token}|{Split}|{SpaceToken}|{Token.string=="."})[0,20]	  
+	   ({Token.kind==word,Token.length<=3,Token.orth==lowerCase})[1,1]
+	):myEmail5_1
+):myEmail5 -->
+:myEmail5_1.MyEmail = {kind = "myEmail5_1", rule = myEMAIL_ADDRESS5}
+
+
+Rule: MMM
+(
+ {Lookup.majorType == email}
+):mmm
+-->
+:mmm.EmailSupport ={kind="mmm", rule = MMM}

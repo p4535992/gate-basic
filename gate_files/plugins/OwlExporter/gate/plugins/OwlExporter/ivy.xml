@@ -1,0 +1,7 @@
+<ivy-module version="2.0">
+    <info organisation="SemanticSoftware" module="OwlExporter"/>
+    <dependencies>
+        <dependency org="icu4j" name="icu4j" rev="2.6.1"/>
+        <dependency org="com.hp.hpl.jena" name="jena" rev="2.6.4"/>
+    </dependencies>
+</ivy-module>

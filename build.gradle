@@ -1,0 +1,118 @@
+/* ================== */
+/* PLUGINS            */
+/* ================== */
+plugins {
+    id 'nebula.optional-base' version '3.0.3' // if you want optional-base
+    id 'nebula.provided-base' version '3.0.3' // if you want provided-base
+}
+
+group 'org.opensextant'
+version '2.3'
+
+apply plugin: 'java' /* support java */
+apply plugin: 'maven' /* support maven */
+//This plugin allows us to execute any JAR file in the project by specifying the main
+//entry class for execution as above. To execute, we issue this, $ gradle run
+apply plugin: 'application' /* support the run method */
+apply plugin: 'maven-publish' /* support maven builder */
+apply plugin: 'ivy-publish' /* support ivy builder */
+/*https://github.com/nebula-plugins/gradle-extra-configurations-plugin*/
+apply plugin: 'nebula.optional-base'
+apply plugin: 'nebula.provided-base'
+
+sourceSets {
+    main {
+        java { srcDir 'src/main/java' }
+        resources { srcDir 'src/main/resources' }
+        //output.resourcesDir = "build/classes/resources"
+        //groovy.srcDirs = ['build/src/main/groovy']
+        //resources.srcDirs =['build/src/main/resources']
+    }
+    //resources {srcDirs = ["src/main/resources"] includes = ["**/*.xml"] }
+
+}
+
+/* ================== */
+/* PROPERTIES         */
+/* ================== */
+group = 'com.github.p4535992'
+version = '1.6.10'
+
+description = 'gate-basic'
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'org.opensextant.service.OpenSextantServer'
+}
+
+mainClassName = "com.github.p4535992.gatebasic.gate.Test_initGate"
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+/* ================== */
+/* REPOSITORIES       */
+/* ================== */
+repositories {
+    mavenCentral()
+
+}
+/* SUPPORT COMPILE LANGUAGE */
+/* JAVA */
+compileJava {
+    // This only works when forking and passing 'javac' as an executable
+    options.encoding = "UTF-8"
+    options.compilerArgs << '-XDignore.symbol.file'
+    options.fork = true
+    options.forkOptions.executable = 'javac'
+    // enable all compiler warnings (GRADLE-1077); eliminate path warnings
+    options.compilerArgs = ['-Xlint:all,-path']
+}
+
+javadoc {
+    options.addStringOption('XDignore.symbol.file', '-quiet')
+    options.addStringOption("sourcepath", "")
+}
+/*DEPENDENCIES*/
+dependencies {
+    compile group: 'javax.servlet', name: 'servlet-api', version:'2.5'
+    compile group: 'junit', name: 'junit', version:'4.12'
+    compile(group: 'uk.ac.gate', name: 'gate-core', version:'8.2') {
+        exclude(module: 'commons-logging')
+        exclude(module: '*')
+        exclude(module: 'junit')
+    }
+    compile group: 'org.apache.commons', name: 'commons-pool2', version:'2.4.2'
+    compile group: 'commons-pool', name: 'commons-pool', version:'1.6'
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+
+    compile group: 'org.springframework.boot', name: 'spring-boot', version:'1.4.0.RELEASE'
+    compile(group: 'org.springframework.boot', name: 'spring-boot-starter', version:'1.4.0.RELEASE') {
+        exclude(module: 'commons-logging')
+    }
+    compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version:'1.4.0.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version:'1.4.0.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-logging', version:'1.4.0.RELEASE'
+    compile group: 'org.springframework', name: 'spring-jms', version:'4.2.5.RELEASE'
+    compile group: 'org.apache.activemq', name: 'activemq-broker', version:'5.12.3'
+    compile group: 'org.slf4j', name: 'slf4j-api', version:'1.7.16'
+    compile group: 'com.google.code.findbugs', name: 'jsr305', version:'3.0.1'
+
+    /*compile group: 'xml-apis', name: 'xml-apis', version: '1.4.01'
+    compile (group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'){
+        exclude(group:'xml-apis' , module: 'xml-apis')
+    }
+    compile (group: 'org.apache.poi', name: 'poi', version: '3.9')*/
+
+    compile (group:'org.apache.poi', name:'poi', version:'3.10-FINAL');
+    compile (group:'org.apache.poi', name:'poi-ooxml', version:'3.10-FINAL')
+    compile ('dom4j:dom4j:1.6.1')
+    compile ('org.apache.poi:poi-ooxml-schemas:3.10-FINAL')
+    compile ('org.apache.poi:ooxml-schemas:1.0')
+    runtime ('xerces:xercesImpl:2.10.0')
+    runtime ('xml-apis:xml-apis:1.4.01')
+    runtime ('xmlbeans:xmlbeans:2.3.0')
+  /*  compile(group: 'org.codehaus.mojo', name: 'exec-maven-plugin', version:'1.4.0') {
+        exclude(module: 'slf4j-jdk14')
+        exclude(module: 'slf4j-nop')
+    }*/
+}

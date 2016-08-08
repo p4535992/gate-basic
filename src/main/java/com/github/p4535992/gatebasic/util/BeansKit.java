@@ -1,6 +1,7 @@
 package com.github.p4535992.gatebasic.util;
 
 import javax.annotation.Nullable;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
@@ -14,9 +15,13 @@ import org.springframework.core.io.ResourceLoader;
 
 import java.io.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +62,13 @@ public class BeansKit implements  org.springframework.context.ResourceLoaderAwar
 
     private static ApplicationContext loadApplicationContextSpring(Class<?> thisClass, String... filePaths) {
         ApplicationContext context = new GenericApplicationContext();
+        //Clean the path for load the context...
+        for(int i = 0; i < filePaths.length; i++){
+            if(filePaths[i].startsWith(File.separator)||filePaths[i].startsWith("/")){
+                filePaths[i] = filePaths[i].substring(1,filePaths[i].length());
+            }
+        }
+
         //This container loads the definitions of the beans from an XML file.
         // Here you do not need to provide the full path of the XML file but
         // you need to set CLASSPATH properly because this container will look
@@ -132,15 +144,74 @@ public class BeansKit implements  org.springframework.context.ResourceLoaderAwar
         }
     }*/
 
+    private ClassLoader getThisClassLoader(){
+        return this.getClass().getClassLoader();
+    }
+
     public static File getResourceAsFile(String name,Class<?> thisClass) {
+        ClassLoader classLoader = thisClass.getClassLoader();
         try {
             //noinspection ConstantConditions
-            return new File(thisClass.getClassLoader().getResource(name).getFile());
+            //String path = classLoader.getResource("").getPath(); ///C:/Users/tenti/Desktop/Projects/gate-basic/target/test-classes/
+            return new File(classLoader.getResource(name).getFile());
         }catch(NullPointerException e){
-            logger.error(e.getMessage(), e);
-            return new File("");
+            try{
+                //return new File(Thread.currentThread().getContextClassLoader().getResource(name).getFile());
+                //ClassLoader classLoader = Config.class.getClassLoader();
+                //URL resource = classLoader.getResource(name);
+                //String path = Paths.get(resource.toURI()).toAbsolutePath().toString();
+                File file = null;
+                URL url = null;
+
+                if (classLoader != null) {
+                    url = classLoader.getResource(name);
+                }
+                if (url == null) {
+                    url = ClassLoader.getSystemResource(name);
+                }
+                if (url != null) {
+                    try {
+                        file = new File(url.toURI());
+                    } catch (URISyntaxException e5) {
+                        file = new File(url.getPath());
+                    }
+                }
+                if(file == null){
+                    file = getResourceAsFileFromBuildFolder(name);
+                }
+                //return new File(path);
+                return file;
+            }catch(NullPointerException|IOException e2) {
+                logger.error(e2.getMessage(), e2);
+                return new File("");
+            }
         }
     }
+
+    private static File getResourceAsFileFromBuildFolder(String name) throws IOException{
+        String path = System.getProperty("user.dir") +File.separator+"build"+File.separator+"resources"+
+                File.separator+"main" + File.separator+ name.replace("/",File.separator);
+        return new File(path);
+    }
+
+
+
+    /*
+     * @param the {@link String} path to the resource
+     * @href https://discuss.gradle.org/t/getresourceasstream-returns-null-in-plugin-in-daemon-mode/2385/7
+     * @return the {@link File} resource.
+     */
+    /*public static File getResourceURLAsFile(String resource) throws IOException{
+        new URLConnection(new URL("file:///")) {
+            {
+                setDefaultUseCaches(false);
+            }
+            @Override
+            public void connect() throws IOException {
+            }
+        }
+        return new File()
+    }*/
 
     public static File getResourceSpringAsFile(String pathRelativeToFileOnResourceFolder) {
         try {

@@ -28,7 +28,7 @@ public class Test_initGate {
 
     /**
      * Method Set up and use GATE embedded .
-     * @version 1.6.9
+     * @version 1.6.10
      * @throws MalformedURLException
      */
     @Test
@@ -56,9 +56,8 @@ public class Test_initGate {
         String content0 = support.getSingleContent("http://www.unifi.it", "MyAnnSet", "MyIndirizzo"); // "P.azza Guido Monaco"
         String content1 = support.getSingleContent(0,"MyAnnSet", "MyIndirizzo"); // "P.azza Guido Monaco"
         String content2 = support.getSingleContent(0,0,"MyIndirizzo"); // "P.azza Guido Monaco"
-        String content3 = support.getSingleContent(0,0,0); // "P.azza Guido Monaco"
-        //GeoDocument geoDoc = web.convertGateSupportToGeoDocument(support,new URL("http://www.unifi.it"),0);
-        String s = "";
+        String content3 = support.getSingleContent(0,0,0); // "+39 055 27571"
+        //Hope can be useful for someone.....
     }
 
    /* @Test
@@ -135,7 +134,7 @@ public class Test_initGate {
     @Test
     public void setUpWithGateAPI() throws MalformedURLException, GateException {
         Gate8Kit gate8Kit = Gate8Kit.getInstance();
-        DocumentProcessor procDoc = gate8Kit.setUpGateEmbeddedWithSpring("gate/gate-beans.xml");
+        DocumentProcessor procDoc = gate8Kit.setUpGateEmbeddedWithSpring("/gate/gate-beans.xml");
         Document doc = GateCorpus8Kit.getInstance().createDoc(new URL("http://www.unifi.it"));
         procDoc.processDocument(doc);
 

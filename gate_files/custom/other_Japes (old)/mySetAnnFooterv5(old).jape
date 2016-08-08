@@ -1,0 +1,45 @@
+Imports: {
+  import static gate.Utils.*;
+}
+Phase: MySetAnnFooter
+Input: Token Lookup Split SpaceToken div html idFooter Sentence
+Options: control=all 
+/** ATTENTION: this rule need to get the input default element TOKEN of gate and the input
+    HTML markups from default annotations of gate (Original markups) in the same annotation set.
+	To do this first you need to use a Annotation Set Transfer.
+*/
+/*
+MACRO: divFooter(
+    {Lookup.majorType == idFooter}
+)*/
+Rule: RuleIdFooter
+Priority: 15 
+(
+    //Get every token in the div.id with specific name
+	(
+	 /*METHOD 1 (WORKS)*/
+	 //id footercredits
+	 /*WORKS*/
+	 {div within {div.id=="footercredits"}}|{div within {div.id=="footercc"}}
+	 
+	 
+	 /*METHOD 2 (NOT WORKS)*/
+	 //{div within {div.id==divFooter}}
+	)
+):idf
+  -->
+  :idf.IDF = {kind = "idf", rule = "RuleIdFooter"}
+  /*
+{
+	AnnotationSet idfAnnSet = (AnnotationSet)bindings.get("idf");
+	Annotation idfAnn = (Annotation)idfAnnSet.iterator().next();
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("idf",idfAnn.getFeatures().get("minorType"));
+	features.put("rule","RuleIdFooter");
+	outputAS.add(idfAnnSet.firstNode(), idfAnnSet.lastNode(), "IDF",features);	
+}
+*/
+
+
+
+

@@ -46,3 +46,4 @@ Temporary Items
 /target/*
 /.idea/libraries/*
 /lib/
+/.nb-gradle/

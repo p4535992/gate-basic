@@ -1,0 +1,372 @@
+Phase:	Telefono
+Input:  Token Lookup Split SpaceToken telefono fax
+Options: control = appelt
+
+/////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////
+//Phone Rules
+
+
+Macro: PHONE_COUNTRYCODE
+// +44
+
+({Token.string == "+"}
+ {Token.kind == number,Token.length == "2"}
+)	
+
+Macro: PHONE_AREACODE
+// 081 (for the old style codes)
+// 01234
+// (0123)
+
+(
+ ({Token.kind == number,Token.length == "3"} |
+  {Token.kind == number,Token.length == "4"} |
+  {Token.kind == number,Token.length == "5"}) 
+|
+ ({Token.string == "("} 
+  ({Token.kind == number,Token.length == "3"} |
+   {Token.kind == number,Token.length == "4"} |
+   {Token.kind == number,Token.length == "5"}) 
+  ({Token.string == ")"})
+ )
+)
+
+Macro: PHONE_REG
+// 222 1481
+// 781932
+
+(
+  ({Token.kind == number,Token.length == "3"}
+
+  ({Token.kind == number,Token.length == "3"} |
+   {Token.kind == number,Token.length == "4"}) 
+  )
+                                              |
+
+  ({Token.kind == number,Token.length == "5"}|
+   {Token.kind == number,Token.length == "6"})
+)
+
+Macro: PHONE_EXT
+// x1234
+// ext. 1234/5
+
+(
+ (({Token.string == "x"})		|
+  ({Token.string == "x"}{Token.string == "."}) |
+  ({Token.string == "ext"})	|
+  ({Token.string == "ext"}{Token.string == "."})
+ )  
+ ({Token.kind == number, Token.length == "4"}|
+  {Token.kind == number, Token.length == "5"}|
+  {Token.kind == number, Token.length == "6"})
+ ({Token.string == "/"}{Token.kind == number})?
+)
+	
+Macro: PHONE_PREFIX
+//Tel:
+
+(
+ {Lookup.majorType == phone_prefix}
+ ({Lookup.majorType == phone_prefix})?
+ ({Token.string == ":"})?
+)
+  
+//////////////////////////////////////////////////
+Rule:PhoneReg
+Priority: 20
+// regular types of number
+// 01234 123 456
+// (01234) 123456
+(
+ (PHONE_AREACODE)
+ (PHONE_REG)
+)
+:phoneNumber -->
+ :phoneNumber.MyPhone = {kind = "phoneNumber", rule = "PhoneReg"}
+
+Rule: PhoneRegContext
+Priority: 100
+// tel: 0114 222 1929
+(
+ (PHONE_PREFIX)
+)
+(
+ (PHONE_AREACODE)
+ (PHONE_REG)
+)
+:phoneNumber -->
+ :phoneNumber.MyPhone = {kind = "phoneNumber", rule = "PhoneRegContext"}
+
+
+Rule:PhoneFull
+Priority: 50
+// +44 161 222 1234
+// +44 (0)161 222 1234
+(
+ (PHONE_PREFIX)?
+)
+(
+ ((PHONE_COUNTRYCODE) |
+  ({Token.string == "("} 
+   (PHONE_COUNTRYCODE)
+   {Token.string == ")"})
+ )
+
+ ({Token.string == "("} 
+   {Token.string == "0"} 
+   {Token.string == ")"})?
+
+ ({Token.kind == number,Token.length == "3"}|
+  {Token.kind == number,Token.length == "4"})
+      
+ (PHONE_REG)
+)
+:phoneNumber -->
+ :phoneNumber.MyPhone = {kind = "phoneNumber", rule = "PhoneFull"}
+
+
+/*
+Rule:PhoneExt
+Priority: 20
+// extension number only
+// ext. 1234
+(
+ (PHONE_EXT)
+)
+:phoneNumber --> 
+ :phoneNumber.MyPhone = {kind = "phoneNumber", rule = "PhoneExt"}
+*/
+
+Rule:PhoneRegExt
+Priority: 40
+// 01234 12345 ext. 1234
+// 01234 12345 x1234/5
+(
+
+ (PHONE_AREACODE)?
+ (PHONE_REG)
+ (PHONE_EXT)
+)
+:phoneNumber -->
+ :phoneNumber.MyPhone = {kind = "phoneNumber", rule = "PhoneRegExt"}
+
+Rule:PhoneRegExtContext
+Priority: 40
+// tel: 12345 ext. 1234
+(
+ (PHONE_PREFIX)
+)
+(
+ (PHONE_AREACODE)?
+ (PHONE_REG)
+ (PHONE_EXT)
+)
+:phoneNumber -->
+ :phoneNumber.MyPhone = {kind = "phoneNumber", rule = "PhoneRegExtContext"}
+
+Rule:PhoneNumberOnly
+Priority: 20
+// Phone 123456
+// Fax: 123 456
+// Tel. No. 123456
+// only recognise numbers like this when preceded by clear context.
+(PHONE_PREFIX)
+(
+ (PHONE_REG)
+)
+:phoneNumber -->
+ :phoneNumber.MyPhone = {kind = "phoneNumber", rule = "PhoneNumberOnly"}
+
+
+Rule: PhoneOtherContext
+// sometimes they're unusual
+// tel: 0124 1963
+(
+ (PHONE_PREFIX)
+)
+(
+ {Token.kind == number}
+ ({Token.kind == number})*
+)
+:phoneNumber 
+-->
+ :phoneNumber.MyPhone = {kind = "phoneNumber", rule = "PhoneOtherContext"}
+
+///////////////////////////////////////////////////////////////
+// Postcode Rules
+
+
+// S1 4DP, S10 4DP, SO1 10DP, etc.
+// UK postocdes only
+
+Rule: Postcode1
+Priority: 50
+(
+ ({Token.orth == allCaps,Token.length == "2"}|
+  {Token.orth == upperInitial,Token.length == "1"}			
+ )	
+ ({Token.kind == number,Token.length == "1"}|
+  {Token.kind == number,Token.length == "2"}
+ )
+ ({Token.kind == number,Token.length == "1"}|
+  {Token.kind == number,Token.length == "2"}
+ )
+ ({Token.orth == allCaps,Token.length == "2"}|
+  {Token.orth == upperInitial,Token.length == "1"}		
+ )	
+):postcode -->
+:postcode.MyPostcode = {kind = "postcode", rule = Postcode1}
+
+//////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+// Street Rules
+/*+39 055 27571 0 (+39) 06 66177602 o +39 02 36747618/20*/
+ Rule:RuleMyPhone_4
+ Priority: 10                                                
+(
+   ({Lookup.majorType==telefono,!Lookup.majorType==fax})[1,1]
+   ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+   (
+      ({Token.string== "("})[0,1]
+	  ({Token.string== "+"})[0,2]
+	  ({Token.string== "("})[0,1]
+	  ({Token.kind == number,Token.length <= "3"})
+	  ({Token.string== ")"})[0,1]
+	  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token,Token.length==1,!Token.kind==number})[0,3]
+	  ({Token.kind == number,Token.length <= "4"})
+	  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token,Token.length==1,!Token.kind==number})[0,3]
+	  ({Token.kind == number,Token.length <= "10"}|{Token.kind == number,Token.length == "8"})[0,1]	  
+	  ({Token.string == "/"}|{Token,Token.length==1,!Token.kind==number}|{SpaceToken})[0,1]
+	  ({Token.kind == number,Token.length <= "5"})[0,1]
+	  
+
+   ):phone_4_1
+):phone_4 -->
+ :phone_4_1.MyPhone = {kind = "phone_4_1", rule = RuleMyPhone_4}
+ 
+ /*Tel. +39 050 221 8000345*/
+ Rule:RuleMyPhone_5
+ Priority: 10                                                
+(
+   ({Lookup.majorType==telefono,!Lookup.majorType==fax})[1,1]
+   ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+   (
+      ({Token.string== "("})[0,1]
+	  ({Token.string== "+"})[0,2]
+	  ({Token.string== "("})[0,1]
+	  ({Token.kind == number,Token.length <= "3"})
+	  ({Token.string== ")"})[0,1]
+	  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token,Token.length==1,!Token.kind==number})[0,3]
+	  ({Token.kind == number,Token.length <= "4"})
+	  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token,Token.length==1,!Token.kind==number})[0,3]
+	  ({Token.kind == number,Token.length <= "10"}|{Token.kind == number,Token.length == "7"})[0,1]	  
+	  ({Token.string == "/"}|{Token,Token.length==1,!Token.kind==number})[0,1]
+	  ({Token.kind == number,Token.length <= "5"})[0,1]
+	  
+
+   ):phone_5_1
+):phone_5 -->
+:phone_5_1.MyPhone = {kind = "phone_5_1", rule = RuleMyPhone_5}
+ 
+/*Tel. +39 050 221 8000*/
+
+Rule:RuleMyPhone_8
+ Priority: 10                                                
+(
+   ({Lookup.majorType==telefono,!Lookup.majorType==fax})[1,1]
+   ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+   (
+      ({Token.string== "("})[0,1]
+	  ({Token.string== "+"})[0,2]
+	  ({Token.string== "("})[0,1]
+	  ({Token.kind == number,Token.length <= "3"})
+	  ({Token.string== ")"})[0,1]
+	  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token,Token.length==1,!Token.kind==number})[0,3]
+	  ({Token.kind == number,Token.length <= "4"})
+	  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token,Token.length==1,!Token.kind==number})[0,3]
+	  ({Token.kind == number,Token.length <= "10"})[0,1]	  
+	  ({Token.string == "/"}|{Token,Token.length==1,!Token.kind==number}|{SpaceToken})[0,1]
+	  ({SpaceToken})[0,2]
+	  ({Token.kind == number,Token.length <= "5"}|{Token.kind == number,Token.length == "4"})[0,1]
+	  
+
+   ):phone_8_1
+):phone_8 -->
+:phone_8_1.MyPhone = {kind = "phone_8_1", rule = RuleMyPhone_8}
+
+/* tel 1234 12345 o Centralino: 02/89919890*/
+Rule:RuleMyPhone_6
+Priority: 10                                                
+( 
+  ({Lookup.majorType==telefono,!Lookup.majorType==fax})[1,1]
+  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+  (
+    (
+		//({Token.kind == number,Token.length == "4"}|{Token.kind == number,Token.length == "2"})
+		//({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="/"}|{Token.string=="."})[0,2]
+		//({Token.kind == number,Token.length == "5"}|{Token.kind == number,Token.length == "7"}|{Token.kind == number,Token.length == "8"})
+		({Token.kind == number,Token.length <= "4"})
+		({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="/"}|{Token.string=="."})[0,2]
+		({Token.kind == number,Token.length <= "8"})
+	)[0,1]
+	(
+	   ({Token.kind == number,Token.length == "10"}) 
+	)[0,1]
+   ):phone_6_1
+):phone_6 -->
+ :phone_6_1.MyPhone = {kind = "phone_6_1", rule = RuleMyPhone_6}
+
+/*Tel. +39 050 221 8000*/
+Rule:RuleMyPhone_7
+Priority: 10                                                
+(
+  ({Lookup.majorType==telefono,!Lookup.majorType==fax})[1,1]
+  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+  (
+	  ({Token.string== "("})[0,1]
+	  ({Token.string== "+"})[0,2]
+	  ({Token.string== "("})[0,1]
+	  ({Token.kind == number,Token.length <= "3"})
+	  ({Token.string== ")"})[0,1]
+	  ({Split}|{SpaceToken}|{Token.string=="-"})[0,2]
+	  ({Token.kind == number,Token.length <= "4"})
+	  ({Split}|{SpaceToken}|{Token.string=="-"})[0,2]
+	  ({Token.kind == number,Token.length <= "8"})[0,1]
+  ):phone_7_1
+):phone_7 -->
+ :phone_7_1.MyPhone = {kind = "phone_7_1", rule = RuleMyPhone_7}
+ 
+/*Tel. (+39) 050 221 8000*/ 
+Rule:RuleMyPhone_9
+Priority: 10                                                
+(
+  ({Lookup.majorType==telefono,!Lookup.majorType==fax})[1,1]
+  ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,3]
+  (
+	  ({Token.string== "("})[0,1]
+	  ({Token.string== "+"})[0,2]
+	  ({Token.string== "("})[0,1]
+	  ({Token.kind == number,Token.length <= "3"})
+	  (
+	    ({Split}|{SpaceToken}|{Token.string=="-"}|{Token.string=="."}|{Token.string==":"})[0,1]
+		({Token.kind == number})
+	  )[1,6]
+  ):phone_9_1
+):phone_9 -->
+ :phone_9_1.MyPhone = {kind = "phone_9_1", rule = RuleMyPhone_9}
+ 
+ Rule: KKK
+(
+ {Lookup.majorType == telefono}
+):kkk
+-->
+:kkk.TelefonoSupport ={kind="kkk", rule = KKK}
+ 
+
+
+
