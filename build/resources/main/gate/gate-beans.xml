@@ -6,28 +6,30 @@
              xmlns:gate="http://gate.ac.uk/ns/spring"
              xmlns:mvc="http://www.springframework.org/schema/mvc"
              xmlns:tx="http://www.springframework.org/schema/tx"
-             xmlns:mongo="http://www.springframework.org/schema/data/mongo"
-             xmlns:webflow-config="http://www.springframework.org/schema/webflow-config"
              xmlns:util="http://www.springframework.org/schema/util"
              xmlns:jms="http://www.springframework.org/schema/jms"
              xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
-		http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd
-		http://www.springframework.org/schema/webflow-config http://www.springframework.org/schema/webflow-config/spring-webflow-config.xsd
 	    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
 	    http://gate.ac.uk/ns/spring http://gate.ac.uk/ns/spring.xsd
 	    http://www.springframework.org/schema/jms https://www.springframework.org/schema/jms/spring-jms.xsd
 		">
     <!--<jms:annotation-driven/>-->
     <util:properties id="nodeProperty"  location="classpath:gate/gate.properties" />
-    <context:property-placeholder properties-ref="nodeProperty" />
+    <!--<context:property-placeholder properties-ref="nodeProperty" />-->
+    <context:property-placeholder location="classpath*:gate/*.properties" />
     <context:component-scan base-package="com.github.p4535992.gatebasic.gate" />
 
+    <!--<property name="userDir" value="#{ systemProperties['user.dir'] }"/>
+    <property name="fileSep" value="#{ systemProperties['file.separator'] }"/>-->
+
     <!--<beans:bean>
-            <beans:property name="userDir" value="#{ systemProperties['user.dir'] }">
-            </beans:property>
+        <beans:property name="userDir" value="#{ systemProperties['user.dir'] }"></beans:property>
+    </beans:bean>
+    <beans:bean>
+        <beans:property name="fileSep" value="#{ systemProperties['file.separator'] }"/>
     </beans:bean>-->
 
     <!-- ========================================================== -->
@@ -36,13 +38,16 @@
     <!-- Test: C:/Users/Marco/Documents/GitHub/EAT/gate_files-->
     <!--<gate:init gate-home="file:../gate_files" plugins-home="file:../gate_files/plugins"
                site-config-file="file:../gate_files/gate.xml" user-config-file="file:../gate_files/gate.xml"/>-->
-    <gate:init gate-home="classpath:gate_files" plugins-home="classpath:gate_files/plugins"
-               site-config-file="classpath:gate_files/gate.xml" user-config-file="classpath:gate_files/user-gate.xml"/>
-
+    <!--<gate:init gate-home="classpath:gate_files" plugins-home="classpath:gate_files/plugins"
+               site-config-file="classpath:gate_files/gate.xml" user-config-file="classpath:gate_files/user-gate.xml"/>-->
+    <gate:init gate-home="${user.dir}${file.separator}gate_files"
+               plugins-home="${user.dir}${file.separator}gate_files/plugins"
+               site-config-file="${user.dir}${file.separator}gate_files/gate.xml"
+               user-config-file="${user.dir}${file.separator}gate_files/user-gate.xml"/>
     <!-- Load a file gapp on spring -->
 
     <gate:duplicate id="gateApplication" return-template="true">
-        <gate:saved-application location="classpath:gate_files/custom/gapp/geoLocationPipeline06102014v7_fastMode.xgapp" />
+        <gate:saved-application location="${user.dir}${file.separator}gate_files/custom/gapp/geoLocationPipeline06102014v7_fastMode.xgapp" />
     </gate:duplicate>
 
     <!-- Define Handler ben,Injection of the controller -->

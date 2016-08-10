@@ -6,9 +6,6 @@ plugins {
     id 'nebula.provided-base' version '3.0.3' // if you want provided-base
 }
 
-group 'org.opensextant'
-version '2.3'
-
 apply plugin: 'java' /* support java */
 apply plugin: 'maven' /* support maven */
 //This plugin allows us to execute any JAR file in the project by specifying the main
@@ -22,21 +19,24 @@ apply plugin: 'nebula.provided-base'
 
 sourceSets {
     main {
-        java { srcDir 'src/main/java' }
-        resources { srcDir 'src/main/resources' }
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
         //output.resourcesDir = "build/classes/resources"
         //groovy.srcDirs = ['build/src/main/groovy']
         //resources.srcDirs =['build/src/main/resources']
+        //resources {srcDirs = ["src/main/resources"] includes = ["**/*.xml"] }
     }
-    //resources {srcDirs = ["src/main/resources"] includes = ["**/*.xml"] }
-
 }
 
 /* ================== */
 /* PROPERTIES         */
 /* ================== */
 group = 'com.github.p4535992'
-version = '1.6.10'
+version = '1.6.11'
 
 description = 'gate-basic'
 
@@ -94,7 +94,6 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-logging', version:'1.4.0.RELEASE'
     compile group: 'org.springframework', name: 'spring-jms', version:'4.2.5.RELEASE'
     compile group: 'org.apache.activemq', name: 'activemq-broker', version:'5.12.3'
-    compile group: 'org.slf4j', name: 'slf4j-api', version:'1.7.16'
     compile group: 'com.google.code.findbugs', name: 'jsr305', version:'3.0.1'
 
     /*compile group: 'xml-apis', name: 'xml-apis', version: '1.4.01'
@@ -109,10 +108,203 @@ dependencies {
     compile ('org.apache.poi:poi-ooxml-schemas:3.10-FINAL')
     compile ('org.apache.poi:ooxml-schemas:1.0')
     runtime ('xerces:xercesImpl:2.10.0')
-    runtime ('xml-apis:xml-apis:1.4.01')
+    //runtime ('xml-apis:xml-apis:1.4.01')
+    compile 'xml-apis:xml-apis:1.4.01'
     runtime ('xmlbeans:xmlbeans:2.3.0')
   /*  compile(group: 'org.codehaus.mojo', name: 'exec-maven-plugin', version:'1.4.0') {
         exclude(module: 'slf4j-jdk14')
         exclude(module: 'slf4j-nop')
     }*/
+
+    compile group: 'org.jdom', name: 'jdom', version: '2.0.2'
+    //compile group: 'org.jdom', name: 'jdom2', version: '2.0.6'
+
+    /* ====================== */
+    /* LOGGING */
+    /* ====================== */
+    compileOnly 'org.slf4j:slf4j-api:1.7.21'
+    /* log4j-over-slf4j + jul-to-slf4j + jcl-over-slf4j + logback-classic*/
+    compile(group: 'org.springframework.boot', name: 'spring-boot-starter-logging', version: '1.4.0.RELEASE'){
+        exclude group: 'ch.qos.logback', module:'logback-classic'
+    }
+
+    /* 1) Using slf4j with Simple logger.
+     * What it’s saying is that at runtime, you are missing the logging "implementation" (or the logger binding),
+     * so slf4j simply use a "NOP" implmentation, which does nothing. In order to see the output properly, you may
+     * try use an simple implementation that does not require any configuration at all!
+     * Now you see logging output on STDOUT with INFO level. This simple logger will default show any INFO level message
+     * or higher. In order to see DEBUG messages, you would need to pass in this System Property
+     * -Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG at your Java startup.
+     */
+    //compileOnly group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.21'
+
+    /* 2) Using slf4j with JDK logger.
+     * Now the configuration for JDK logging is a bit difficult to work with. Not only need a config file,
+     * such as src/main/resources/logging.properties, but you would also need to add a System properties
+     * -Djava.util.logging.config.file=logging.properties in order to have it pick it up.
+    */
+    //compileOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
+
+    /*  3) Using slf4j with log4j.
+     *  Now we can experiment and swap different logger implementations, but your application code
+     *  can remain the same. All we need is to replace slf4j-simple with another popular logger implementation,
+     *  such as the Log4j. Again, we must configure logging per implementation that we picked. In this case,
+     *  we need an src/main/resources/log4j.properties file. but you would also need to add a System properties
+     * -Dlog4j.configuration=file:.\etc\log4j.properties in order to have it pick it up.
+     */
+    //compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.21'
+
+    /* 4) Using slf4j with Logback logger.
+    * The logback logger implementation is a super dupa quality implementation. If you intend to write serious code
+    * that go into production, you may want to evaluate this option. but you would also need to add a System properties
+     * -Dlogback.configurationFile=logback.xml in order to have it pick it up.
+    */
+    compile (group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7') {
+        exclude group: 'org.slf4j'
+    }
+
+    /* Support Colored Logging (optional) */
+    /*compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.13'*/
+    /* Redirect System.out and System.err to SLF4J (optional) */
+    /*compile group: 'uk.org.lidalia', name: 'sysout-over-slf4j', version: '1.0.2'*/
 }
+/* ================== */
+/* TASKS            */
+/* ================== */
+/*task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}*/
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+/*tasks.withType(Compile).allTasks { Compile compile ->
+    compile.options.debug = true
+    compile.options.compilerArgs = ['-Xlint:all']
+}*/
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << '-Xlint:all'
+}
+
+project.tasks.withType(Javadoc) {
+    if (JavaVersion.current().isJava8Compatible()) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
+/*We also add a distribution, that gets shipped to the client:*/
+task dist(type: Zip) {
+    dependsOn jar
+    from 'src/dist'
+    into('libs') {
+        from jar.archivePath
+        from configurations.runtime
+    }
+}
+
+task writeNewPom << {
+    pom {
+        project {
+            inceptionYear '2008'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+        }
+    }.writeTo("$buildDir/generated-pom.xml")
+    //destination = file("$buildDir/generated-pom2.xml")
+}
+
+/* =============== */
+/* PUBBLISHING PLUGIN    */
+/* =============== */
+publishing {
+    publications {
+        /* “generatePomFileFor«PUBNAME»Publication” */
+        mavenJava(MavenPublication) {
+            groupId 'com.github.p4535992'
+            artifactId 'gate-basic'
+            version '1.6.11'
+
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+        /* “generatePomFileFor«PUBNAME»Publication” */
+        ivyJava(IvyPublication) {
+            organisation 'com.github.p4535992'
+            module 'gate-basic'
+            revision '1.6.11'
+            descriptor.status = 'milestone'
+            descriptor.branch = 'testing'
+            descriptor.extraInfo 'http://my.namespace', 'myElement', 'Some value'
+
+            from components.java
+
+            artifact(sourceJar) {
+                type "source"
+                extension "src.jar"
+                conf "runtime"
+            }
+            /*descriptor.withXml {
+                asNode().info[0].appendNode('description', description)
+            }*/
+        }
+    }
+    repositories {
+        maven {
+            // change to point to your repo, e.g. http://my.org/repo
+            url "$buildDir/repo"
+        }
+        ivy {
+            // change to point to your repo, e.g. http://my.org/repo
+            /*https://discuss.gradle.org/t/custom-ivy-resolver-deprecation-in-gradle-2-x/7492/2*/
+            ivyPattern "/filesytem/repo/[organisation]/[module]-ivy-[revision].xml"
+            artifactPattern "/filesystem/repo/[organisation]/[module]-[revision](-[classifier]).[ext]"
+            url "$buildDir/repo"
+        }
+    }
+}
+/* ================== */
+/* PUBBLISHING        */
+/* ================== */
+/*
+uploadArchives {
+    repositories {
+        ivy {
+            credentials {
+                username "username"
+                password "pw"
+            }
+            url "http://repo.mycompany.com"
+        }
+        mavenDeployer {
+            repository(url: "file://localhost/tmp/myRepo/")
+        }
+        mavenDeployer {
+            configuration = configurations.deployerJars
+            repository(url: "scp://repos.mycompany.com/releases") {
+                authentication(userName: "me", password: "myPassword")
+            }
+        }
+        mavenDeployer {
+            repository(url: "file://localhost/tmp/myRepo/")
+            pom.version = '1.0Maven'
+            pom.artifactId = 'myMavenName'
+        }
+    }
+}*/

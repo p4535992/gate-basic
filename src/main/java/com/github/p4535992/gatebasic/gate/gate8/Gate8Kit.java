@@ -9,8 +9,8 @@ import gate.gui.MainFrame;
 import gate.persist.PersistenceException;
 import gate.util.DocumentProcessor;
 import gate.util.GateException;
+import gate.util.LanguageAnalyserDocumentProcessor;
 import gate.util.persistence.PersistenceManager;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 
 import java.io.File;
@@ -21,6 +21,10 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by 4535992 on 17/04/2015.
@@ -39,7 +43,7 @@ public class Gate8Kit {
     private Controller controller;
     /** Gapp File */
     private File gappFile;
-    /** Gate Document */
+    /* Gate Document */
     //private Document gateDoc;
     /** Gate processor document */
     private DocumentProcessor procDoc;
@@ -105,14 +109,14 @@ public class Gate8Kit {
 
     /**
      * Method for setup the GATE API in EMbedded mode with manual configuration.
-     * @param directoryFolderHome path to the directory folder where all GATE files are stored.
-     * @param directoryFolderPlugin path to the directory folder where all PLUGIN GATE files are stored.
-     * @param configFileGate path to the file configuration of gate eg gate.xml.
-     * @param configFileUser path to the file configuration of user gate eg user.xml.
-     * @param configFileSession path to the file configuration of where write and save the session of GATE eg gate.session
+     * @param directoryFolderHome the {@link String} path to the directory folder where all GATE files are stored.
+     * @param directoryFolderPlugin the {@link String} path to the directory folder where all PLUGIN GATE files are stored.
+     * @param configFileGate the {@link String} path to the file configuration of gate eg gate.xml.
+     * @param configFileUser the {@link String} path to the file configuration of user gate eg user.xml.
+     * @param configFileSession the {@link String} path to the file configuration of where write and save the session of GATE eg gate.session
      *                          if null is stoed on the user folder on the system.
      * @param gappFile sting absolute path to the file gapp.
-     * @return the gate controller full setted.
+     * @return the gate {@link CorpusController} full setted.
      */
     public CorpusController setUpGateEmbedded(String directoryFolderHome,String directoryFolderPlugin,
                                               String configFileGate,String configFileUser,String configFileSession,String gappFile) {
@@ -120,15 +124,15 @@ public class Gate8Kit {
     }
     /**
      * Method for setup the GATE API in EMbedded mode with manual configuration.
-     * @param directoryFolderHome path to the directory folder where all GATE files are stored.
-     * @param directoryFolderPlugin path to the directory folder where all PLUGIN GATE files are stored.
-     * @param configFileGate path to the file configuration of gate eg gate.xml.
-     * @param configFileUser path to the file configuration of user gate eg user.xml.
-     * @param configFileSession path to the file configuration of where write and save the session of GATE eg gate.session
+     * @param directoryFolderHome the {@link String} path to the directory folder where all GATE files are stored.
+     * @param directoryFolderPlugin the {@link String} path to the directory folder where all PLUGIN GATE files are stored.
+     * @param configFileGate the {@link String} path to the file configuration of gate eg gate.xml.
+     * @param configFileUser the {@link String} path to the file configuration of user gate eg user.xml.
+     * @param configFileSession the {@link String} path to the file configuration of where write and save the session of GATE eg gate.session
      *                          if null is stoed on the user folder on the system.
-     * @param gappFile sting absolute path to the file gapp.
+     * @param gappFile the {@link String} absolute path to the file gapp.
      * @param useOnlyAbsoluteReference the {@link Boolean} if true you use absolute reference for set the element of gate.
-     * @return the gate controller full set.
+     * @return the gate {@link CorpusController} full set.
      */
     public CorpusController setUpGateEmbedded(String directoryFolderHome,String directoryFolderPlugin,
                             String configFileGate,String configFileUser,String configFileSession,
@@ -246,15 +250,19 @@ public class Gate8Kit {
                             Gate.init();
                         }
                     } catch (IOException e1) {
-                        logger.error("Can't set the configuration session file:"
-                                +config.getAbsolutePath()+"->"+e.getMessage(),e);
+                        throw new GateException("Can't set the configuration session file:"
+                                +config.getAbsolutePath()+"->"+e1.getMessage(),e1);
                     }
+                }else{
+                    throw new GateException("Can't set the configuration session file:" +config.getAbsolutePath());
                 }
             }catch(GateException ex){
-                logger.error(e.getMessage(),e);
+                logger.error(ex.getMessage(),ex);
+                return null;
             }
         }
         logger.info("...GATE initialized");
+        gateAlreadySetted = true;
         if(showGate) {
             //Work with graphic GATE interface
             MainFrame.getInstance().setVisible(true);
@@ -262,6 +270,13 @@ public class Gate8Kit {
         return (CorpusController) loadGapp(gappFile);
     }
 
+    /**
+     * Method for make a brute force copy of the necessary resources under the directory of GATE_HOME already setted.
+     * @param gateHome the {@link String} path to the directory GATE_HOME
+     * @param resourceGate the {@link String} path of the external resource to add to GATE_HOME.
+     * @param useOnlyAbsoluteReference the {@link Boolean} if true the method work with the absolutes path of the files.
+     * @return the {@link String} path to the resource under the GATE_HOME folder.
+     */
     private String setUpAndCopyFile(String gateHome,String resourceGate,boolean useOnlyAbsoluteReference){
         if(new File(resourceGate).isAbsolute() && !useOnlyAbsoluteReference) {
             resourceGate = resourceGate.replace(gateHome,"");
@@ -289,7 +304,6 @@ public class Gate8Kit {
         if(fileGapp.startsWith(File.separator)) fileGapp = fileGapp.substring(1,fileGapp.length());
         if(fileGapp.endsWith(File.separator)) fileGapp = fileGapp.substring(0,fileGapp.length()-1);
         return loadGapp(base + fileGapp);
-        //return (CorpusController)controller;
     } // initAnnie()
 
     /**
@@ -298,19 +312,70 @@ public class Gate8Kit {
      * @return the {@link Controller} of gate of the gapp file.
      */
     public Controller loadGapp(String fileGapp){
+        return loadGapp(controller,fileGapp);
+    }
+
+    /**
+     * Method for load a gapp file and generate the controller for this session of gate.
+     * @param fileGapp the {@link File} filepath ot the gapp file.
+     * @return the {@link Controller} of gate of the gapp file.
+     */
+    public Controller loadGapp(File fileGapp){
+        return loadGapp(controller,fileGapp.getAbsolutePath());
+    }
+
+    /**
+     * Method for load a gapp file and generate the controller for this session of gate.
+     * @param fileGapp the {@link Path} filepath ot the gapp file.
+     * @return the {@link Controller} of gate of the gapp file.
+     */
+    public Controller loadGapp(Path fileGapp){
+        return loadGapp(controller,fileGapp.toAbsolutePath().toString());
+    }
+
+    /**
+     * Method for load a gapp file and generate the controller for this session of gate.
+     * @param controller the {@link Controller} of gate.
+     * @param fileGapp the {@link File} filepath ot the gapp file.
+     * @return the {@link Controller} of gate of the gapp file.
+     */
+    public Controller loadGapp(Controller controller, File fileGapp){
+        return loadGapp(controller,fileGapp.getAbsolutePath());
+    }
+
+    /**
+     * Method for load a gapp file and generate the controller for this session of gate.
+     * @param controller the {@link Controller} of gate.
+     * @param fileGapp the {@link Path} filepath ot the gapp file.
+     * @return the {@link Controller} of gate of the gapp file.
+     */
+    public Controller loadGapp(Controller controller, Path fileGapp){
+        return loadGapp(controller,fileGapp.toAbsolutePath().toString());
+    }
+
+    /**
+     * Method for load a gapp file and generate the controller for this session of gate.
+     * @param controller the {@link Controller} of gate.
+     * @param fileGapp the {@link String} filepath ot the gapp file.
+     * @return the {@link Controller} of gate of the gapp file.
+     */
+    public Controller loadGapp(Controller controller,String fileGapp){
         logger.info("Loading file .gapp/.xgapp from "+fileGapp+"...");
+        Path path = Paths.get(fileGapp);
+        if(Files.exists(path) && !Files.isDirectory(path)){
+            logger.warn(".. can't laod the gapp file"+fileGapp+" not exists or is a directory");
+            return null;
+        }
         try {
-            if(new File(fileGapp).isAbsolute()) fileGapp = fileGapp.replace(Gate.getGateHome().getAbsolutePath(),"");
+            if(path.isAbsolute()) fileGapp = fileGapp.replace(Gate.getGateHome().getAbsolutePath(),"");
             if(!fileGapp.startsWith(File.separator)) fileGapp = File.separator + fileGapp;
             if(fileGapp.endsWith(File.separator)) fileGapp = fileGapp.substring(0,fileGapp.length()-1);
-            //File gapp = new File(home.home, "custom/gapp/geoLocationPipelineFast.xgapp");
             if (new File(Gate.getGateHome() +  fileGapp).exists()) {
                 controller = (Controller) PersistenceManager.loadObjectFromFile(
                         new File(Gate.getGateHome() + fileGapp));
             } else {
                 throw new IOException("The gapp file not exists on "+fileGapp);
             }
-            //CorpusController  con = (CorpusController) PersistenceManager.loadObjectFromFile(gapp);
             logger.info("... file .gapp/.xgapp loaded!");
         }catch(GateException|IOException e){
             logger.warn(e.getMessage(), e);
@@ -321,10 +386,10 @@ public class Gate8Kit {
     /**
      * Method for setup the GATE API in Embedded mode with spring configuration.
      * OLD_NAME: initGateWithSpring
-     * @param referencePathResourceFile string reference path to the resource file spring for gate context
+     * @param referencePathResourceFile the {@link String} reference path to the resource file spring for gate context
      *                                  eg:"gate/gate_context.xml".
-     * @param thisClass the reference to the invoke class.
-     * @param idBeanDocumentProcessor string name/id of the bean reference to DocumentProcessor on the gate context.
+     * @param thisClass the {@link Class}reference to the invoke class.
+     * @param idBeanDocumentProcessor the {@link String} name/id of the bean reference to DocumentProcessor on the gate context.
      * @return the DocumentProcessor Controller.
      */
     public DocumentProcessor setUpGateEmbeddedWithSpring(
@@ -353,9 +418,9 @@ public class Gate8Kit {
 
     /**
      * Method for setup the GATE API in Embedded mode with spring configuration.
-     * @param referencePathResourceFile string reference path to the resource file spring for gate context
+     * @param referencePathResourceFile the {@link String} reference path to the resource file spring for gate context
      *                                  eg:"gate/gate_context.xml".
-     * @param idBeanDocumentProcessor string name/id of the bean reference to DocumentProcessor on the gate context.
+     * @param idBeanDocumentProcessor the {@link String} name/id of the bean reference to DocumentProcessor on the gate context.
      * @return the DocumentProcessor Controller.
      */
     public DocumentProcessor setUpGateEmbeddedWithSpring(
@@ -365,9 +430,9 @@ public class Gate8Kit {
 
     /**
      * Method for setup the GATE API in Embedded mode with spring configuration.
-     * @param referencePathResourceFile string reference path to the resource file spring for gate context
+     * @param referencePathResourceFile the {@link String} reference path to the resource file spring for gate context
      *                                  eg:"gate/gate_context.xml".
-     * @return the DocumentProcessor Controller.
+     * @return the GATE {@link DocumentProcessor}.
      */
     public DocumentProcessor setUpGateEmbeddedWithSpring(String referencePathResourceFile){
         return setUpGateEmbeddedWithSpring(referencePathResourceFile,Gate8Kit.class,"documentProcessor");
@@ -375,13 +440,13 @@ public class Gate8Kit {
 
     /**
      * Method to set the GATE Embedded API.
-     * @param directoryFolderHome the root directory where all files of gate are stored eg:"gate_files".
-     * @param directoryFolderPlugin  the root directory of all plugin of gate under the directoryFolderHome eg: "plugins".
-     * @param configFileGate the path to the config file of gate under the directoryFolderHome eg:"gate.xml".
-     * @param configFileUser the path to the config file user of gate under the directoryFolderHome eg:"user-gate.xml".
-     * @param configFileSession the path to the config file session of gate under the directoryFolderHome eg:"gate.session".
-     * @param gappFile the path to the gapp file user of gate under the directoryFolderHome eg:"custom/gapp/test.xgapp".
-     * @return the GATE Controller.
+     * @param directoryFolderHome the {@link String} root directory where all files of gate are stored eg:"gate_files".
+     * @param directoryFolderPlugin the {@link String} root directory of all plugin of gate under the directoryFolderHome eg: "plugins".
+     * @param configFileGate the {@link String}path to the config file of gate under the directoryFolderHome eg:"gate.xml".
+     * @param configFileUser the {@link String} path to the config file user of gate under the directoryFolderHome eg:"user-gate.xml".
+     * @param configFileSession the {@link String} path to the config file session of gate under the directoryFolderHome eg:"gate.session".
+     * @param gappFile the {@link String} path to the gapp file user of gate under the directoryFolderHome eg:"custom/gapp/test.xgapp".
+     * @return the GATE {@link CorpusController}.
      */
     public CorpusController setGate(String directoryFolderHome,String directoryFolderPlugin,
                               String configFileGate,String configFileUser,String configFileSession,String gappFile){
@@ -393,7 +458,7 @@ public class Gate8Kit {
                 return (CorpusController) controller;
             }else{
                 logger.warn("The GATE embedded API is already set with Spring Framework and ProcessorDocument!!!");
-                return null;
+                return (CorpusController) controller;
             }
         }else{
             logger.warn("The GATE embedded API is already set with Corpus Controller!!!");
@@ -403,11 +468,11 @@ public class Gate8Kit {
 
     /**
      * Method to set the GATE Embedded API with Spring framework.
-     * @param pathToTheGateContextFile path to the GATE Context File eg: "gate/gate-beans.xml".
-     * @param beanNameOfTheProcessorDocument string name of the bean for the DocumentProcessor class on the
+     * @param pathToTheGateContextFile the {@link String} path to the GATE Context File eg: "gate/gate-beans.xml".
+     * @param beanNameOfTheProcessorDocument the {@link String} name of the bean for the DocumentProcessor class on the
      *                                       gate context file eg:"documentProcessor".
-     * @param thisClass class here you want invoke this method necessary for avoid exception with spring.
-     * @return the GATE DocumentProcessor.
+     * @param thisClass the {@link Class} here you want invoke this method necessary for avoid exception with spring.
+     * @return the GATE the {@link DocumentProcessor}.
      */
     public DocumentProcessor setGateWithSpring(
             String pathToTheGateContextFile,String beanNameOfTheProcessorDocument,Class<?> thisClass){
@@ -418,7 +483,7 @@ public class Gate8Kit {
                 return procDoc;
             }else{
                 logger.warn("The GATE embedded API is already set with Corpus Controller!!!");
-                return null;
+                return procDoc;
             }
         }else {
             logger.warn("The GATE embedded API is already set with Spring Framework and ProcessorDocument!!!");
@@ -426,18 +491,120 @@ public class Gate8Kit {
         }
     }
 
+    /**
+     * Methods to setup a simple ANNIE controller with GATE
+     * @return the {@link SerialAnalyserController} of GATE.
+     */
     public SerialAnalyserController setGateWithANNIE(){
         // load ANNIE as an application from a gapp file
-        SerialAnalyserController controller = null;
+        Controller controller;
         try {
-            controller = (SerialAnalyserController)
-                    PersistenceManager.loadObjectFromFile(new File(new File(
-                    Gate.getPluginsHome(), ANNIEConstants.PLUGIN_DIR),
-                    ANNIEConstants.DEFAULT_FILE));
+            if(gateAlreadySetted) {
+                controller = (SerialAnalyserController)
+                        PersistenceManager.loadObjectFromFile(new File(new File(
+                                Gate.getPluginsHome(), ANNIEConstants.PLUGIN_DIR),
+                                ANNIEConstants.DEFAULT_FILE));
+                return (SerialAnalyserController) controller;
+            }else{
+                throw new PersistenceException("The GATE embedded API must be set before invoking this method use one of the setGate(...) methdos");
+            }
         } catch (PersistenceException | IOException | ResourceInstantiationException e) {
            logger.error(e.getMessage(),e);
+            return null;
         }
-        return controller;
+    }
+
+    public synchronized Boolean cleanup(Corpus corpus) {
+        return cleanup(controller,corpus);
+    }
+
+    public synchronized Boolean cleanup(Controller controller, Corpus corpus) {
+        Factory.deleteResource(controller);
+        if (corpus != null) {
+            Factory.deleteResource(corpus);
+            return true;
+        }
+        return false;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    //Method to manage the process on the current controller of GATE
+    ////////////////////////////////////////////////////////////////////////
+    private Map<String, BlockingQueue<DocumentProcessor>> poolMap = new HashMap<>();
+    private long docsProcessedCount;
+    private long docsFailedCount;
+
+    public void addProcess(String processName, File gappFile, int poolSize) {
+        Controller template = loadGapp(gappFile);
+        if (poolSize > 0) {
+            ArrayBlockingQueue<DocumentProcessor> pool = new ArrayBlockingQueue<>(poolSize);
+            DocumentProcessor dp = new LanguageAnalyserDocumentProcessor();
+            pool.add(dp);
+
+            for (int i = 0; i < poolSize - 1; i++) {
+
+                try {
+                    CorpusController tmp = (CorpusController) Factory.duplicate(template);
+                    DocumentProcessor dpTmp = new LanguageAnalyserDocumentProcessor();
+                    pool.add(dpTmp);
+                } catch (ResourceInstantiationException e) {
+                    logger.error("Couldn't create controller for " + gappFile.getName(), e);
+                }
+
+            }
+            poolMap.put(processName, pool);
+        }
+    }
+
+    public Document setAndExecuteProcess(CorpusController controller,String name, gate.Document doc) {
+        DocumentProcessor processor = null;
+        try {
+            processor = poolMap.get(name).take();
+        } catch (InterruptedException e) {
+            logger.error("Couldn't get a processor from the pool", e);
+        }
+        if (processor == null) {
+            logger.error("Couldn't get a processor from the pool");
+            return doc;
+        }
+        try {
+            executeProcess(processor,controller,null,doc);
+        } catch (Exception e) {
+            docsFailedCount++;
+            logger.error("Document failed to process" + doc.getName(), e);
+        } finally {
+            docsProcessedCount++;
+            poolMap.get(name).add(processor);
+        }
+
+        return doc;
+    }
+
+    private void executeProcess(DocumentProcessor processor,CorpusController controller,Corpus corpus,Document doc) {
+        if (corpus == null) {
+            try {
+                corpus = Factory.newCorpus("DP Corpus");
+                if(corpus == null)
+                    throw new ResourceInstantiationException("The Corpus is NULL");
+            } catch (ResourceInstantiationException e) {
+                logger.error("Couldn't create new corpus", e);
+            }
+        }
+        try {
+            corpus.add(doc);
+            controller.setCorpus(corpus);
+            try {
+                controller.execute();
+                processor.processDocument(doc);
+            } catch (GateException e) {
+                logger.error("Couldnt execute document processing", e);
+            }
+        } finally {
+            controller.setCorpus(null);
+            if (corpus != null) {
+                corpus.clear();
+            }
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////

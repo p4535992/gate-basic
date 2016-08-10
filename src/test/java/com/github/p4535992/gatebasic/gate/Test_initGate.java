@@ -134,7 +134,7 @@ public class Test_initGate {
     @Test
     public void setUpWithGateAPI() throws MalformedURLException, GateException {
         Gate8Kit gate8Kit = Gate8Kit.getInstance();
-        DocumentProcessor procDoc = gate8Kit.setUpGateEmbeddedWithSpring("/gate/gate-beans.xml");
+        DocumentProcessor procDoc = gate8Kit.setUpGateEmbeddedWithSpring("gate/gate-beans.xml");
         Document doc = GateCorpus8Kit.getInstance().createDoc(new URL("http://www.unifi.it"));
         procDoc.processDocument(doc);
 

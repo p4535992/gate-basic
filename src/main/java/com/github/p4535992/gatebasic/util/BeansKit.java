@@ -77,9 +77,11 @@ public class BeansKit implements  org.springframework.context.ResourceLoaderAwar
         try {
             context = new ClassPathXmlApplicationContext(filePaths,true);
         } catch (Exception e0) {
+            try {
             if (e0.getCause().getMessage().contains("has already been set")) {
                 logger.warn(e0.getMessage() + "->" + e0.getCause());
             }
+            }catch(java.lang.NullPointerException e){/*do nothing*/}
             try {
                 context = new ClassPathXmlApplicationContext(filePaths, true);
             } catch (Exception e1) {
