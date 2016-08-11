@@ -47,3 +47,9 @@ Temporary Items
 /.idea/libraries/*
 /lib/
 /.nb-gradle/
+/*.userlibraries
+/src/main/*.eml
+/src/test/*.eml
+.idea/*
+.gradle/*
+build/*
