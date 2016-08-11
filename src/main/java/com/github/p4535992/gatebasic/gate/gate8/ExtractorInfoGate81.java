@@ -1,6 +1,5 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
-import com.github.p4535992.gatebasic.object.MapAnnotation;
 import com.github.p4535992.gatebasic.object.MapAnnotationSet;
 import com.github.p4535992.gatebasic.object.MapDocument;
 import javax.annotation.Nullable;

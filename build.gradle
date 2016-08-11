@@ -21,9 +21,13 @@ sourceSets {
     main {
         java {
             srcDir 'src/main/java'
+            //compileClasspath += main.output + test.output
+            //runtimeClasspath += main.output + test.output
+            //srcDir file('src/integration-test/java')
         }
         resources {
             srcDir 'src/main/resources'
+            //srdDir file('src/integration-test/resources')
         }
         //output.resourcesDir = "build/classes/resources"
         //groovy.srcDirs = ['build/src/main/groovy']
@@ -48,6 +52,8 @@ mainClassName = "com.github.p4535992.gatebasic.gate.Test_initGate"
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
+
+
 
 /* ================== */
 /* REPOSITORIES       */
@@ -75,7 +81,7 @@ javadoc {
 /*DEPENDENCIES*/
 dependencies {
     compile group: 'javax.servlet', name: 'servlet-api', version:'2.5'
-    compile group: 'junit', name: 'junit', version:'4.12'
+
     compile(group: 'uk.ac.gate', name: 'gate-core', version:'8.2') {
         exclude(module: 'commons-logging')
         exclude(module: '*')
@@ -167,6 +173,9 @@ dependencies {
     /*compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.13'*/
     /* Redirect System.out and System.err to SLF4J (optional) */
     /*compile group: 'uk.org.lidalia', name: 'sysout-over-slf4j', version: '1.0.2'*/
+
+    /*TESTTING DEPENDENCY (optional) */
+    compile group: 'junit', name: 'junit', version:'4.12'
 }
 /* ================== */
 /* TASKS            */

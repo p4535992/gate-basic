@@ -31,7 +31,7 @@ public class Test_initGate {
      * @version 1.6.10
      * @throws MalformedURLException
      */
-    @Test
+    //@Test
     public void setUpGateEmbedded() throws MalformedURLException {
         //Class for process a document with GATE and get a result with only the st String value
         //name Document -> name AnnotationSet -> name Annotation -> string content.
@@ -81,7 +81,7 @@ public class Test_initGate {
         String ss="";
     }*/
 
-    @Test
+    //@Test
     public void setUpGateEmbeddedWithAnnotationSpring() throws IOException, GateException {
         //Class for process a document with GATE and get a result with only the st String value
         //name Document -> name AnnotationSet -> name Annotation -> string content.
@@ -131,7 +131,7 @@ public class Test_initGate {
         String content4 = contents.get(0); // "+39 055 27571"
     }
 
-    @Test
+    //@Test
     public void setUpWithGateAPI() throws MalformedURLException, GateException {
         Gate8Kit gate8Kit = Gate8Kit.getInstance();
         DocumentProcessor procDoc = gate8Kit.setUpGateEmbeddedWithSpring("gate/gate-beans.xml");

@@ -500,6 +500,36 @@ public class GateUtils {
         return editableContent;
     }
 
+    /////////////////////////////////////////////////////////////////////////
+    // NEW METHOD (JUST A FACADE FOR THE gate.Utils CLASS)
+    ////////////////////////////////////////////////////////////////////////
 
+    /**
+     * This Method will get you all the 'nameAnnotation' annotations from the default annotation
+     * set (doc.getAnnotations()) that are within the span of the annotation 'ann'.
+     * For each of those Token annotations you can then extract its part of
+     * speech using .getFeatures().get("category")
+     * @param doc the {@link Document}
+     * @param ann the {@link Annotation}
+     * @param nameAnnotation {@link String}
+     * @return the {@link AnnotationSet}
+     */
+    public static AnnotationSet getAnnotationSetFromDoc(Document doc,Annotation ann,String nameAnnotation){
+        return Utils.getContainedAnnotations(doc.getAnnotations(), ann, nameAnnotation);
+    }
+
+    /**
+     * This Method will get you all the 'nameAnnotation' annotations from the annotation
+     * set 'annSet' that are within the span of the annotation 'ann'.
+     * For each of those Token annotations you can then extract its part of
+     * speech using .getFeatures().get("category")
+     * @param annSet the {@link AnnotationSet}
+     * @param ann the {@link Annotation}
+     * @param nameAnnotation {@link String}
+     * @return the {@link AnnotationSet}
+     */
+    public static AnnotationSet getAnnotationSetFromAnnSet(AnnotationSet annSet,Annotation ann,String nameAnnotation){
+        return Utils.getContainedAnnotations(annSet, ann, nameAnnotation);
+    }
 
 }

@@ -15,6 +15,15 @@ public class GateEmbedded {
 
     public GateEmbedded(){}
 
+    public GateEmbedded(String directoryFolderHome, String directoryFolderPlugin, String configFileGate, String configFileUser, String configFileSession) {
+        this.directoryFolderHome = directoryFolderHome;
+        this.directoryFolderPlugin = directoryFolderPlugin;
+        this.configFileGate = configFileGate;
+        this.configFileUser = configFileUser;
+        this.configFileSession = configFileSession;
+        this.gappFile = "NOT DEFINED";
+    }
+
     public GateEmbedded(String directoryFolderHome, String directoryFolderPlugin, String configFileGate, String configFileUser, String configFileSession, String gappFile) {
         this.directoryFolderHome = directoryFolderHome;
         this.directoryFolderPlugin = directoryFolderPlugin;
@@ -75,12 +84,39 @@ public class GateEmbedded {
     @Override
     public String toString() {
         return "GateEmbedded{" +
-                "directoryFolderHome='" + directoryFolderHome + '\'' +
+                " directoryFolderHome='" + directoryFolderHome + '\'' +
                 ", directoryFolderPlugin='" + directoryFolderPlugin + '\'' +
                 ", configFileGate='" + configFileGate + '\'' +
                 ", configFileUser='" + configFileUser + '\'' +
                 ", configFileSession='" + configFileSession + '\'' +
                 ", gappFile='" + gappFile + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GateEmbedded)) return false;
+
+        GateEmbedded that = (GateEmbedded) o;
+
+        if (!getDirectoryFolderHome().equals(that.getDirectoryFolderHome())) return false;
+        if (!getDirectoryFolderPlugin().equals(that.getDirectoryFolderPlugin())) return false;
+        if (!getConfigFileGate().equals(that.getConfigFileGate())) return false;
+        if (!getConfigFileUser().equals(that.getConfigFileUser())) return false;
+        if (!getConfigFileSession().equals(that.getConfigFileSession())) return false;
+        return getGappFile().equals(that.getGappFile());
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getDirectoryFolderHome().hashCode();
+        result = 31 * result + getDirectoryFolderPlugin().hashCode();
+        result = 31 * result + getConfigFileGate().hashCode();
+        result = 31 * result + getConfigFileUser().hashCode();
+        result = 31 * result + getConfigFileSession().hashCode();
+        result = 31 * result + getGappFile().hashCode();
+        return result;
     }
 }

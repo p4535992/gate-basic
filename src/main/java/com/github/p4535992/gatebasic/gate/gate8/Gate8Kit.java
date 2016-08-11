@@ -1,5 +1,6 @@
 package com.github.p4535992.gatebasic.gate.gate8;
 
+import com.github.p4535992.gatebasic.object.GateEmbedded;
 import com.github.p4535992.gatebasic.util.BeansKit;
 import gate.*;
 import gate.creole.ANNIEConstants;
@@ -51,6 +52,8 @@ public class Gate8Kit {
     private String baseDirectory;
     /** Check if the GATE API is already set for this Thread */
     private boolean gateAlreadySetted = false;
+    /* Gate Embedded Info */
+    private GateEmbedded gateEmbedded;
 
     private static Gate8Kit instance = null;
     protected Gate8Kit(){
@@ -108,14 +111,14 @@ public class Gate8Kit {
 
 
     /**
-     * Method for setup the GATE API in EMbedded mode with manual configuration.
+     * Method for setup the GATE API in Embedded mode with manual configuration.
      * @param directoryFolderHome the {@link String} path to the directory folder where all GATE files are stored.
      * @param directoryFolderPlugin the {@link String} path to the directory folder where all PLUGIN GATE files are stored.
      * @param configFileGate the {@link String} path to the file configuration of gate eg gate.xml.
      * @param configFileUser the {@link String} path to the file configuration of user gate eg user.xml.
      * @param configFileSession the {@link String} path to the file configuration of where write and save the session of GATE eg gate.session
      *                          if null is stoed on the user folder on the system.
-     * @param gappFile sting absolute path to the file gapp.
+     * @param gappFile the {@link String} absolute path to the file gapp.
      * @return the gate {@link CorpusController} full setted.
      */
     public CorpusController setUpGateEmbedded(String directoryFolderHome,String directoryFolderPlugin,
@@ -263,6 +266,7 @@ public class Gate8Kit {
         }
         logger.info("...GATE initialized");
         gateAlreadySetted = true;
+        gateEmbedded = new GateEmbedded(directoryFolderHome,directoryFolderPlugin,configFileGate,configFileUser,configFileSession,null);
         if(showGate) {
             //Work with graphic GATE interface
             MainFrame.getInstance().setVisible(true);
